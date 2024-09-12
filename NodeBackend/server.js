@@ -7,7 +7,6 @@ const path = require('node:path');
 const server = http.createServer((request, response) => { //listens
 
     if (request.url === '/' || request.url === '/index.html') {
-        // Serve the HTML file
         fs.readFile('website.html', (error, data) => {
             if (error) {
                 response.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -20,11 +19,12 @@ const server = http.createServer((request, response) => { //listens
     } else if (request.url === '/website.js') {
         fs.readFile('website.js', (error, data) => {
             if(error){
-                response.writeHead(500, { 'Content-Type': 'text/plain' });
+                response.writeHead(500, { 'Content-Type': 'application/javascript' });
                 response.end("ERROR");
             }
             else{
-                response.writeHead(200)
+                response.writeHead(200);
+                response.end(data);
             }
         });
     }
