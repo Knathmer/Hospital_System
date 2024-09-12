@@ -2,24 +2,36 @@
 
 const http = require('node:http');
 const fs = require('node:fs');
-
-
-
-
+const path = require('node:path');
 
 const server = http.createServer((request, response) => { //listens
 
-    fs.readFile('website.html', (error, data) => {
-        if(error) {
-            response.writeHead(500, { 'Content-Type': 'text/plain'});
-            response.end("ERROR READING");
-        }
-        else {
-            response.writeHead(200, { 'Content-Type': 'text/html'});
-            response.end(data);
-        }
-
-    });
+    if (request.url === '/' || request.url === '/index.html') {
+        // Serve the HTML file
+        fs.readFile('website.html', (error, data) => {
+            if (error) {
+                response.writeHead(500, { 'Content-Type': 'text/plain' });
+                response.end("ERROR READING HTML FILE");
+            } else {
+                response.writeHead(200, { 'Content-Type': 'text/html' });
+                response.end(data);
+            }
+        });
+    } else if (request.url === '/website.js') {
+        fs.readFile('website.js', (error, data) => {
+            if(error){
+                response.writeHead(500, { 'Content-Type': 'text/plain' });
+                response.end("ERROR");
+            }
+            else{
+                response.writeHead(200)
+            }
+        });
+    }
+    else{
+        response.writeHead(404, {'Content-Type': 'text/plain'});
+        response.end('404 Not Found');
+    }
 });
 
 server.listen(3000, () => {
