@@ -1,6 +1,6 @@
 
 // Use <npm run dev> in the console to run the server in dev mode which allows the front end to constantly be updated as there are changes made to the back end (this is done with nodemon)
-// const fruitRouter = require("./routers/edibles.js");
+const fruitRouter = require("./routers/edibles.js");
 const express = require("express");
 const app = express();
 
@@ -12,11 +12,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.get("/fruits", (req, res) => {
-    res.json({fruits: ["apple", "orange", "banana"] });
-});
-// app.use("/fruits", fruitRouter);
 
+app.use("/edibles", fruitRouter);
 
 app.listen(3000, () => {
     console.log("Server started on port 3000");  
