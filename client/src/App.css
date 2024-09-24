@@ -1,42 +1,101 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Global styles */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #ecdcae; /* Light beige background */
+}
+
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+/* If we want header seperation from the rest of the page, then use this */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #f7e6d0;
+  border-bottom: 1px solid #000000;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  display: flex;
+  align-items: center;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.logo h1 {
+  font-size: 1.5rem;
+  margin-left: 10px;
+  color: #524a3d;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.navigation {
+  display: flex;
+  gap: 1.5rem;
 }
 
-.card {
-  padding: 2em;
+.nav-link {
+  text-decoration: none;
+  color: #524a3d;
+  font-size: 1rem;
 }
 
-.read-the-docs {
-  color: #888;
+.login-btn {
+  background-color: #d16a45;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.main-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  flex-grow: 1;
+  background-color: #f7e6d0;
+}
+
+.content h1 {
+  font-size: 2.5rem;
+  color: #524a3d;
+}
+
+.content h2 {
+  font-size: 1.5rem;
+  color: #524a3d;
+}
+
+.content p {
+  font-size: 1.2rem;
+  color: #524a3d;
+  margin-top: 1rem;
+  max-width: 500px;
+}
+
+.book-btn {
+  background-color: #6a8245;
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 5px;
+  margin-top: 1.5rem;
+  font-size: 1rem;
+}
+
+.image img {
+  max-width: 100%;
+  height: auto;
+}
+
+.footer {
+  background-color: #6a8245;
+  color: white;
+  text-align: center;
+  padding: 1rem;
 }
