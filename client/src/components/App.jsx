@@ -8,7 +8,7 @@ import AppointmentsPage from './frontpage/AppointmentsPage';
 import DoctorsPage from './frontpage/DoctorsPage.jsx';
 import LoginPage from './frontpage/LoginPage.jsx';
 import BookPage from './frontpage/BookPage.jsx';
-
+import '../Styles.css'; // This imports tailwind css file.
 
 
 function App(){
