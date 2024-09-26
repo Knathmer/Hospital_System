@@ -7,12 +7,12 @@ const HospitalLandingPage = () => {
     <div className="min-h-screen bg-[#f5efe7] flex flex-col">
       <header className="p-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <img src="/path/to/your/logo.png" alt="UMA Cares logo" className="w-10 h-10" />
+          <img src="../src/assets/doctor.svg" alt="UMA Cares logo" className="w-10 h-10" />
           <h1 className="text-2xl font-semibold text-[#4a5d23]">UMA Cares</h1>
         </div>
         <nav className="hidden md:flex space-x-6">
           <Link to="/" className="text-[#8b4513] hover:text-[#4a5d23]">Home</Link>
-          <Link to="/about" className="text-[#8b4513] hover:text-[#4a5d23]">About</Link>
+          <Link to="/about" className="text-[#8b4513] hover:text-[#f1f3ec]">About</Link>
           <Link to="/appointments" className="text-[#8b4513] hover:text-[#4a5d23]">Appointments</Link>
           <Link to="/doctors" className="text-[#8b4513] hover:text-[#4a5d23]">Doctors</Link>
         </nav>
