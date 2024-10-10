@@ -1,5 +1,5 @@
-const mysql = require('mysql2');
-const fs = require('fs');
+import mysql from 'mysql2';
+import fs from 'fs';
 
 const config = JSON.parse(fs.readFileSync('./config.json'));
 
