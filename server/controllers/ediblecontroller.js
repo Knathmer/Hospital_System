@@ -8,4 +8,4 @@ ediblecontroller.fruitRequest = (req, res, next) => {
 }
 
 
-module.exports = ediblecontroller;
+export default ediblecontroller;
