@@ -11,15 +11,13 @@ const pool = mysql.createPool({
     connectionLimit: 10
 });
 
-module.exports = {
-    query: (sql, params) => {
-        return new Promise((resolve, reject) =>{
-            pool.execute(sql, params, (err, results) => {
-                if(err){
-                    return reject(err);
-                }
-                resolve(results);
-            });
+export const query = (sql, params) => {
+    return new Promise((resolve, reject) =>{
+        pool.execute(sql, params, (err, results) => {
+            if(err){
+                return reject(err);
+            }
+            resolve(results);
         });
-    }
+    });
 };
