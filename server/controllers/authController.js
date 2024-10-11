@@ -1,6 +1,4 @@
-// controllers/authController.js
-const db = require('../database'); // Import database functions
-// const bcrypt = require('bcrypt'); // For password hashing (if passwords are hashed)
+import { query } from '../database.js';  // Import the query function
 
 async function getAddressID(addrStreet, addrZip, addrCity, addrState){
     try{
@@ -32,8 +30,7 @@ async function getAddressID(addrStreet, addrZip, addrCity, addrState){
     }
 
 
-}
-
+};
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
@@ -41,7 +38,7 @@ exports.login = async (req, res) => {
     try {
         // Query the database to find the user by email
         const sql = 'SELECT * FROM patient WHERE email = ?';
-        const users = await db.query(sql, [email]);
+        const users = await query(sql, [email]);
 
         if (users.length === 0) {
             // User not found
@@ -60,7 +57,6 @@ exports.login = async (req, res) => {
         }
 
         // Authentication successful
-        // Generate a session or token here (e.g., JWT)
         return res.status(200).json({ message: 'Login successful', user: { id: user.id, email: user.email } });
 
     } catch (error) {

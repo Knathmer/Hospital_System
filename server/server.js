@@ -1,8 +1,9 @@
-const fruitRouter = require("./routers/edibles.js");
-const authRouter = require('./routers/auth.js');
-const express = require("express");
-const bodyParser = require('body-parser');
+import fruitRouter from "./routers/edibles.js";
+import authRouter from "./routers/auth.js";
+import express from "express";
+import bodyParser from "body-parser";
 const app = express();
+
 
 
 //Connection restrictions

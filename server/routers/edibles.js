@@ -1,5 +1,5 @@
-const express = require("express");
-const ediblecontroller = require('../controllers/ediblecontroller.js')
+import express from "express";
+import ediblecontroller from "../controllers/ediblecontroller.js";
 
 const router = express.Router();
 
@@ -10,4 +10,4 @@ router.get("/fruits", ediblecontroller.fruitRequest ,(req, res) => {
     return res.json(res.locals.fruit);
 });
 
-module.exports = router;
+export default router;
