@@ -8,7 +8,10 @@ const pool = mysql.createPool({
     user: config.db.user,
     password: config.db.password,
     database: config.db.database,
-    connectionLimit: 10
+    connectionLimit: 10,
+    ssl: {
+        rejectUnauthorized: true,  // You can set this to `false` to allow self-signed certs
+      },
 });
 
 module.exports = {
