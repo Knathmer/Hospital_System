@@ -4,6 +4,7 @@ import axios from "axios";
 
 // Public routes
 import HospitalLandingPage from './frontpage/HospitalLandingPage.jsx';
+//import HospitalLandingPage2 from './frontpage/HospitalLandingPage2.jsx';
 import AboutPage from './frontpage/AboutPage.jsx';
 import AppointmentsPage from './frontpage/AppointmentsPage';
 import DoctorsPage from './frontpage/DoctorsPage.jsx';
@@ -14,6 +15,7 @@ import BookPage from './frontpage/BookPage.jsx';
 import UserDashboard from './dashboards/UserDashboard.jsx';
 
 import '../Styles.css'; // This imports tailwind css file.
+import RegistrationPage from './frontpage/RegistrationPage.jsx';
 
 function App() {
   const isAuthenticated = () => {
@@ -44,6 +46,7 @@ function App() {
       <Route path="/doctors" element={<DoctorsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/book" element={<BookPage />} />
+      <Route path="/register" element={<RegistrationPage />} />
 
       {/* Protected route for user dashboard */}
       <Route path="/dashboard/*" element={

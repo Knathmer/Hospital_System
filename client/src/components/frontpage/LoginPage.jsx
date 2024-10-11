@@ -60,7 +60,7 @@ const LoginPage = () => {
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)} // e is the form object, and this just calls the setEmail function from useState
                 required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-[#cd7f32] rounded-md text-[#5c4033] focus:outline-none focus:ring-2 focus:ring-[#4a5d23]"
               />
