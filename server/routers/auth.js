@@ -1,8 +1,9 @@
 import express from 'express';
-import authController from "../controllers/authController.js"; // .js needs to be added for ES modules
+import { login, register } from "../controllers/authController.js"; // Named imports
+
 const router = express.Router();
 
-router.post('/login', authController.login);
-router.post('/register', authController.register);
+router.post('/login', login);
+router.post('/register', register);
 
-export default router; //standard form for ES module exports
+export default router;
