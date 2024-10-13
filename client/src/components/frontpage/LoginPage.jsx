@@ -18,13 +18,13 @@ const LoginPage = () => {
 
     try{
       const response = await axios.post('http://localhost:3000/auth/login', { //Here we are sending a response to the back end and getting back an object that has the token
-        email,
+        email, //These are being passed to the back-end
         password,
       });
 
-      if (response.data.token) {
+      if (response.data.token) { //If a response token exists
         // Store the JWT token in the browser
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('JWT Token', response.data.token);
 
         //Based on user role, redirect to the correct dashboard
         if(response.data.user.role === 'admin') {

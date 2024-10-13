@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from './components/protectedroute.jsx';
+import ProtectedRoute from './components/protectedroute.jsx'; //Higher-order component or 'guard'. It's basically middleware.
 import Forbidden from './components/forbidden.jsx';
 import axios from "axios";
 
@@ -33,10 +33,9 @@ function App() {
       <Route path="/book" element={<BookPage />} />
       <Route path="/register" element={<RegistrationPage />} />
 
-      {/* Role-based protected routes */}
       <Route path="/admin/*" element={
-        <ProtectedRoute allowedRoles={['admin']}>
-          <AdminRoutes />
+        <ProtectedRoute allowedRoles={['admin']}> {/* The 'allowedRoles var doesn't have to match 1-1 with the var name defined in the higher order component. ProtectedRoutes is what actually protects the route . */}
+           <AdminRoutes /> {/* This is the actual routing. AKA the child. CHILDREN ARE AUTOMATICALLY PASSED AS ARGUMENTS */}
         </ProtectedRoute>
       } />
 
@@ -48,7 +47,7 @@ function App() {
 
       <Route path="/patient/*" element={
         <ProtectedRoute allowedRoles={['patient']}>
-          <PatientRoutes />
+          <PatientRoutes /> 
         </ProtectedRoute>
       } />
 

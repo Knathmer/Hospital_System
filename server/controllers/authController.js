@@ -36,7 +36,7 @@ async function getAddressID(addrStreet, addrZip, addrCity, addrState){
 
 //Function to handle login request and JWT generation
 export async function login(req, res) {
-    const { email, password } = req.body;
+    const { email, password } = req.body; //Destructures the request into email and password (this matches what we gave it in the front-end)
 
     try {
         // Query the database to find the user by email in all tables (admin, patient, doctor)
@@ -44,10 +44,10 @@ export async function login(req, res) {
         const checkPatientSQL = 'SELECT * FROM patient WHERE email = ?';
         const checkDoctorSQL = 'SELECT * FROM doctor WHERE workEmail = ?';
 
-        let user = await query(checkAdminSQL, [email]);
+        let user = await query(checkAdminSQL, [email]); // 'let' allows variable to change within the same block where it was defined
         let role = 'admin';
 
-        if (user.length === 0) {
+        if (user.length === 0) { 
             user = await query(checkPatientSQL, [email]);
             role = 'patient';
         }
@@ -57,7 +57,7 @@ export async function login(req, res) {
             role = 'doctor';
         }
 
-        if (user.length === 0) {
+        if (user.length === 0) { //If we have cycled through all and have matched, then we say there is an invalid log in
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
@@ -106,7 +106,9 @@ export async function register(req, res) {
 
         const insertPatientSQL = `
             INSERT INTO patient 
-            (firstName, lastName, dateOfBirth, gender, height, weight, phoneNumber, email, password, lastLogin, emergencyPhoneNumber, emergencyEmail, createdBy, createdAt, updatedBy, updatedAt, addressID)
+            (firstName, lastName, dateOfBirth, gender, height, weight,
+            phoneNumber, email, password, lastLogin, emergencyPhoneNumber,
+             emergencyEmail, createdBy, createdAt, updatedBy, updatedAt, addressID)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
 
