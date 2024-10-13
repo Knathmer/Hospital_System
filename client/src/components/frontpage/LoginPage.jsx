@@ -13,25 +13,37 @@ const LoginPage = () => {
 
 
   const handleSubmit = async (e) => { //e is the form submission object
-    e.preventDefault(); //prevents the default form submission function from calling
+    e.preventDefault();
+    setError('');
 
-    try { //now we handle it ourselves
-      const response = await axios.post('http://localhost:3000/auth/login', {
+    try{
+      const response = await axios.post('http://localhost:3000/auth/login', { //Here we are sending a response to the back end and getting back an object that has the token
         email,
         password,
-      }, {
-        withCredentials: true,
       });
 
-      if (response.status === 200) {
-        console.log('Login successful:', response.data);
-        navigate('/dashboard');
+      if (response.data.token) {
+        // Store the JWT token in the browser
+        localStorage.setItem('token', response.data.token);
+
+        //Based on user role, redirect to the correct dashboard
+        if(response.data.user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (response.data.user.role === 'doctor') {
+          navigate('/doctor/dashboard');
+        } else if (response.data.user.role === 'patient') {
+          navigate('/patient/dashboard');
+        }
+      } else {
+        setError('Login failed. Please try again.');
       }
-    } catch (error) {
-      //console.error('Login error:', error); // This is useful for debugging
+    } catch(error){
+      console.error('Login error:', error);
       setError('Invalid email or password');
     }
+
   };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f5efe7]">

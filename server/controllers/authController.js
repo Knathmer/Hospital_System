@@ -1,4 +1,10 @@
 import { query } from '../database.js';  // Import the query function
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
+import bcrypt from "bcrypt";
+
+const JWT_SECRET = process.env.JWT_SECRET; //Pulls the ENV secret key from .env
 
 async function getAddressID(addrStreet, addrZip, addrCity, addrState){
     try{
@@ -28,33 +34,56 @@ async function getAddressID(addrStreet, addrZip, addrCity, addrState){
     }
 }
 
+//Function to handle login request and JWT generation
 export async function login(req, res) {
     const { email, password } = req.body;
 
     try {
-        // Query the database to find the user by email
-        const sql = 'SELECT * FROM patient WHERE email = ?';
-        const users = await query(sql, [email]);
+        // Query the database to find the user by email in all tables (admin, patient, doctor)
+        const checkAdminSQL = 'SELECT * FROM admin WHERE workEmail = ?';
+        const checkPatientSQL = 'SELECT * FROM patient WHERE email = ?';
+        const checkDoctorSQL = 'SELECT * FROM doctor WHERE workEmail = ?';
 
-        if (users.length === 0) {
+        let user = await query(checkAdminSQL, [email]);
+        let role = 'admin';
+
+        if (user.length === 0) {
+            user = await query(checkPatientSQL, [email]);
+            role = 'patient';
+        }
+
+        if (user.length === 0) {
+            user = await query(checkDoctorSQL, [email]);
+            role = 'doctor';
+        }
+
+        if (user.length === 0) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const user = users[0];
+        user = user[0];
 
-        // For now, just compare the plain text password
-        if (password !== user.password) {
-            return res.status(401).json({ message: 'Invalid email or password' });
-        }
+        // Generate a JWT token with the user's ID and role
+        const token = jwt.sign(
+            { id: user.id, role: role },  // Payload (user id and role)
+            JWT_SECRET,                   // Secret
+            { expiresIn: '1h' }           // Token expiration
+        );
 
-        return res.status(200).json({ message: 'Login successful', user: { id: user.id, email: user.email } });
+        // Return the token and user information
+        return res.status(200).json({
+            message: 'Login successful',
+            token,                        // JWT Token
+            user: { id: user.id, email: user.email, role }  // User info
+        });
 
     } catch (error) {
         console.error('Login error:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
-}
+};
 
+//Function to handle user registration
 export async function register(req, res) {
     const { confirmPassword, ...userData } = req.body;
 
