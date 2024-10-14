@@ -12,22 +12,23 @@ const LoginPage = () => {
 
 
 
-  const handleSubmit = async (e) => { //e is the form submission object
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    try{
-      const response = await axios.post('http://localhost:3000/auth/login', { //Here we are sending a response to the back end and getting back an object that has the token
-        email, //These are being passed to the back-end
+  
+    try {
+      const response = await axios.post('http://localhost:3000/auth/login', {
+        email,
         password,
       });
-
-      if (response.data.token) { //If a response token exists
-        // Store the JWT token in the browser
-        localStorage.setItem('JWT Token', response.data.token);
-
-        //Based on user role, redirect to the correct dashboard
-        if(response.data.user.role === 'admin') {
+  
+      if (response.data.token) {
+        // Store the JWT token and user role in the browser
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRole', response.data.user.role); // Save the user role
+  
+        // Redirect based on user role
+        if (response.data.user.role === 'admin') {
           navigate('/admin/dashboard');
         } else if (response.data.user.role === 'doctor') {
           navigate('/doctor/dashboard');
@@ -37,11 +38,10 @@ const LoginPage = () => {
       } else {
         setError('Login failed. Please try again.');
       }
-    } catch(error){
+    } catch (error) {
       console.error('Login error:', error);
       setError('Invalid email or password');
     }
-
   };
 
 

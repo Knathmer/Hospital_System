@@ -1,23 +1,21 @@
 import express from "express";
-import cors from "cors"; // Use import instead of require
+import cors from "cors";
 import bodyParser from "body-parser";
 import fruitRouter from "./routers/edibles.js";
 import authRouter from "./routers/auth.js";
 
 const app = express();
 
-// Connection restrictions
-const corsOptions = { 
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific HTTP methods
-    credentials: true, // Allow sending cookies and authentication tokens (if needed)
-    allowedHeaders: ["Content-Type", "Authorization"],
+// CORS options configuration
+const corsOptions = {
+    origin: 'http://localhost:5173',  // Allow your frontend's origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allowed HTTP methods
+    credentials: true,  // Allow credentials such as cookies or headers
+    allowedHeaders: ['Content-Type', 'Authorization'],  // Allow specific headers
 };
 
-app.use(cors(corsOptions)); // Using CORS middleware with the defined options
-
-// Middleware
-app.use(bodyParser.json());
+app.use(cors(corsOptions));  // Enable CORS with options
+app.use(bodyParser.json());  // Parse JSON requests
 
 // Routes
 app.use("/edibles", fruitRouter);
