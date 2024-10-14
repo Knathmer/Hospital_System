@@ -1,106 +1,128 @@
 import { query } from '../database.js';  // Import the query function
+import pool from '../database.js'; // You can also import the pool if needed for transactions
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
+import bcrypt from "bcrypt";
 
-async function getAddressID(addrStreet, addrZip, addrCity, addrState){
-    try{
+const JWT_SECRET = process.env.JWT_SECRET; //Pulls the ENV secret key from .env
+
+// Helper function for getting or inserting an address
+async function getAddressID(addrStreet, addrZip, addrCity, addrState) {
+    try {
         const checkAddressSQL = `
             SELECT addressID
             FROM address
-            WHERE addrStreet = ? AND addrZip = ? AND addrCity = ? AND addrState =?;
+            WHERE addrStreet = ? AND addrZip = ? AND addrCity = ? AND addrState = ?;
         `;
-        const addresses = await db.query(checkAddressSQL, [addrStreet, addrZip, addrCity, addrState]);
+        const addresses = await query(checkAddressSQL, [addrStreet, addrZip, addrCity, addrState]);
 
-        if (addresses.length > 0){
+        if (addresses.length > 0) {
             return addresses[0].addressID;
-        }
-        else{
-            //Handle address insertion here
+        } else {
+            // Handle address insertion here
             const insertAddressSQL = `
-            INSERT INTO address (addrStreet, addrZip, addrCity, addrState)
-            VALUES (?,?,?,?);
-        `;
-        const insertResult = await db.query(insertAddressSQL, [addrStreet, addrZip, addrCity, addrState]); //Insert using above query
-
-        return insertResult.insertId; //MySQL returns the auto-increment ID this way.
-
+                INSERT INTO address (addrStreet, addrZip, addrCity, addrState)
+                VALUES (?, ?, ?, ?);
+            `;
+            const insertResult = await query(insertAddressSQL, [addrStreet, addrZip, addrCity, addrState]);
+            return insertResult.insertId; // MySQL returns the auto-increment ID this way.
         }
-    }
-    catch(error){ //In case we get an error doing this
-        console.error('Error checking and or inserting address.', error);
+    } catch (error) {
+        console.error('Error checking or inserting address:', error);
         throw new Error('Database error');
     }
+}
 
-
-};
-
-exports.login = async (req, res) => {
-    const { email, password } = req.body;
+// Function to handle login request and JWT generation
+export async function login(req, res) {
+    const { email, password } = req.body;  // Destructures the request into email and password
 
     try {
-        // Query the database to find the user by email
-        const sql = 'SELECT * FROM patient WHERE email = ?';
-        const users = await query(sql, [email]);
+        // Query the database to find the user by email in all tables (admin, patient, doctor)
+        const checkAdminSQL = 'SELECT * FROM admin WHERE workEmail = ?';
+        const checkPatientSQL = 'SELECT * FROM patient WHERE email = ?';
+        const checkDoctorSQL = 'SELECT * FROM doctor WHERE workEmail = ?';
 
-        if (users.length === 0) {
-            // User not found
+        let user = await query(checkAdminSQL, [email]); 
+        let role = 'admin';
+
+        if (user.length === 0) { 
+            user = await query(checkPatientSQL, [email]);
+            role = 'patient';
+        }
+
+        if (user.length === 0) {
+            user = await query(checkDoctorSQL, [email]);
+            role = 'doctor';
+        }
+
+        if (user.length === 0) { // If no user is found, return an error
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const user = users[0];
+        user = user[0]; // Get the first user result
 
-        // If passwords were hashed, compare the password using bcrypt (currently disabled)
-        // const match = await bcrypt.compare(password, user.password);
-
-        // For now, just compare the plain text password
+        // Check if the password matches the one in the database
         if (password !== user.password) {
-            // Password does not match
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Authentication successful
-        return res.status(200).json({ message: 'Login successful', user: { id: user.id, email: user.email } });
+        // Generate a JWT token with the user's ID and role
+        const token = jwt.sign(
+            { id: user.id, role: role },  // Payload (user id and role)
+            JWT_SECRET,                   // Secret
+            { expiresIn: '1h' }           // Token expiration
+        );
+
+        // Return the token and user information
+        return res.status(200).json({
+            message: 'Login successful',
+            token,                        // JWT Token
+            user: { id: user.id, email: user.email, role }  // User info
+        });
 
     } catch (error) {
         console.error('Login error:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
-};
+}
 
-
-exports.register = async (req, res) => {
+// Function to handle user registration
+export async function register(req, res) {
     const { confirmPassword, ...userData } = req.body;
+    let connection;
 
     try {
-        // Check if the user already exists by email
+        connection = await pool.getConnection(); // Get a connection from the pool
+        await connection.beginTransaction(); // Begin transaction
+
+        // Check if the email already exists
         const checkEmailSQL = 'SELECT * FROM patient WHERE email = ?';
-        const existingUsers = await db.query(checkEmailSQL, [userData.email]);
+        const [existingUsers] = await connection.query(checkEmailSQL, [userData.email]);
 
         if (existingUsers.length > 0) {
+            console.error('Email already exists');
+            await connection.rollback();
             return res.status(400).json({ message: 'Email already exists!' });
         }
-        
-        // Check if the phone number already exists
-        const checkPhoneSQL = 'SELECT * FROM patient WHERE phoneNumber = ?';
-        const existingPhoneUsers = await db.query(checkPhoneSQL, [userData.phoneNumber]);
 
-        if (existingPhoneUsers.length > 0) {
-            return res.status(400).json({ message: 'Phone number already exists!' });
-        }
-
-
-        // First check if the address already exists, if it does, use that address.
+        // Insert or get the address ID
+        console.log('Inserting or retrieving address ID');
         const addressID = await getAddressID(userData.addrStreet, userData.addrZip, userData.addrCity, userData.addrState);
 
-        // Hash password if necessary (uncomment if using bcrypt)
-        // const hashedPassword = await bcrypt.hash(userData.password, 10);
+        console.log('Address ID obtained:', addressID);
 
-        // Insert the new user into the database with the obtained addressID
+        // Insert the patient
         const insertPatientSQL = `
             INSERT INTO patient 
-            (firstName, lastName, dateOfBirth, gender, height, weight, phoneNumber, email, password, lastLogin, emergencyPhoneNumber, emergencyEmail, createdBy, createdAt, updatedBy, updatedAt, addressID)
+            (firstName, lastName, dateOfBirth, gender, height, weight, phoneNumber, email, password, lastLogin, emergencyPhoneNumber,
+             emergencyEmail, createdBy, createdAt, updatedBy, updatedAt, addressID)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
 
-        await db.query(insertPatientSQL, [
+        console.log('Inserting patient information');
+        const insertResult = await connection.query(insertPatientSQL, [
             userData.firstName,
             userData.lastName,
             userData.dateOfBirth,
@@ -114,16 +136,27 @@ exports.register = async (req, res) => {
             userData.emergencyPhoneNumber,
             userData.emergencyEmail,
             'user', 
-            new Date(), //Needs to be set
+            new Date(), // createdAt
             'user',
-            new Date(), //Needs to be set
+            new Date(), // updatedAt
             addressID 
         ]);
 
+        console.log('Patient insert result:', insertResult);
+
+        await connection.commit(); // Commit transaction
+        console.log('Transaction committed');
         return res.status(200).json({ message: 'Registration Successful!' });
 
     } catch (error) {
-        console.error('Registration Error:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        if (connection) {
+            await connection.rollback(); // Rollback on error
+        }
+        console.error('Registration Error:', error.message || error);
+        return res.status(500).json({ message: 'Internal Server Error', error: error.message || error });
+    } finally {
+        if (connection) {
+            connection.release(); // Release the connection back to the pool if it was successfully acquired
+        }
     }
-};
+}

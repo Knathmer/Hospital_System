@@ -40,29 +40,33 @@ const RegistrationPage = () => {
   [name]: value - This does essentially a dictionary search and changes the associated value of the key 'name'
   */
 
-  const handleSubmit = async (e) => { //This handles the whole form submission
-    e.preventDefault(); //Prevents the default form submission func from calling
-    setError(''); //Clears the error object
-
-    if (formData.password !== formData.confirmPassword) { //Handles the case where the confirm password does not match the written password
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+  
+    if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-
+  
     try {
-      const response = await axios.post('http://localhost:3000/auth/register', formData);
-
-      if (response.data && response.data.token) { //Explain this section up to the else statement
-        if(response.status = 200){
-            console.log("Registration Succesful!");
-            navigate('/login')
-        }
+      const response = await axios.post('http://localhost:3000/auth/register', formData, {
+        withCredentials: true,
+      });
+  
+      if (response.status === 200 && response.data) {
+        console.log("Registration Successful!");
+        navigate('/login');
       } else {
         setError('Registration failed. Please try again.');
       }
     } catch (error) {
-      setError('An error occurred. Please try again.');
-      console.error('Registration error:', error); //Remove later, for debugging purposes
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError('An error occurred. Please try again.');
+      }
+      console.error('Registration error:', error);
     }
   };
 

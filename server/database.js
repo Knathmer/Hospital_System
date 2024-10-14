@@ -1,8 +1,10 @@
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 import fs from 'fs';
 
+// Load configuration from config.json
 const config = JSON.parse(fs.readFileSync('./config.json'));
 
+// Create a connection pool with SSL settings if needed
 const pool = mysql.createPool({
     host: config.db.host,
     user: config.db.user,
@@ -11,16 +13,18 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     ssl: {
         rejectUnauthorized: true,  // You can set this to `false` to allow self-signed certs
-      },
+    },
 });
 
-export const query = (sql, params) => {
-    return new Promise((resolve, reject) =>{
-        pool.execute(sql, params, (err, results) => {
-            if(err){
-                return reject(err);
-            }
-            resolve(results);
-        });
-    });
+// Directly use the promise-based pool.execute
+export const query = async (sql, params) => {
+    try {
+        const [results] = await pool.execute(sql, params);
+        return results;
+    } catch (err) {
+        throw err;  // Forward the error for handling elsewhere
+    }
 };
+
+// Optionally export the pool if you need to manage connections manually
+export default pool;
