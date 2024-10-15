@@ -40,7 +40,7 @@ export default function WomensHealthLandingPage() {
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
                   Empowering Women's Health
                 </h1>
-                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400 py-6">
                   Comprehensive care for every stage of a woman's life. Expert guidance, compassionate support, and
                   cutting-edge treatments.
                 </p>
