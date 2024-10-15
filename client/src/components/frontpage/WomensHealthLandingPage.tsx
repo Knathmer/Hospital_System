@@ -1,33 +1,36 @@
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-import { Heart, Users, Calendar, Phone } from "lucide-react"
-// import Link from "next/link"
-
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Heart, Users, Calendar, Phone } from "lucide-react"
+import Button from "../ui/button";
+import Input from "../ui/input";
 
 export default function WomensHealthLandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-16 flex items-center">
         <Link className="flex items-center justify-center" to="#">
-          <Heart className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">WomenWell</span>
+          <Heart className="h-6 w-6 text-pink-500 hover:fill-pink-500" />
+          <span className="ml-2 text-2xl font-bold text-gray-900 hover:text-pink-500">WomenWell</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
+          <Link className="text-sm font-medium hover:underline underline-offset-8 decoration-pink-500" to="#">
             Services
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
+          <Link className="text-sm font-medium hover:underline underline-offset-8 decoration-pink-500" to="/about">
             About Us
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
+          <Link className="text-sm font-medium hover:underline underline-offset-8 decoration-pink-500" to="#">
             Resources
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
+          <Link className="text-sm font-medium hover:underline underline-offset-8 decoration-pink-500" to="#">
             Contact
           </Link>
         </nav>
+        <div className="px-6">
+          <Button className= "text-sm" to= "/login">
+            Log in
+          </Button>
+        </div>
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-pink-50">
@@ -43,8 +46,8 @@ export default function WomensHealthLandingPage() {
                 </p>
               </div>
               <div className="space-x-4">
-                {/* <Button className="bg-pink-500 text-white hover:bg-pink-600">Book Appointment</Button>
-                <Button variant="outline">Learn More</Button> */}
+                <Button to="book" >Book Appointment</Button>
+                <Button variant="outline">Learn More</Button>
               </div>
             </div>
           </div>
@@ -85,10 +88,10 @@ export default function WomensHealthLandingPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row lg:justify-end">
-                {/* <Button className="bg-pink-500 text-white hover:bg-pink-600">
+                <Button >
                   Schedule a Consultation
                 </Button>
-                <Button variant="outline">View Our Services</Button> */}
+                <Button variant="outline">View Our Services</Button>
               </div>
             </div>
           </div>
@@ -107,14 +110,14 @@ export default function WomensHealthLandingPage() {
               </div>
               <div className="w-full max-w-sm space-y-2">
                 <form className="flex space-x-2">
-                  {/* <Input
+                  <Input
                     className="max-w-lg flex-1"
                     placeholder="Enter your email"
                     type="email"
-                  /> */}
-                  {/* <Button className="bg-pink-500 text-white hover:bg-pink-600" type="submit">
+                  />
+                  <Button >
                     Subscribe
-                  </Button> */}
+                  </Button>
                 </form>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   By subscribing, you agree to our Terms & Conditions and Privacy Policy.
