@@ -18,14 +18,15 @@ import AdminRoutes from './routers/AdminRoutes.jsx';
 import DoctorRoutes from './routers/DoctorRoutes.jsx';
 import PatientRoutes from './routers/PatientRoutes.jsx';
 
-import './Styles.css'; // This imports tailwind css file.
+import './styles.css'; // This imports tailwind css file.
+import WomensHealthLandingPage from './components/frontpage/WomensHealthLandingPage.tsx';
 
 function App() {
 
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={<HospitalLandingPage />} />
+      <Route path="/" element={<WomensHealthLandingPage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/appointments" element={<AppointmentsPage />} />
       <Route path="/doctors" element={<DoctorsPage />} />
