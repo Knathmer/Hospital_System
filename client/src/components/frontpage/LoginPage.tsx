@@ -3,13 +3,11 @@ import React from "react";
 import { Button } from "@/components/ui/button"
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Heart } from "lucide-react";
 import {useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 export default function LoginPage() {
-  const [userType, setUserType] = useState('patient');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -65,20 +63,8 @@ export default function LoginPage() {
           {/* Error message */}
           {error && <p className="text-red-500 text-center">{error}</p>}
 
-          <RadioGroup 
-            defaultValue="patient" 
-            className="flex justify-center space-x-4"
-            onValueChange={(value) => setUserType(value)}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="patient" id="patient" />
-              <Label htmlFor="patient">Patient</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="doctor" id="doctor" />
-              <Label htmlFor="doctor">Doctor</Label>
-            </div>
-          </RadioGroup>
+    
+        
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>
@@ -120,19 +106,19 @@ export default function LoginPage() {
                 </Label>
               </div>
               <div className="text-sm">
-                <Link to="#" className="font-medium text-pink-600 hover:text-pink-500">
+                <Link to="/forgot-password" className="font-medium text-pink-600 hover:text-pink-500">
                   Forgot your password?
                 </Link>
               </div>
             </div>
             <Button type="submit" className="w-full bg-pink-600 hover:bg-pink-700 text-white">
-              Sign in as {userType === 'patient' ? 'Patient' : 'Doctor'}
+              Sign in
             </Button>
           </form>
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link to="#" className="font-medium text-pink-600 hover:text-pink-500">
+              <Link to="/register" className="font-medium text-pink-600 hover:text-pink-500">
                 Sign up
               </Link>
             </p>

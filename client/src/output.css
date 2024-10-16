@@ -1360,10 +1360,6 @@ body {
   background-color: hsl(var(--secondary) / 0.8);
 }
 
-.hover\:fill-pink-500:hover {
-  fill: #ec4899;
-}
-
 .hover\:text-\[\#4a5d23\]:hover {
   --tw-text-opacity: 1;
   color: rgb(74 93 35 / var(--tw-text-opacity));
