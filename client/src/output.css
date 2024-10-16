@@ -1215,8 +1215,16 @@ body {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.decoration-pink-500 {
+  text-decoration-color: #ec4899;
+}
+
 .underline-offset-4 {
   text-underline-offset: 4px;
+}
+
+.underline-offset-8 {
+  text-underline-offset: 8px;
 }
 
 .shadow {
@@ -1350,6 +1358,10 @@ body {
 
 .hover\:bg-secondary\/80:hover {
   background-color: hsl(var(--secondary) / 0.8);
+}
+
+.hover\:fill-pink-500:hover {
+  fill: #ec4899;
 }
 
 .hover\:text-\[\#4a5d23\]:hover {

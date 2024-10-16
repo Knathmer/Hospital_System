@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Heart, Users, Calendar, Phone } from "lucide-react"
-import React = require("react");
+import React from "react";
 import {useNavigate, Link } from 'react-router-dom';
 
-export default function WomensHealthLanding() {
+export default function WomensHealthLandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-16 flex items-center">
@@ -16,7 +16,7 @@ export default function WomensHealthLanding() {
           <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
             Services
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
+          <Link className="text-sm font-medium hover:underline underline-offset-4" to="/about">
             About Us
           </Link>
           <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
@@ -24,6 +24,9 @@ export default function WomensHealthLanding() {
           </Link>
           <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
             Contact
+          </Link>
+          <Link className="text-sm font-medium hover:underline underline-offset-8 decoration-pink-500" to="/login">
+            Login
           </Link>
         </nav>
       </header>
