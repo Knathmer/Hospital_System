@@ -9,7 +9,7 @@ import HospitalLandingPage from './components/frontpage/HospitalLandingPage.jsx'
 import AboutPage from './components/frontpage/AboutPage.jsx';
 import AppointmentsPage from './components/frontpage/AppointmentsPage';
 import DoctorsPage from './components/frontpage/DoctorsPage.jsx';
-import LoginPage from './components/frontpage/LoginPage.jsx';
+import LoginPage from './components/frontpage/LoginPage.tsx';
 import BookPage from './components/frontpage/BookPage.jsx';
 import RegistrationPage from './components/frontpage/RegistrationPage.jsx';
 
