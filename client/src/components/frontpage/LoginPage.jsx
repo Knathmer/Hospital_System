@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Button } from "@/components/ui/button"
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Heart } from "lucide-react";
+import {useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
-
-const LoginPage = () => {
-  //Hooks(Event handler) (For dyanmically updating site)
+export default function LoginPage() {
+  const [userType, setUserType] = useState('patient');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); 
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,84 +46,101 @@ const LoginPage = () => {
     }
   };
 
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#f5efe7]">
-      <header className="bg-[#f5efe7] p-4 shadow-md">
-        <div className="container mx-auto">
-          <Link to="/" className="flex items-center space-x-2">
-            <img src="/placeholder.svg?height=40&width=40" alt="UMA Cares logo" className="w-10 h-10" />
-            <h1 className="text-2xl font-semibold text-[#4a5d23]">UMA Cares</h1>
-          </Link>
-        </div>
+    <div className="flex flex-col min-h-screen bg-pink-50">
+      <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
+        <Link className="flex items-center justify-center" to="#">
+          <Heart className="h-6 w-6 text-pink-500" />
+          <span className="ml-2 text-2xl font-bold text-gray-900">WomenWell</span>
+        </Link>
       </header>
+      <main className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-md">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold">Welcome Back</h1>
+            <p className="mt-2 text-gray-600">Please sign in to your account</p>
+          </div>
 
-      <main className="flex-grow flex items-center justify-center px-4 py-12">
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-          <h2 className="text-3xl font-bold text-[#8b4513] mb-6 text-center">Welcome Back</h2>
-
-          {/* Display error message */}
+          {/* Error message */}
           {error && <p className="text-red-500 text-center">{error}</p>}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <RadioGroup 
+            defaultValue="patient" 
+            className="flex justify-center space-x-4"
+            onValueChange={(value) => setUserType(value)}
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="patient" id="patient" />
+              <Label htmlFor="patient">Patient</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="doctor" id="doctor" />
+              <Label htmlFor="doctor">Doctor</Label>
+            </div>
+          </RadioGroup>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#5c4033]">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
+              <Label htmlFor="email">Email address</Label>
+              <Input 
+                id="email" 
+                name="email" 
+                type="email" 
+                autoComplete="email" 
+                required 
+                className="mt-1"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)} // e is the form object, and this just calls the setEmail function from useState
-                required
-                className="mt-1 block w-full px-3 py-2 bg-white border border-[#cd7f32] rounded-md text-[#5c4033] focus:outline-none focus:ring-2 focus:ring-[#4a5d23]"
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#5c4033]">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
+              <Label htmlFor="password">Password</Label>
+              <Input 
+                id="password" 
+                name="password" 
+                type="password" 
+                autoComplete="current-password" 
+                required 
+                className="mt-1"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
-                className="mt-1 block w-full px-3 py-2 bg-white border border-[#cd7f32] rounded-md text-[#5c4033] focus:outline-none focus:ring-2 focus:ring-[#4a5d23]"
               />
             </div>
-            <div>
-              <button
-                type="submit"
-                className="w-full bg-[#4a5d23] text-white py-2 px-4 rounded-md hover:bg-[#3a4a1c] transition duration-300"
-              >
-                Log In
-              </button>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                />
+                <Label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  Remember me
+                </Label>
+              </div>
+              <div className="text-sm">
+                <Link to="#" className="font-medium text-pink-600 hover:text-pink-500">
+                  Forgot your password?
+                </Link>
+              </div>
             </div>
+            <Button type="submit" className="w-full bg-pink-600 hover:bg-pink-700 text-white">
+              Sign in as {userType === 'patient' ? 'Patient' : 'Doctor'}
+            </Button>
           </form>
           <div className="mt-6 text-center">
-            <p className="text-[#5c4033]">
-              First time patient?{' '}
-              <Link to="/register" className="text-[#4a5d23] hover:underline">
-                Register here
+            <p className="text-sm text-gray-600">
+              Don't have an account?{' '}
+              <Link to="#" className="font-medium text-pink-600 hover:text-pink-500">
+                Sign up
               </Link>
             </p>
           </div>
-          <div className="mt-4 text-center">
-            <Link to="/forgot-password" className="text-[#8b4513] hover:underline text-sm">
-              Forgot your password?
-            </Link>
-          </div>
         </div>
       </main>
-
-      <footer className="bg-[#4a5d23] text-white py-4">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2024 UMA Cares. All rights reserved.</p>
-        </div>
+      <footer className="py-6 text-center border-t bg-white">
+        <p className="text-sm text-gray-500">© 2024 WomenWell. All rights reserved.</p>
       </footer>
     </div>
   );
-};
-
-export default LoginPage;
+}

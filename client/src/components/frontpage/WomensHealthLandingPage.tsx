@@ -1,36 +1,31 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Heart, Users, Calendar, Phone } from "lucide-react"
-import Button from "../ui/button";
-import Input from "../ui/input";
+import React = require("react");
+import {useNavigate, Link } from 'react-router-dom';
 
-export default function WomensHealthLandingPage() {
+export default function WomensHealthLanding() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-16 flex items-center">
         <Link className="flex items-center justify-center" to="#">
-          <Heart className="h-6 w-6 text-pink-500 hover:fill-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900 hover:text-pink-500">WomenWell</span>
+          <Heart className="h-6 w-6 text-pink-500" />
+          <span className="ml-2 text-2xl font-bold text-gray-900">WomenWell</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-8 decoration-pink-500" to="#">
+          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
             Services
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-8 decoration-pink-500" to="/about">
+          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
             About Us
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-8 decoration-pink-500" to="#">
+          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
             Resources
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-8 decoration-pink-500" to="#">
+          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
             Contact
           </Link>
         </nav>
-        <div className="px-6">
-          <Button className= "text-sm" to= "/login">
-            Log in
-          </Button>
-        </div>
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-pink-50">
@@ -40,13 +35,13 @@ export default function WomensHealthLandingPage() {
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
                   Empowering Women's Health
                 </h1>
-                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400 py-6">
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
                   Comprehensive care for every stage of a woman's life. Expert guidance, compassionate support, and
                   cutting-edge treatments.
                 </p>
               </div>
               <div className="space-x-4">
-                <Button to="book" >Book Appointment</Button>
+                <Button className="bg-pink-500 text-white hover:bg-pink-600">Book Appointment</Button>
                 <Button variant="outline">Learn More</Button>
               </div>
             </div>
@@ -88,7 +83,7 @@ export default function WomensHealthLandingPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row lg:justify-end">
-                <Button >
+                <Button className="bg-pink-500 text-white hover:bg-pink-600">
                   Schedule a Consultation
                 </Button>
                 <Button variant="outline">View Our Services</Button>
@@ -115,7 +110,7 @@ export default function WomensHealthLandingPage() {
                     placeholder="Enter your email"
                     type="email"
                   />
-                  <Button >
+                  <Button className="bg-pink-500 text-white hover:bg-pink-600" type="submit">
                     Subscribe
                   </Button>
                 </form>
