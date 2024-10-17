@@ -36,12 +36,12 @@ export default function WomensHealthLandingPage() {
           </div>
         </section>
         <section className="w-full py-12 md:py-24 lg:py-32 bg-pink-100">
-          <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-12 px-6 justify-center">
+          <div className="flex items-center gap-6 lg:flex-cols-2 lg:gap-12 px-8 space-x-24 justify-center">
             <div className="space-y-4">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                 Your Health, Our Priority
               </h2>
-              <p className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+              <p className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400 max-w-2xl">
                 At WomenWell, we understand that every woman's health journey is
                 unique. Our team of expert healthcare professionals is dedicated
                 to providing personalized care that addresses your individual
