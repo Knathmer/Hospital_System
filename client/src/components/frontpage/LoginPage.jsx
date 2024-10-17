@@ -1,56 +1,59 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const LoginPage = () => {
   //Hooks(Event handler) (For dyanmically updating site)
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-  
+    setError("");
+
     try {
-      const response = await axios.post('http://localhost:3000/auth/login', {
+      const response = await axios.post("http://localhost:3000/auth/login", {
         email,
         password,
       });
-  
+
       if (response.data.token) {
         // Store the JWT token and user role in the browser
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userRole', response.data.user.role); // Save the user role
-  
+        localStorage.setItem("token", response.data.token);
+
+        const decodedToken = jwtDecode(response.data.token);
+        const userRole = decodedToken.role;
+
         // Redirect based on user role
-        if (response.data.user.role === 'admin') {
-          navigate('/admin/dashboard');
-        } else if (response.data.user.role === 'doctor') {
-          navigate('/doctor/dashboard');
-        } else if (response.data.user.role === 'patient') {
-          navigate('/patient/dashboard');
+        if (userRole === "admin") {
+          navigate("/admin/dashboard");
+        } else if (userRole === "doctor") {
+          navigate("/doctor/dashboard");
+        } else if (userRole === "patient") {
+          navigate("/patient/dashboard");
         }
       } else {
-        setError('Login failed. Please try again.');
+        setError("Login failed. Please try again.");
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError('Invalid email or password');
+      console.error("Login error:", error);
+      setError("Invalid email or password");
     }
   };
-
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f5efe7]">
       <header className="bg-[#f5efe7] p-4 shadow-md">
         <div className="container mx-auto">
           <Link to="/" className="flex items-center space-x-2">
-            <img src="/placeholder.svg?height=40&width=40" alt="UMA Cares logo" className="w-10 h-10" />
+            <img
+              src="/placeholder.svg?height=40&width=40"
+              alt="UMA Cares logo"
+              className="w-10 h-10"
+            />
             <h1 className="text-2xl font-semibold text-[#4a5d23]">UMA Cares</h1>
           </Link>
         </div>
@@ -58,14 +61,19 @@ const LoginPage = () => {
 
       <main className="flex-grow flex items-center justify-center px-4 py-12">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-          <h2 className="text-3xl font-bold text-[#8b4513] mb-6 text-center">Welcome Back</h2>
+          <h2 className="text-3xl font-bold text-[#8b4513] mb-6 text-center">
+            Welcome Back
+          </h2>
 
           {/* Display error message */}
           {error && <p className="text-red-500 text-center">{error}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#5c4033]">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-[#5c4033]"
+              >
                 Email
               </label>
               <input
@@ -78,7 +86,10 @@ const LoginPage = () => {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#5c4033]">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-[#5c4033]"
+              >
                 Password
               </label>
               <input
@@ -101,14 +112,17 @@ const LoginPage = () => {
           </form>
           <div className="mt-6 text-center">
             <p className="text-[#5c4033]">
-              First time patient?{' '}
+              First time patient?{" "}
               <Link to="/register" className="text-[#4a5d23] hover:underline">
                 Register here
               </Link>
             </p>
           </div>
           <div className="mt-4 text-center">
-            <Link to="/forgot-password" className="text-[#8b4513] hover:underline text-sm">
+            <Link
+              to="/forgot-password"
+              className="text-[#8b4513] hover:underline text-sm"
+            >
               Forgot your password?
             </Link>
           </div>
