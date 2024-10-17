@@ -46,28 +46,34 @@ async function getAddressID(addrStreet, addrZip, addrCity, addrState) {
   }
 }
 
+async function getUserAndRole(email) {
+  let user = await query(SELECT_ADMIN_FROM_EMAIL_QUERY, [email]);
+  let role = "admin";
+
+  if (user.length === 0) {
+    user = await query(SELECT_PATIENT_FROM_EMAIL_QUERY, [email]);
+    role = "patient";
+  } else if (user.length === 0) {
+    user = await query(SELECT_DOCTOR_FROM_EMAIL_QUERY, [email]);
+    role = "doctor";
+  } else if (user.length === 0) {
+    // If no user is found, return an error
+    return [null, null];
+  }
+  console.log(`user: ${user}, role: ${role}`);
+  return [user, role];
+}
+
 // Function to handle login request and JWT generation
 export async function login(req, res) {
   const { email, password } = req.body; // Destructures the request into email and password
 
   try {
     // Query the database to find the user by email in all tables (admin, patient, doctor)
-
-    let user = await query(SELECT_ADMIN_FROM_EMAIL_QUERY, [email]);
-    let role = "admin";
-
-    if (user.length === 0) {
-      user = await query(SELECT_PATIENT_FROM_EMAIL_QUERY, [email]);
-      role = "patient";
-    } else if (user.length === 0) {
-      user = await query(SELECT_DOCTOR_FROM_EMAIL_QUERY, [email]);
-      role = "doctor";
-    } else if (user.length === 0) {
-      // If no user is found, return an error
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-
+    let [user, role] = await getUserAndRole(email);
+    console.log(`user: ${user}`);
     user = user[0]; // Get the first user result
+    console.log(`user: ${user}`);
 
     // Check if the password matches the one in the database
     if (password !== user.password) {
