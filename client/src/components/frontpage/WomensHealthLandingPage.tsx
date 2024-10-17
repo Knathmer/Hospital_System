@@ -36,7 +36,7 @@ export default function WomensHealthLandingPage() {
           </div>
         </section>
         <section className="w-full py-12 md:py-24 lg:py-32 bg-pink-100">
-          <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-12">
+          <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-12 px-6 justify-center">
             <div className="space-y-4">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                 Your Health, Our Priority
