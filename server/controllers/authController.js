@@ -12,7 +12,7 @@ import {
   SELECT_ADDRESSID_QUERY,
   SELECT_PATIENT_FROM_EMAIL_QUERY,
 } from "../queries/constants/selectQueries.js";
-import { getUserAndRole } from "../queries/user.js/getUserAndRole.js";
+import { getUserAndRole } from "../queries/user/getUserAndRole.js";
 
 const JWT_SECRET = process.env.JWT_SECRET; //Pulls the ENV secret key from .env
 
@@ -57,8 +57,6 @@ export async function login(req, res) {
     if (user === null) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-
-    user = user[0]; // Get the first user result
 
     // Check if the password matches the one in the database
     if (password !== user.password) {
