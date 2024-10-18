@@ -47,7 +47,7 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
       <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
-        <Link className="flex items-center justify-center" to="#">
+        <Link className="flex items-center justify-center" to="/WomensHealthLandingPage">
           <Heart className="h-6 w-6 text-pink-500" />
           <span className="ml-2 text-2xl font-bold text-gray-900">WomenWell</span>
         </Link>
