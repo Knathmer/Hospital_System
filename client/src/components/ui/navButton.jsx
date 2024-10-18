@@ -1,7 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const Button = ({ children, variant = "default", className = "", to = "" }) => {
+const NavButton = ({
+  children,
+  variant = "default",
+  className = "",
+  to = "",
+}) => {
   const nav = useNavigate();
 
   const handleClick = () => {
@@ -21,4 +26,4 @@ const Button = ({ children, variant = "default", className = "", to = "" }) => {
   );
 };
 
-export default Button;
+export default NavButton;

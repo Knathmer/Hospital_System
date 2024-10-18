@@ -1,6 +1,6 @@
 import React from "react";
 import GenericContainer from "./genericContainer.jsx";
-import Button from "../../../../button.jsx";
+import NavButton from "../../../../navButton.jsx";
 import { ClipboardList } from "lucide-react";
 
 const TestResultsContainer = () => {
@@ -26,9 +26,9 @@ const TestResultsContainer = () => {
           </span>
         </li>
       </ul>
-      <Button variant="outline" className="mt-4">
+      <NavButton variant="outline" className="mt-4">
         View All Results
-      </Button>
+      </NavButton>
     </GenericContainer>
   );
 };

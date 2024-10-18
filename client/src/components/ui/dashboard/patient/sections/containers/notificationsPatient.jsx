@@ -1,7 +1,7 @@
 import React from "react";
 import GenericContainer from "./genericContainer";
 import { Bell } from "lucide-react";
-import Button from "../../../../button";
+import NavButton from "../../../../navButton";
 
 const NotificationsPatient = () => {
   return (
@@ -18,9 +18,9 @@ const NotificationsPatient = () => {
           New message from Dr. Johnson about your recent lab results
         </li>
       </ul>
-      <Button variant="outline" className="mt-4">
+      <NavButton variant="outline" className="mt-4">
         See All Notifications
-      </Button>
+      </NavButton>
     </GenericContainer>
   );
 };

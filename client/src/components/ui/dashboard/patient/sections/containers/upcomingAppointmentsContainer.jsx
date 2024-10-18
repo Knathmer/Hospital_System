@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar } from "lucide-react";
-import Button from "../../../../button.jsx";
+import NavButton from "../../../../navButton.jsx";
 import GenericContainer from "./genericContainer.jsx";
 
 const UpcomingAppointmentsContainer = () => {
@@ -24,9 +24,9 @@ const UpcomingAppointmentsContainer = () => {
           <span className="text-sm text-gray-500">June 3, 2024 at 2:00 PM</span>
         </li>
       </ul>
-      <Button className="mt-4 bg-pink-500 text-white hover:bg-pink-600">
+      <NavButton className="mt-4 bg-pink-500 text-white hover:bg-pink-600">
         Schedule Appointment
-      </Button>
+      </NavButton>
     </GenericContainer>
   );
 };

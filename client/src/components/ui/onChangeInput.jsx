@@ -1,12 +1,13 @@
 import React from "react";
 
-const Input = ({
+const OnChangeInput = ({
   className = "",
   placeholder = "",
   type = "",
   id = "",
   isRequired = false,
   value = "",
+  onChange,
 }) => {
   return (
     <input
@@ -16,8 +17,9 @@ const Input = ({
       id={id}
       required={isRequired}
       value={value}
+      onChange={onChange}
     />
   );
 };
 
-export default Input;
+export default OnChangeInput;

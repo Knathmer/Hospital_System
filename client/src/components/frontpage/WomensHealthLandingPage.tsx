@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, Users, Calendar, Phone } from "lucide-react";
-import Button from "../ui/button";
+import NavButton from "../ui/navButton";
 import Input from "../ui/input";
 import Footer from "../ui/footer";
 import IconLogo from "../ui/iconLogo";
@@ -18,9 +18,9 @@ export default function WomensHealthLandingPage() {
         <IconLogo />
         <Navbar />
         <div className="px-6">
-          <Button className="text-sm" to="/login">
+          <NavButton className="text-sm" to="/login">
             Log in
-          </Button>
+          </NavButton>
         </div>
       </header>
       <main className="flex-1">
@@ -49,8 +49,8 @@ export default function WomensHealthLandingPage() {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row lg:justify-end">
-              <Button>Schedule a Consultation</Button>
-              <Button variant="outline">View Our Services</Button>
+              <NavButton>Schedule a Consultation</NavButton>
+              <NavButton variant="outline">View Our Services</NavButton>
             </div>
           </div>
         </section>
@@ -72,7 +72,7 @@ export default function WomensHealthLandingPage() {
                   placeholder="Enter your email"
                   type="email"
                 />
-                <Button>Subscribe</Button>
+                <NavButton>Subscribe</NavButton>
               </form>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 By subscribing, you agree to our Terms & Conditions and Privacy

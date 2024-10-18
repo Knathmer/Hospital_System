@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "../../button";
+import NavButton from "../../navButton";
 
 const MainSection = () => {
   return (
@@ -15,8 +15,8 @@ const MainSection = () => {
           </p>
         </div>
         <div className="space-x-4">
-          <Button to="/book">Book Appointment</Button>
-          <Button variant="outline">Learn More</Button>
+          <NavButton to="/book">Book Appointment</NavButton>
+          <NavButton variant="outline">Learn More</NavButton>
         </div>
       </div>
     </section>
