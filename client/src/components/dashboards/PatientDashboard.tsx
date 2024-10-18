@@ -12,6 +12,7 @@ import Button from "../ui/button.jsx";
 import NavbarPatient from "../ui/dashboard/patient/navbarPatient.jsx";
 import QuickActions from "../ui/dashboard/patient/sections/quickActions.jsx";
 import UpcomingAppointmentsContainer from "../ui/dashboard/patient/sections/containers/upcomingAppointmentsContainer.jsx";
+import TestResultsContainer from "../ui/dashboard/patient/sections/containers/testResultsContainer.jsx";
 
 export default function PatientDashboard() {
   return (
@@ -21,31 +22,7 @@ export default function PatientDashboard() {
         <h1 className="text-3xl font-bold mb-6">Welcome back, Sarah</h1>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <UpcomingAppointmentsContainer />
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <ClipboardList className="h-5 w-5 text-pink-500 mr-2" />
-              Recent Test Results
-            </h2>
-            <ul className="space-y-2">
-              <li>
-                <span className="font-medium">Blood Work</span>
-                <br />
-                <span className="text-sm text-gray-500">
-                  Completed on April 10, 2024
-                </span>
-              </li>
-              <li>
-                <span className="font-medium">Pap Smear</span>
-                <br />
-                <span className="text-sm text-gray-500">
-                  Completed on March 22, 2024
-                </span>
-              </li>
-            </ul>
-            <Button variant="outline" className="mt-4">
-              View All Results
-            </Button>
-          </div>
+          <TestResultsContainer />
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
               <Bell className="h-5 w-5 text-pink-500 mr-2" />
