@@ -1,10 +1,13 @@
-import React from 'react';
+import React from "react";
 
-const PatientDashboard = () => {
+const PatientDashboardOld = () => {
   return (
     <div>
       <h1>Patient Dashboard</h1>
-      <p>Welcome, Patient! Here you can view your appointments, medical history, and prescriptions.</p>
+      <p>
+        Welcome, Patient! Here you can view your appointments, medical history,
+        and prescriptions.
+      </p>
       <ul>
         <li>View Appointments</li>
         <li>Check Medical History</li>
@@ -15,4 +18,4 @@ const PatientDashboard = () => {
   );
 };
 
-export default PatientDashboard;
+export default PatientDashboardOld;
