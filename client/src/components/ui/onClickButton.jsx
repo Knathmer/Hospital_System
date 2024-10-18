@@ -1,10 +1,11 @@
 import React from "react";
 
-const NavButton = ({
+const OnClickButton = ({
   children,
   variant = "default",
   className = "",
   onClick,
+  type,
 }) => {
   return (
     <button
@@ -14,10 +15,11 @@ const NavButton = ({
           : `bg-pink-500 text-white font-medium px-4 py-2 hover:bg-pink-600 rounded-md inline-block ${className}`
       }
       onClick={onClick}
+      type={type}
     >
       {children}
     </button>
   );
 };
 
-export default NavButton;
+export default OnClickButton;
