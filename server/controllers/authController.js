@@ -51,7 +51,7 @@ export async function login(req, res) {
 
   try {
     // Get user and role if one exists
-    let [user, role] = await getUserAndRole(email);
+    let [user, role, userIDField] = await getUserAndRole(email);
 
     // If no user is found, return an error
     if (user === null) {
