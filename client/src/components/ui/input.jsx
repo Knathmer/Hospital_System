@@ -1,21 +1,12 @@
 import React from "react";
 
-const Input = ({
-  className = "",
-  placeholder = "",
-  type = "",
-  id = "",
-  isRequired = false,
-  value = "",
-}) => {
+const Input = ({ className = "", placeholder = "", type = "", ...props }) => {
   return (
     <input
-      className={`border-2 hover:border-gray-300 rounded-md px-2 h-10 ${className}`}
+      className={`input border-2 hover:border-gray-300 rounded-md px-2 h-10 flex-1 max-w-sm ${className}`}
       type={type}
       placeholder={placeholder}
-      id={id}
-      required={isRequired}
-      value={value}
+      {...props}
     />
   );
 };

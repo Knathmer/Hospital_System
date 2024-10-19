@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, Users, Calendar, Phone } from "lucide-react";
-import NavButton from "../ui/navButton";
+import NavButton from "../ui/buttons/navButton";
 import Input from "../ui/input";
 import Footer from "../ui/footer";
 import IconLogo from "../ui/iconLogo";
@@ -66,7 +66,7 @@ export default function WomensHealthLandingPage() {
               </p>
             </div>
             <div className="w-full max-w-sm space-y-2">
-              <form className="flex space-x-2">
+              <form className="flex space-x-2 justify-center">
                 <Input
                   className="max-w-lg flex-1"
                   placeholder="Enter your email"

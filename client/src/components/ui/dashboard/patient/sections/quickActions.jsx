@@ -1,5 +1,5 @@
 import React from "react";
-import NavButton from "../../../navButton.jsx";
+import NavButton from "../../../buttons/navButton.jsx";
 
 const QuickActions = () => {
   return (

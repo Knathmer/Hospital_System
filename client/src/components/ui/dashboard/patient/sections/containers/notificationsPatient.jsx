@@ -1,7 +1,7 @@
 import React from "react";
 import GenericContainer from "./genericContainer";
 import { Bell } from "lucide-react";
-import NavButton from "../../../../navButton";
+import NavButton from "../../../../buttons/navButton";
 
 const NotificationsPatient = () => {
   return (
