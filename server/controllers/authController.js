@@ -63,9 +63,10 @@ export async function login(req, res) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    const userID = user[userIDField];
     // Generate a JWT token with the user's ID and role
     const token = jwt.sign(
-      { id: user.id, role: role }, // Payload (user id and role)
+      { id: userID, role: role }, // Payload (user id and role)
       JWT_SECRET, // Secret
       { expiresIn: "1h" } // Token expiration
     );
@@ -74,7 +75,7 @@ export async function login(req, res) {
     return res.status(200).json({
       message: "Login successful",
       token, // JWT Token
-      user: { id: user.id, email: user.email, role }, // User info
+      user: { id: userID, email: user.email, role }, // User info
     });
   } catch (error) {
     console.error("Login error:", error);
