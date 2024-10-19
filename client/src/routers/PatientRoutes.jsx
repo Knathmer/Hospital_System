@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import PatientDashboard from "../components/dashboards/PatientDashboard.tsx";
+import PatientDashboard from "../components/dashboards/patient/PatientDashboard.tsx";
 
 const PatientRoutes = () => {
   return (

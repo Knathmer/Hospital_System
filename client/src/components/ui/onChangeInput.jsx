@@ -11,7 +11,7 @@ const OnChangeInput = ({
 }) => {
   return (
     <input
-      className={`border-2 hover:border-gray-300 rounded-md px-2 ${className}`}
+      className={`border-2 hover:border-gray-300 rounded-md px-2 max-w-lg flex-1 h-10 ${className}`}
       type={type}
       placeholder={placeholder}
       id={id}

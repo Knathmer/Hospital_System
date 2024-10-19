@@ -11,6 +11,8 @@ import { useState } from "react";
 
 import Input from "../../ui/input";
 import OnChangeInput from "../../ui/onChangeInput";
+import OnClickButton from "../../ui/onClickButton";
+import NavButton from "../../ui/navButton";
 
 export default function MedicalHistoryForm() {
   const [vaccines, setVaccines] = useState([{ name: "", date: "" }]);
@@ -89,8 +91,8 @@ export default function MedicalHistoryForm() {
                   <Input id="dateOfBirth" type="date" isRequired={true} />
                 </div>
                 <div>
-                  {/* <Label htmlFor="gender">Gender</Label> */}
-                  {/* <Select>
+                  {/* <Label htmlFor="gender">Gender</Label>
+                  <Select>
                     <SelectTrigger id="gender">
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
@@ -165,20 +167,24 @@ export default function MedicalHistoryForm() {
                       setVaccines(newVaccines);
                     }}
                   />
-                  <Button
+                  <OnClickButton
                     type="button"
                     variant="outline"
                     size="icon"
                     onClick={() => removeVaccine(index)}
                   >
                     <Trash2 className="h-4 w-4" />
-                  </Button>
+                  </OnClickButton>
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={addVaccine}>
+              <OnClickButton
+                type="button"
+                variant="outline"
+                onClick={addVaccine}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Vaccine
-              </Button>
+              </OnClickButton>
             </div>
 
             <div className="space-y-4">
@@ -229,20 +235,24 @@ export default function MedicalHistoryForm() {
                       setSurgeries(newSurgeries);
                     }}
                   />
-                  <Button
+                  <OnClickButton
                     type="button"
                     variant="outline"
                     size="icon"
                     onClick={() => removeSurgery(index)}
                   >
                     <Trash2 className="h-4 w-4" />
-                  </Button>
+                  </OnClickButton>
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={addSurgery}>
+              <OnClickButton
+                type="button"
+                variant="outline"
+                onClick={addSurgery}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Surgery
-              </Button>
+              </OnClickButton>
             </div>
 
             <div className="space-y-4">
@@ -293,10 +303,10 @@ export default function MedicalHistoryForm() {
             </div>
 
             <div className="flex justify-end space-x-4">
-              <Button variant="outline">Save as Draft</Button>
-              <Button className="bg-pink-500 text-white hover:bg-pink-600">
+              <NavButton variant="outline">Save as Draft</NavButton>
+              <NavButton className="bg-pink-500 text-white hover:bg-pink-600">
                 Submit Form
-              </Button>
+              </NavButton>
             </div>
           </form>
         </div>

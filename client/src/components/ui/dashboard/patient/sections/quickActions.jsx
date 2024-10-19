@@ -10,7 +10,9 @@ const QuickActions = () => {
           Request Prescription Refill
         </NavButton>
         <NavButton variant="outline">Message Your Doctor</NavButton>
-        <NavButton variant="outline">Update Health Information</NavButton>
+        <NavButton variant="outline" to="/medical-history">
+          Update Health Information
+        </NavButton>
         <NavButton variant="outline">View Billing Statements</NavButton>
       </div>
     </section>

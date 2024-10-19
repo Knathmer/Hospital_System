@@ -20,6 +20,7 @@ import PatientRoutes from "./routers/PatientRoutes.jsx";
 
 import "./styles.css"; // This imports tailwind css file.
 import WomensHealthLandingPage from "./components/frontpage/WomensHealthLandingPage.tsx";
+import MedicalHistoryForm from "./components/dashboards/patient/MedicalHistoryForm.tsx";
 
 function App() {
   return (
@@ -32,6 +33,9 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/book" element={<BookPage />} />
       <Route path="/register" element={<RegistrationPage />} />
+      <Route path="/medical-history" element={<MedicalHistoryForm />}>
+        "
+      </Route>
 
       <Route
         path="/admin/*"
