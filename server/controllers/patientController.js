@@ -11,7 +11,7 @@ export const getPatientMedication = async (req, res) => {
                       WHERE p.patientID = ?`;
 
     //This makes the query with the patientID which should return the users medication.
-    const patientMedications = query(SQLQuery, [patientID]);
+    const patientMedications = await query(SQLQuery, [patientID]);
 
     //The query function returns an array of objects, each object being a query result.
 

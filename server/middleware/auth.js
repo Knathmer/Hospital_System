@@ -7,7 +7,8 @@ const JWT_SECRET = process.env.JWT_SECRET; // Pulls the secret key from .env
 
 // Middleware for ensuring that user has 'some' JWT (This is not role-based)
 export const verifyToken = (req, res, next) => {
-  const token = req.headers["authorization"];
+  //In the authorization header the word 'Bearer' precedes the token, this makes sure to extract the token properly.
+  const token = req.headers["authorization"]?.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ message: "No token provided" });
