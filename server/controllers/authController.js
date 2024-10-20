@@ -4,18 +4,22 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 import bcrypt from "bcrypt";
+import {
+  INSERT_ADDRESS_QUERY,
+  INSERT_PATIENT_QUERY,
+} from "../queries/constants/insertQueries.js";
+import {
+  SELECT_ADDRESSID_QUERY,
+  SELECT_PATIENT_FROM_EMAIL_QUERY,
+} from "../queries/constants/selectQueries.js";
+import { getUserAndRole } from "../queries/user/getUserAndRole.js";
 
 const JWT_SECRET = process.env.JWT_SECRET; //Pulls the ENV secret key from .env
 
 // Helper function for getting or inserting an address
 async function getAddressID(addrStreet, addrZip, addrCity, addrState) {
   try {
-    const checkAddressSQL = `
-            SELECT addressID
-            FROM address
-            WHERE addrStreet = ? AND addrZip = ? AND addrCity = ? AND addrState = ?;
-        `;
-    const addresses = await query(checkAddressSQL, [
+    const addresses = await query(SELECT_ADDRESSID_QUERY, [
       addrStreet,
       addrZip,
       addrCity,
@@ -26,11 +30,8 @@ async function getAddressID(addrStreet, addrZip, addrCity, addrState) {
       return addresses[0].addressID;
     } else {
       // Handle address insertion here
-      const insertAddressSQL = `
-                INSERT INTO address (addrStreet, addrZip, addrCity, addrState)
-                VALUES (?, ?, ?, ?);
-            `;
-      const insertResult = await query(insertAddressSQL, [
+
+      const insertResult = await query(INSERT_ADDRESS_QUERY, [
         addrStreet,
         addrZip,
         addrCity,
@@ -49,33 +50,13 @@ export async function login(req, res) {
   const { email, password } = req.body; // Destructures the request into email and password
 
   try {
-    // Query the database to find the user by email in all tables (admin, patient, doctor)
-    const checkAdminSQL = "SELECT * FROM admin WHERE workEmail = ?";
-    const checkPatientSQL = "SELECT * FROM patient WHERE email = ?";
-    const checkDoctorSQL = "SELECT * FROM doctor WHERE workEmail = ?";
+    // Get user and role if one exists
+    let [user, role, userIDField] = await getUserAndRole(email);
 
-    let user = await query(checkAdminSQL, [email]);
-    let role = "admin";
-    let userIDField = "adminID";
-
-    if (user.length === 0) {
-      user = await query(checkPatientSQL, [email]);
-      role = "patient";
-      userIDField = "patientID";
-    }
-
-    if (user.length === 0) {
-      user = await query(checkDoctorSQL, [email]);
-      role = "doctor";
-      userIDField = "doctorID";
-    }
-
-    if (user.length === 0) {
-      // If no user is found, return an error
+    // If no user is found, return an error
+    if (user === null) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-
-    user = user[0]; // Get the first user result
 
     // Check if the password matches the one in the database
     if (password !== user.password) {
@@ -112,10 +93,10 @@ export async function register(req, res) {
     await connection.beginTransaction(); // Begin transaction
 
     // Check if the email already exists
-    const checkEmailSQL = "SELECT * FROM patient WHERE email = ?";
-    const [existingUsers] = await connection.query(checkEmailSQL, [
-      userData.email,
-    ]);
+    const [existingUsers] = await connection.query(
+      SELECT_PATIENT_FROM_EMAIL_QUERY,
+      [userData.email]
+    );
 
     if (existingUsers.length > 0) {
       console.error("Email already exists");
@@ -135,15 +116,8 @@ export async function register(req, res) {
     console.log("Address ID obtained:", addressID);
 
     // Insert the patient
-    const insertPatientSQL = `
-            INSERT INTO patient 
-            (firstName, lastName, dateOfBirth, gender, height, weight, phoneNumber, email, password, lastLogin, emergencyPhoneNumber,
-             emergencyEmail, createdBy, createdAt, updatedBy, updatedAt, addressID)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-        `;
-
     console.log("Inserting patient information");
-    const insertResult = await connection.query(insertPatientSQL, [
+    const insertResult = await connection.query(INSERT_PATIENT_QUERY, [
       userData.firstName,
       userData.lastName,
       userData.dateOfBirth,
