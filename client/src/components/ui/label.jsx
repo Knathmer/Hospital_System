@@ -1,21 +1,6 @@
-<<<<<<< HEAD
 import React from "react";
 
-const Label = ({ htmlFor = "default", children, className = "", ...props }) => {
-  return (
-    <div className="space-y-2">
-      <label htmlFor={htmlFor} className={`label ${className}`} {...props}>
-        {children}
-      </label>
-    </div>
-  );
-};
-
-export default Label;
-=======
-import React from "react"
-
-const Label = React.forwardRef(({ className = "", children, ...props }, ref) => {
+const Label = React.forwardRef(({ className, children, ...props }, ref) => {
   return (
     <label
       ref={ref}
@@ -24,10 +9,9 @@ const Label = React.forwardRef(({ className = "", children, ...props }, ref) => 
     >
       {children}
     </label>
-  )
-})
+  );
+});
 
-Label.displayName = "Label"
+Label.displayName = "Label";
 
-export default Label
->>>>>>> main
+export default Label;

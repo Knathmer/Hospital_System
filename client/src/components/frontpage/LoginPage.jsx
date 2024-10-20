@@ -1,4 +1,5 @@
-import Button from "../ui/button";
+//import Button from "../ui/button";
+import React from "react";
 import Input from "../ui/input";
 import Label from "../ui/label";
 import { Heart } from "lucide-react";
@@ -6,6 +7,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import NavButton from "../ui/buttons/navButton";
 
 const LoginPage = () => {
   //Hooks(Event handler) (For dyanmically updating site)
@@ -51,16 +53,25 @@ const LoginPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
       <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
-        <Link className="flex items-center justify-center" to="/WomensHealthLandingPage">
+        <Link
+          className="flex items-center justify-center"
+          to="/WomensHealthLandingPage"
+        >
           <Heart className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">WomenWell</span>
+          <span className="ml-2 text-2xl font-bold text-gray-900">
+            WomenWell
+          </span>
         </Link>
       </header>
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-xl">
           <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-gray-900">Welcome Back</h1>
-            <p className="mt-2 text-sm text-gray-600">Please sign in to your account</p>
+            <h1 className="text-3xl font-extrabold text-gray-900">
+              Welcome Back
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Please sign in to your account
+            </p>
           </div>
 
           {/* Error message */}
@@ -68,7 +79,10 @@ const LoginPage = () => {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-gray-700"
+              >
                 Email address
               </Label>
               <Input
@@ -83,7 +97,10 @@ const LoginPage = () => {
               />
             </div>
             <div>
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="password"
+                className="text-sm font-medium text-gray-700"
+              >
                 Password
               </Label>
               <Input
@@ -105,27 +122,36 @@ const LoginPage = () => {
                   type="checkbox"
                   className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                 />
-                <Label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                <Label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-gray-900"
+                >
                   Remember me
                 </Label>
               </div>
               <div className="text-sm">
-                <Link to="/forgot-password" className="font-medium text-pink-600 hover:text-pink-500">
+                <Link
+                  to="/forgot-password"
+                  className="font-medium text-pink-600 hover:text-pink-500"
+                >
                   Forgot your password?
                 </Link>
               </div>
             </div>
-            <Button
+            <NavButton
               type="submit"
               className="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-md shadow-lg transition duration-200 ease-in-out"
             >
               Sign in
-            </Button>
+            </NavButton>
           </form>
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don&apos;t have an account?{" "}
-              <Link to="/register" className="font-medium text-pink-600 hover:text-pink-500">
+              <Link
+                to="/register"
+                className="font-medium text-pink-600 hover:text-pink-500"
+              >
                 Sign up
               </Link>
             </p>
@@ -133,10 +159,12 @@ const LoginPage = () => {
         </div>
       </main>
       <footer className="py-6 text-center border-t bg-white">
-        <p className="text-sm text-gray-500">© 2024 WomenWell. All rights reserved.</p>
+        <p className="text-sm text-gray-500">
+          © 2024 WomenWell. All rights reserved.
+        </p>
       </footer>
     </div>
   );
-}
+};
 
 export default LoginPage;
