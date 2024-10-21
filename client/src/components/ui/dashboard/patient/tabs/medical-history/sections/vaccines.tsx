@@ -4,10 +4,9 @@ import { Plus, Trash2 } from "lucide-react";
 import Input from "../../../../../input";
 import DefaultButton from "../../../../../buttons/defaultButton";
 
-const Vaccines = () => {
-  const [vaccines, setVaccines] = useState([{ name: "", date: "" }]);
+const Vaccines = ({ vaccines, setVaccines }) => {
   const addVaccine = () => {
-    setVaccines([...vaccines, { name: "", date: "" }]);
+    setVaccines([...vaccines, { name: "", date: "", doctor: null }]);
   };
 
   const removeVaccine = (index: number) => {
@@ -33,6 +32,15 @@ const Vaccines = () => {
             onChange={(e) => {
               const newVaccines = [...vaccines];
               newVaccines[index].date = e.target.value;
+              setVaccines(newVaccines);
+            }}
+          />
+          <Input
+            placeholder="Doctor name"
+            value={vaccine.doctor}
+            onChange={(e) => {
+              const newVaccines = [...vaccines];
+              newVaccines[index].doctor = e.target.value;
               setVaccines(newVaccines);
             }}
           />

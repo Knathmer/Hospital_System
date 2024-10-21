@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import NavbarPatient from "../../ui/dashboard/patient/navbarPatient";
 import FamilyHistory from "../../ui/dashboard/patient/tabs/medical-history/sections/familyHistory";
@@ -13,8 +13,88 @@ import Footer from "../../ui/footer";
 import Allergies from "../../ui/dashboard/patient/tabs/medical-history/sections/allergies";
 import FormSubmitButton from "../../ui/buttons/formSubmitButton";
 import AdditionalInfo from "../../ui/dashboard/patient/tabs/medical-history/sections/additionalInfo";
+import axios from "axios";
 
 export default function MedicalHistoryForm() {
+  const [allergies, setAllergies] = useState([
+    { name: null, reaction: null, severity: "" },
+  ]);
+  const [disabilities, setDisablilities] = useState([{ name: "" }]);
+  const [vaccines, setVaccines] = useState([
+    { name: "", date: "", doctor: null },
+  ]);
+  const [surgeries, setSurgeries] = useState([
+    { name: "", date: "", doctor: null },
+  ]);
+  const [formData, setFormData] = useState({
+    allAllergies: allergies,
+    allDisabilities: disabilities,
+    allVaccines: vaccines,
+    allSurgeries: surgeries,
+  });
+
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  // Update formData when allergies change
+  useEffect(() => {
+    setFormData((prevState) => ({
+      ...prevState,
+      allAllergies: allergies,
+      allDisabilities: disabilities,
+      allVaccines: vaccines,
+      allSurgeries: surgeries,
+    }));
+  }, [allergies, disabilities, vaccines, surgeries]);
+
+  // const handleChange = (e) => {
+  //   //e is the event object
+  //   const { name, value } = e.target; //Breaks down the element where changes took place into name and value (Destructuring input)
+  //   setFormData((prevState) => ({
+  //     ...prevState,
+  //     [name]: value,
+  //   }));
+  // };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      const response = await axios.post(
+        "http://localhost:3000/auth/patient/medical-history",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200 && response.data) {
+        console.log("Add Allergy Successful!");
+      } else {
+        setError("Add Allergy failed. Please try again.");
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+      console.error("Lemon error:", error);
+    }
+  };
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
       <NavbarPatient />
@@ -28,18 +108,21 @@ export default function MedicalHistoryForm() {
             Back to Dashboard
           </Link>
           <h1 className="text-3xl font-bold mb-6">Medical History Form</h1>
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <FamilyHistory />
 
-            <Allergies />
+            <Allergies allergies={allergies} setAllergies={setAllergies} />
 
             <Medications />
 
-            <Vaccines />
+            <Vaccines vaccines={vaccines} setVaccines={setVaccines} />
 
-            <Disabilities />
+            <Disabilities
+              disabilities={disabilities}
+              setDisablilities={setDisablilities}
+            />
 
-            <Surgeries />
+            <Surgeries surgeries={surgeries} setSurgeries={setSurgeries} />
 
             <AdditionalInfo />
 

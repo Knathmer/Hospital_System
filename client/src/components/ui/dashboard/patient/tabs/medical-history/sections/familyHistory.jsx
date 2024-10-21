@@ -20,7 +20,10 @@ const FamilyHistory = () => {
             "Mental Illness",
           ].map((condition) => (
             <div key={condition} className="flex items-center space-x-2">
-              <Checkbox id={condition.toLowerCase().replace(/\s/g, "-")} />
+              <Checkbox
+                className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                id={condition.toLowerCase().replace(/\s/g, "-")}
+              />
               <Label htmlFor={condition.toLowerCase().replace(/\s/g, "-")}>
                 {condition}
               </Label>

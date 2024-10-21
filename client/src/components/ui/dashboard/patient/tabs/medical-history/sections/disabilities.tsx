@@ -4,10 +4,9 @@ import { Plus, Trash2 } from "lucide-react";
 import Input from "../../../../../input";
 import DefaultButton from "../../../../../buttons/defaultButton";
 
-const Disabilities = () => {
-  const [disabilities, setDisablilities] = useState([{ name: "" }]);
+const Disabilities = ({ disabilities, setDisablilities }) => {
   const addDisability = () => {
-    setDisablilities([...disabilities, { name: "" }]);
+    setDisablilities([...disabilities, { name: null }]);
   };
 
   const removeDisability = (index: number) => {

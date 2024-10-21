@@ -3,11 +3,12 @@ import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import Input from "../../../../../input";
 import DefaultButton from "../../../../../buttons/defaultButton";
+import Select from "../../../../../select/select";
+import SelectItem from "../../../../../select/selectItem";
 
-const Allergies = () => {
-  const [allergies, setAllergies] = useState([{ name: "" }]);
+const Allergies = ({ allergies, setAllergies }) => {
   const addAllergy = () => {
-    setAllergies([...allergies, { name: "" }]);
+    setAllergies([...allergies, { name: "", reaction: "", severity: "" }]);
   };
 
   const removeAllergy = (index: number) => {
@@ -27,6 +28,31 @@ const Allergies = () => {
               setAllergies(newAllergies);
             }}
           />
+          <Input
+            placeholder="Reaction"
+            value={allergy.reaction}
+            onChange={(e) => {
+              const newAllergies = [...allergies];
+              newAllergies[index].reaction = e.target.value;
+              setAllergies(newAllergies);
+            }}
+          />
+
+          <Select
+            id="severity"
+            name="severity"
+            value={allergy.severity}
+            onChange={(e) => {
+              const newAllergies = [...allergies];
+              newAllergies[index].severity = e.target.value;
+              setAllergies(newAllergies);
+            }}
+          >
+            <SelectItem value=""> Select Severity</SelectItem>
+            <SelectItem value="Mild"> Mild</SelectItem>
+            <SelectItem value="Moderate"> Moderate</SelectItem>
+            <SelectItem value="Severe"> Severe</SelectItem>
+          </Select>
 
           <DefaultButton
             type="button"
