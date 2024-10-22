@@ -1,10 +1,10 @@
 import React from "react";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import Input from "../../../../../input";
-import DefaultButton from "../../../../../buttons/defaultButton";
-import Select from "../../../../../select/select";
-import SelectItem from "../../../../../select/selectItem";
+import Input from "../../../../../../ui/input";
+import DefaultButton from "../../../../../../ui/buttons/defaultButton";
+import Select from "../../../../../../ui/select/select";
+import SelectItem from "../../../../../../ui/select/selectItem";
 
 const Allergies = ({ allergies, setAllergies }) => {
   const addAllergy = () => {

@@ -1,6 +1,6 @@
 import React from "react";
-import Label from "../../../../../label";
-import Checkbox from "../../../../../checkbox";
+import Label from "../../../../../../ui/label";
+import Checkbox from "../../../../../../ui/checkbox";
 
 const FamilyHistory = () => {
   return (

@@ -1,13 +1,14 @@
 //import Button from "../ui/button";
 import React from "react";
-import Input from "../ui/input";
-import Label from "../ui/label";
+
+import Label from "../../ui/label";
 import { Heart } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import NavButton from "../ui/buttons/navButton";
+import NavButton from "../../ui/buttons/navButton";
+import Input from "../../ui/input";
 
 const LoginPage = () => {
   //Hooks(Event handler) (For dyanmically updating site)

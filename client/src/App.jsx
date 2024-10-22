@@ -6,12 +6,12 @@ import axios from "axios";
 
 // Public routes
 
-import AboutPage from "./components/frontpage/AboutPage.jsx";
-import AppointmentsPage from "./components/frontpage/AppointmentsPage";
-import DoctorsPage from "./components/frontpage/DoctorsPage.jsx";
-import LoginPage from "./components/frontpage/LoginPage.jsx";
-import BookPage from "./components/frontpage/BookPage.jsx";
-import RegistrationPage from "./components/frontpage/RegistrationPage.jsx";
+import AboutPage from "./components/frontpages/AboutPage.jsx";
+import AppointmentsPage from "./components/frontpages/AppointmentsPage.jsx";
+import DoctorsPage from "./components/frontpages/DoctorsPage.jsx";
+import LoginPage from "./components/frontpages/authpages/LoginPage.jsx";
+import BookPage from "./components/frontpages/BookPage.jsx";
+import RegistrationPage from "./components/frontpages/authpages/RegistrationPage.jsx";
 
 // Role-specific route imports
 import AdminRoutes from "./routers/AdminRoutes.jsx";
@@ -19,8 +19,8 @@ import DoctorRoutes from "./routers/DoctorRoutes.jsx";
 import PatientRoutes from "./routers/PatientRoutes.jsx";
 
 import "./styles.css"; // This imports tailwind css file.
-import WomensHealthLandingPage from "./components/frontpage/WomensHealthLandingPage.tsx";
-import MedicalHistoryForm from "./components/dashboards/patient/MedicalHistoryForm.tsx";
+import WomensHealthLandingPage from "./components/frontpages/landingpage/WomensHealthLandingPage.tsx";
+import MedicalHistoryForm from "./components/dashboards/patient/sidebar/pages/medical-history/MedicalHistoryForm.tsx";
 
 function App() {
   return (

@@ -3,16 +3,16 @@ import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
-import NavbarPatient from "../../ui/dashboard/patient/navbarPatient";
-import FamilyHistory from "../../ui/dashboard/patient/tabs/medical-history/sections/familyHistory";
-import Surgeries from "../../ui/dashboard/patient/tabs/medical-history/sections/surgeries";
-import Disabilities from "../../ui/dashboard/patient/tabs/medical-history/sections/disabilities";
-import Vaccines from "../../ui/dashboard/patient/tabs/medical-history/sections/vaccines";
-import Medications from "../../ui/dashboard/patient/tabs/medical-history/sections/medications";
-import Footer from "../../ui/footer";
-import Allergies from "../../ui/dashboard/patient/tabs/medical-history/sections/allergies";
-import FormSubmitButton from "../../ui/buttons/formSubmitButton";
-import AdditionalInfo from "../../ui/dashboard/patient/tabs/medical-history/sections/additionalInfo";
+import NavbarPatient from "../../../sections/header/navbarPatient";
+import FamilyHistory from "./sections/familyHistory";
+import Surgeries from "./sections/surgeries";
+import Disabilities from "./sections/disabilities";
+import Vaccines from "./sections/vaccines";
+import Medications from "./sections/medications";
+import Footer from "../../../../../ui/footer";
+import Allergies from "./sections/allergies";
+import FormSubmitButton from "../../../../../ui/buttons/formSubmitButton";
+import AdditionalInfo from "./sections/additionalInfo";
 import axios from "axios";
 
 export default function MedicalHistoryForm() {
@@ -78,9 +78,9 @@ export default function MedicalHistoryForm() {
       );
 
       if (response.status === 200 && response.data) {
-        console.log("Add Allergy Successful!");
+        console.log("Add Medical History Successful!");
       } else {
-        setError("Add Allergy failed. Please try again.");
+        setError("Add Medical History failed. Please try again.");
       }
     } catch (error) {
       if (
@@ -92,7 +92,7 @@ export default function MedicalHistoryForm() {
       } else {
         setError("An error occurred. Please try again.");
       }
-      console.error("Lemon error:", error);
+      console.error("Medical History error:", error);
     }
   };
   return (

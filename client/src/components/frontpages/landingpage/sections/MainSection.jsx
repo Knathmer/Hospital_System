@@ -1,5 +1,5 @@
 import React from "react";
-import NavButton from "../../buttons/navButton";
+import NavButton from "../../../ui/buttons/navButton";
 
 const MainSection = () => {
   return (

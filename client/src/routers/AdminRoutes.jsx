@@ -1,6 +1,6 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import AdminDashboard from '../components/dashboards/AdminDashboard';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import AdminDashboard from "../components/dashboards/admin/AdminDashboard";
 
 const AdminRoutes = () => {
   return (
