@@ -1,20 +1,20 @@
 import { useState } from 'react'
-import { Heart, Calendar, FileText, PillBottle, CreditCard, ShieldPlus,Settings, LogOut } from "lucide-react"
+import { Heart, Calendar, FileText, CalendarClock, Settings, LogOut } from "lucide-react"
 import { Link } from 'react-router-dom';
 
 export default function SimplifiedDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
 
   const sidebarItems = {
-    "Patient Services": [
-      { id: 'dashboard', label: 'Dashboard', icon: Heart },
-      { id: 'appointments', label: 'Appointments', icon: Calendar },
-      { id: 'medical-records', label: 'Medical Records', icon: FileText },
-      { id: 'medication', label: 'Medication', icon: PillBottle },
+    "": [
+      { id: 'dashboard', label: 'Home', icon: Heart }
     ],
-    "Billing & Payments": [
-      { id: 'billing', label: 'Billing', icon: CreditCard },
-      { id: 'insurance', label: 'Insurance', icon: ShieldPlus },
+    " ": [
+      { id: 'dashboard', label: 'Home', icon: Heart },
+      { id: 'appointments', label: 'Appointments', icon: Calendar },
+      { id: 'schedule', label: 'Schedule', icon: CalendarClock },
+      { id: 'patients-list', label: 'Patient', icon: FileText },
+    //   { id: 'patient-records', label: 'Medication', icon: PillBottle },
     ],
   }
 

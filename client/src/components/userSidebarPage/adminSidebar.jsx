@@ -1,20 +1,24 @@
 import { useState } from 'react'
-import { Heart, Calendar, FileText, PillBottle, CreditCard, ShieldPlus,Settings, LogOut } from "lucide-react"
+import { Heart, House, Logs, UserRoundPen ,Settings, LogOut, UserCog, ChartSpline , ShieldAlert} from "lucide-react"
 import { Link } from 'react-router-dom';
+import AdminDashboard from './doctorSidebarItems/admin-dashboard';
 
 export default function SimplifiedDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
 
   const sidebarItems = {
-    "Patient Services": [
-      { id: 'dashboard', label: 'Dashboard', icon: Heart },
-      { id: 'appointments', label: 'Appointments', icon: Calendar },
-      { id: 'medical-records', label: 'Medical Records', icon: FileText },
-      { id: 'medication', label: 'Medication', icon: PillBottle },
+    "Quick Access": [
+        { id: 'dashboard', label: 'Home', icon: House },
+        { id: 'recent-activity', label: 'Recent Activity', icon: Logs },
     ],
-    "Billing & Payments": [
-      { id: 'billing', label: 'Billing', icon: CreditCard },
-      { id: 'insurance', label: 'Insurance', icon: ShieldPlus },
+    "User & Role Management": [
+      { id: 'manage-user', label: 'Manage user', icon: UserCog},
+      { id: 'patients-records', label: 'Edit Patient Records', icon: UserRoundPen },
+      { id: 'user-logs', label: 'Access Logs', icon: Logs},
+    ],
+    "Reports & Insights": [
+    { id: 'reports', label: 'Reports', icon: ChartSpline},
+    { id: 'security', label: 'Security Alerts', icon: ShieldAlert},
     ],
   }
 
@@ -39,7 +43,7 @@ export default function SimplifiedDashboard() {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-pink-600">Welcome</h2>
-                <p className="text-sm text-gray-700">Dr. John Doe</p> {/* this needs to get updated */}
+                <p className="text-sm text-gray-700">Dr. John Doe</p>
               </div>
             </div>
           </div>
@@ -89,11 +93,11 @@ export default function SimplifiedDashboard() {
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
             {activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}
         </h1>
-        
+
        {/* Link pages here to according sidebar items */}
         {activeTab === 'dashboard' && (
             <div>
-            <p className="text-gray-700">Place dashboard file here</p>
+            <p className="text-gray-700">{<AdminDashboard/>}</p>
             </div>
         )}
 
