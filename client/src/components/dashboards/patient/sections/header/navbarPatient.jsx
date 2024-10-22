@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Menu } from "lucide-react";
-import IconLogoPatient from "./iconLogoPatient.jsx";
+import IconLogoPatient from "./IconLogoPatient.jsx";
 
 const NavbarPatient = () => {
   return (

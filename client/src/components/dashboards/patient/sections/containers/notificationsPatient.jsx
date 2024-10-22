@@ -1,5 +1,5 @@
 import React from "react";
-import GenericContainer from "./genericContainer";
+import GenericContainer from "./GenericContainer";
 import { Bell } from "lucide-react";
 import NavButton from "../../../../ui/buttons/navButton";
 

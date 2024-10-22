@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import NavbarPatient from "./sections/header/navbarPatient.jsx";
-import QuickActions from "./sections/quickActions.jsx";
+import NavbarPatient from "./sections/header/NavbarPatient.jsx";
+import QuickActions from "./sections/QuickActionsPatient.jsx";
 
-import MainSectionPatient from "./sections/mainSectionPatient.jsx";
-import Footer from "../../ui/footer.jsx";
+import MainSectionPatient from "./sections/MainSectionPatient.jsx";
+import Footer from "../../ui/Footer.jsx";
 
 export default function PatientDashboard() {
   return (

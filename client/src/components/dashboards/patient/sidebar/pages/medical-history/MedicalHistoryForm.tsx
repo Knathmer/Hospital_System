@@ -3,16 +3,16 @@ import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
-import NavbarPatient from "../../../sections/header/navbarPatient";
-import FamilyHistory from "./sections/familyHistory";
-import Surgeries from "./sections/surgeries";
-import Disabilities from "./sections/disabilities";
-import Vaccines from "./sections/vaccines";
-import Medications from "./sections/medications";
-import Footer from "../../../../../ui/footer";
-import Allergies from "./sections/allergies";
-import FormSubmitButton from "../../../../../ui/buttons/formSubmitButton";
-import AdditionalInfo from "./sections/additionalInfo";
+import NavbarPatient from "../../../sections/header/NavbarPatient";
+import FamilyHistory from "./sections/FamilyHistory";
+import Surgeries from "./sections/Surgeries";
+import Disabilities from "./sections/Disabilities";
+import Vaccines from "./sections/Vaccines";
+import Medications from "./sections/Medications";
+import Footer from "../../../../../ui/Footer";
+import Allergies from "./sections/Allergies";
+import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
+import AdditionalInfo from "./sections/AdditionalInfo";
 import axios from "axios";
 
 export default function MedicalHistoryForm() {

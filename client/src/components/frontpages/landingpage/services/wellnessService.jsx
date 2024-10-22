@@ -7,7 +7,7 @@ const WellnessService = () => {
       <Heart className="h-12 w-12 text-pink-500 mb-4" />
       <h3 className="text-xl font-bold mb-2">Wellness</h3>
       <p className="text-gray-500">
-        Holistic approaches to women's health and well-being.
+        Holistic approaches to women&apos;s health and well-being.
       </p>
     </div>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import GenericContainer from "./genericContainer.jsx";
+import GenericContainer from "./GenericContainer.jsx";
 
 import { ClipboardList } from "lucide-react";
 import NavButton from "../../../../ui/buttons/navButton.jsx";

@@ -1,5 +1,4 @@
 //import Button from "../ui/button";
-import React from "react";
 
 import Label from "../../ui/label";
 import { Heart } from "lucide-react";
@@ -7,7 +6,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import NavButton from "../../ui/buttons/navButton";
+import NavButton from "../../ui/buttons/NavButton";
 import Input from "../../ui/input";
 
 const LoginPage = () => {

@@ -1,15 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, Users, Calendar, Phone } from "lucide-react";
-import IconLogo from "../header/iconLogo";
-import Navbar from "../header/navbar";
-import NavButton from "../../ui/buttons/navButton";
+import IconLogo from "../header/IconLogo";
+import Navbar from "../header/Navbar";
+import NavButton from "../../ui/buttons/NavButton";
 import MainSection from "./sections/MainSection";
 import Input from "../../ui/input";
 import Footer from "../../ui/footer";
-import GynecologyService from "./services/gynecologyService";
-import ObstetricsService from "./services/obstetricsService";
-import WellnessService from "./services/wellnessService";
+import GynecologyService from "./services/GynecologyService";
+import ObstetricsService from "./services/ObstetricsService";
+import WellnessService from "./services/WellnessService";
 
 export default function WomensHealthLandingPage() {
   return (

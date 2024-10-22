@@ -1,7 +1,7 @@
 import React from "react";
-import UpcomingAppointmentsContainer from "./containers/upcomingAppointmentsContainer";
-import TestResultsContainer from "./containers/testResultsContainer";
-import NotificationsPatient from "./containers/notificationsPatient";
+import UpcomingAppointmentsContainer from "./containers/UpcomingAppointmentsContainer";
+import TestResultsContainer from "./containers/TestResultsContainer";
+import NotificationsPatient from "./containers/NotificationsPatient";
 
 const MainSectionPatient = ({ user }) => {
   return (
