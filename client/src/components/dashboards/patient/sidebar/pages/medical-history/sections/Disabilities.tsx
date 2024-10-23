@@ -1,8 +1,8 @@
 import React from "react";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import Input from "../../../../../../ui/input";
-import DefaultButton from "../../../../../../ui/buttons/defaultButton";
+import Input from "../../../../../../ui/Input";
+import DefaultButton from "../../../../../../ui/buttons/DefaultButton";
 
 const Disabilities = ({ disabilities, setDisablilities }) => {
   const addDisability = () => {

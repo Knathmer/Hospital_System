@@ -1,6 +1,6 @@
 import React from "react";
-import Label from "../../../../../../ui/label";
-import Input from "../../../../../../ui/input";
+import Label from "../../../../../../ui/Label";
+import Input from "../../../../../../ui/Input";
 
 const PersonalInfo = () => {
   return (

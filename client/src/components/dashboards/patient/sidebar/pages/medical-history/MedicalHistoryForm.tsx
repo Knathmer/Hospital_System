@@ -12,7 +12,7 @@ import Medications from "./sections/Medications";
 import Footer from "../../../../../ui/Footer";
 import Allergies from "./sections/Allergies";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
-import AdditionalInfo from "./sections/AdditionalInfo";
+
 import axios from "axios";
 
 export default function MedicalHistoryForm() {
@@ -108,7 +108,7 @@ export default function MedicalHistoryForm() {
             Back to Dashboard
           </Link>
           <h1 className="text-3xl font-bold mb-6">Medical History Form</h1>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 py-4">
             <FamilyHistory />
 
             <Allergies allergies={allergies} setAllergies={setAllergies} />
@@ -123,8 +123,6 @@ export default function MedicalHistoryForm() {
             />
 
             <Surgeries surgeries={surgeries} setSurgeries={setSurgeries} />
-
-            <AdditionalInfo />
 
             <FormSubmitButton />
           </form>

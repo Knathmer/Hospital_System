@@ -2,7 +2,7 @@ import React from "react";
 import { Calendar } from "lucide-react";
 
 import GenericContainer from "./GenericContainer.jsx";
-import NavButton from "../../../../ui/buttons/navButton.jsx";
+import NavButton from "../../../../ui/buttons/NavButton.jsx";
 
 const UpcomingAppointmentsContainer = () => {
   return (

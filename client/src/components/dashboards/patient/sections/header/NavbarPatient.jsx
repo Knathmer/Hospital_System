@@ -10,9 +10,8 @@ const NavbarPatient = () => {
         <Link>
           <Menu className="h-8 w-8 text-pink-500"></Menu>
         </Link>
-        <div className="px-8">
-          <IconLogoPatient />
-        </div>
+
+        <IconLogoPatient />
       </nav>
     </header>
   );

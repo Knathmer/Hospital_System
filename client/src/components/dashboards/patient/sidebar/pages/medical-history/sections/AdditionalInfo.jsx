@@ -1,6 +1,6 @@
 import React from "react";
-import Label from "../../../../../../ui/label";
-import Textarea from "../../../../../../ui/textArea";
+import Label from "../../../../../../ui/Label";
+import Textarea from "../../../../../../ui/TextArea";
 
 const AdditionalInfo = () => {
   return (

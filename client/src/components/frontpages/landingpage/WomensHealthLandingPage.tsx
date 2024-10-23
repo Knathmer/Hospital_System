@@ -5,11 +5,12 @@ import IconLogo from "../header/IconLogo";
 import Navbar from "../header/Navbar";
 import NavButton from "../../ui/buttons/NavButton";
 import MainSection from "./sections/MainSection";
-import Input from "../../ui/input";
-import Footer from "../../ui/footer";
+
+import Footer from "../../ui/Footer";
 import GynecologyService from "./services/GynecologyService";
 import ObstetricsService from "./services/ObstetricsService";
 import WellnessService from "./services/WellnessService";
+import Input from "../../ui/Input";
 
 export default function WomensHealthLandingPage() {
   return (

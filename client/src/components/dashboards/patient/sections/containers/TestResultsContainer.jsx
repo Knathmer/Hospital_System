@@ -2,7 +2,7 @@ import React from "react";
 import GenericContainer from "./GenericContainer.jsx";
 
 import { ClipboardList } from "lucide-react";
-import NavButton from "../../../../ui/buttons/navButton.jsx";
+import NavButton from "../../../../ui/buttons/NavButton.jsx";
 
 const TestResultsContainer = () => {
   return (
