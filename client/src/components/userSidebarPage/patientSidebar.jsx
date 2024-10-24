@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Heart, Calendar, FileText, PillBottle, CreditCard, ShieldPlus,Settings, LogOut } from "lucide-react"
 import { Link } from 'react-router-dom';
+import AdminDashboard from './doctorSidebarItems/admin-dashboard';
 
 export default function SimplifiedDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -93,7 +94,7 @@ export default function SimplifiedDashboard() {
        {/* Link pages here to according sidebar items */}
         {activeTab === 'dashboard' && (
             <div>
-            <p className="text-gray-700">Place dashboard file here</p>
+            <p className="text-gray-700">{AdminDashboard()}</p>
             </div>
         )}
 

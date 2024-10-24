@@ -6,9 +6,6 @@ export default function SimplifiedDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
 
   const sidebarItems = {
-    "": [
-      { id: 'dashboard', label: 'Home', icon: Heart }
-    ],
     " ": [
       { id: 'dashboard', label: 'Home', icon: Heart },
       { id: 'appointments', label: 'Appointments', icon: Calendar },
