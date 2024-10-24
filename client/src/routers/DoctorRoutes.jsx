@@ -1,6 +1,6 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import DoctorDashboard from '../components/dashboards/DoctorDashboard';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import DoctorDashboard from "../components/dashboards/doctor/DoctorDashboard";
 
 const DoctorRoutes = () => {
   return (
