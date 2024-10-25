@@ -1,4 +1,4 @@
-import { SELECT_PATIENT_MEDICATION_INFORMATION_QUERY } from "../../queries/constants/selectQueries";
+import { SELECT_PATIENT_MEDICATION_INFORMATION_QUERY } from "../../queries/constants/selectQueries.js";
 import { query } from "../../database.js";
 export const getPatientMedications = async (req, res) => {
   try {
