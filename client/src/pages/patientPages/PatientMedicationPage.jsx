@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Printer, Info, Trash2 } from "lucide-react";
 import MedicationCard from "../../components/patientComponents/MedicationCard.jsx";
+import NavbarPatient from "../../components/dashboards/patient/sections/header/NavbarPatient.jsx";
+import Footer from "../../components/ui/Footer.jsx";
 
 export default function PrescriptionPage() {
   const [medications, setMedications] = useState([]);
@@ -49,46 +51,12 @@ export default function PrescriptionPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <header className="px-4 lg:px-6 h-16 flex items-center bg-white border-b">
-        <button className="p-1 rounded hover:bg-pink-100">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-pink-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
-        <div className="flex items-center ml-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-pink-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-          <span className="ml-2 text-xl font-bold">PatientPortal</span>
-        </div>
-      </header>
+    <div className="flex flex-col min-h-screen bg-pink-50">
+      <NavbarPatient linkTo={"/patient/dashboard"} />
       <main className="flex-1 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-pink-600">
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-black">
               Medications
             </h1>
             <button className="flex items-center text-pink-600 hover:text-pink-700">
@@ -97,7 +65,7 @@ export default function PrescriptionPage() {
             </button>
           </div>
           <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-bold tracking-tighter sm:text-2xl md:text-3xl mb-4 text-pink-600">
+            <h2 className="text-xl font-bold tracking-tighter sm:text-2xl md:text-3xl mb-4 text-black">
               Current Medications
             </h2>
             <p className="text-sm text-gray-600 mb-4">
@@ -111,9 +79,9 @@ export default function PrescriptionPage() {
             <p className="text-sm text-gray-600 mb-4">
               Please understand that any changes you request to your clinical
               information do not immediately occur. Changes must be reviewed and
-              reconciled by your Houston Methodist health care provider. It is
-              common that this clinical review will take place at your next
-              scheduled appointment.
+              reconciled by your WomenWell health care provider. It is common
+              that this clinical review will take place at your next scheduled
+              appointment.
             </p>
             <p className="text-sm text-gray-600 mb-4">
               Need to update your list of pharmacies?{" "}
@@ -158,25 +126,7 @@ export default function PrescriptionPage() {
           </div>
         </div>
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-gray-600">
-          © {new Date().getFullYear()} WomenWell. All rights reserved.
-        </p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <a
-            href="#"
-            className="text-xs text-pink-600 hover:text-pink-700 hover:underline underline-offset-4"
-          >
-            Terms of Service
-          </a>
-          <a
-            href="#"
-            className="text-xs text-pink-600 hover:text-pink-700 hover:underline underline-offset-4"
-          >
-            Privacy
-          </a>
-        </nav>
-      </footer>
+      <Footer />
     </div>
   );
 }
