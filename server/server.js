@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import fruitRouter from "./routers/edibles.js";
 import authRouter from "./routers/auth.js";
+import appointmentRouter from "./routers/appointment.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(bodyParser.json());  // Parse JSON requests
 // Routes
 app.use("/edibles", fruitRouter);
 app.use("/auth", authRouter);
+app.use("/appointment", appointmentRouter);
 
 // Start the server
 app.listen(3000, () => {

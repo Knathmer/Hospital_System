@@ -1,119 +1,195 @@
-import React, { useState } from 'react';
+// BookPage.jsx
 
-// Mock data for specialties and doctors
-const specialties = [
-  { id: 1, name: "Gynecology" },
-  { id: 2, name: "Obstetrics" },
-  { id: 3, name: "Fertility" },
-];
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const doctors = [
-  { id: 1, name: "Dr. Emily Johnson", specialtyId: 1 },
-  { id: 2, name: "Dr. Sarah Smith", specialtyId: 2 },
-  { id: 3, name: "Dr. Michael Brown", specialtyId: 3 },
-];
+function BookPage() {
+    // State variables for form data
+    const [specialty, setSpecialty] = useState("");
+    const [specialties, setSpecialties] = useState([]); // State for specialties
+    const [doctors, setDoctors] = useState([]);
+    const [doctor, setDoctor] = useState("");
+    const [date, setDate] = useState("");
+    const [time, setTime] = useState("");
+    const [reason, setReason] = useState("");
+    const [message, setMessage] = useState(""); // For success/error messages
+    const [bookedTimes, setBookedTimes] = useState([]); // Booked times for selected doctor and date
+    const [availableTimes, setAvailableTimes] = useState([]); // Available times after excluding booked times
 
-const BookPage = () => {
-  const [selectedSpecialty, setSelectedSpecialty] = useState("");
-  const [selectedDoctor, setSelectedDoctor] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
-  const [appointmentTime, setAppointmentTime] = useState("");
-  const [reason, setReason] = useState("");
+    // Define business hours and time intervals
+    const BUSINESS_HOURS_START = 9; // 9 AM
+    const BUSINESS_HOURS_END = 17; // 5 PM
+    const TIME_INTERVAL = 30; // in minutes
 
-  const filteredDoctors = doctors.filter(
-    doctor => doctor.specialtyId === parseInt(selectedSpecialty)
-  );
+    // Fetch specialties when component mounts
+    useEffect(() => {
+        axios.get("http://localhost:3000/appointment/specialties")
+            .then(response => setSpecialties(response.data))
+            .catch(error => console.error("Error fetching specialties:", error));
+    }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log({
-      specialty: selectedSpecialty,
-      doctor: selectedDoctor,
-      date: selectedDate,
-      time: appointmentTime,
-      reason,
-    });
-  };
+    // Fetch doctors based on specialty
+    useEffect(() => {
+        if (specialty) {
+            axios.get("http://localhost:3000/appointment/doctors", {
+                params: { specialty }
+            })
+            .then(response => setDoctors(response.data))
+            .catch(error => console.error("Error fetching doctors:", error));
+        } else {
+            setDoctors([]);
+            setDoctor("");
+        }
+    }, [specialty]);
 
-  return (
-    <section className="min-w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-pink-50">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col items-center space-y-4 text-center">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Book Your Appointment
-            </h1>
-            <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400 py-6">
-              Schedule your visit with our expert healthcare professionals. We're here to provide you with comprehensive care and support.
-            </p>
-          </div>
-          <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
-            <div>
-              <select
-                className="w-full p-2 border border-gray-300 rounded-md"
-                value={selectedSpecialty}
-                onChange={(e) => setSelectedSpecialty(e.target.value)}
-              >
-                <option value="">Select Specialty</option>
-                {specialties.map((specialty) => (
-                  <option key={specialty.id} value={specialty.id.toString()}>
-                    {specialty.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <select
-                className="w-full p-2 border border-gray-300 rounded-md"
-                value={selectedDoctor}
-                onChange={(e) => setSelectedDoctor(e.target.value)}
-                disabled={!selectedSpecialty}
-              >
-                <option value="">Select Doctor</option>
-                {filteredDoctors.map((doctor) => (
-                  <option key={doctor.id} value={doctor.id.toString()}>
-                    {doctor.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <input
-                type="date"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              />
-            </div>
-            <div>
-              <input
-                type="time"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                value={appointmentTime}
-                onChange={(e) => setAppointmentTime(e.target.value)}
-              />
-            </div>
-            <div>
-              <textarea
-                className="w-full p-2 border border-gray-300 rounded-md"
-                rows={4}
-                placeholder="Reason for appointment"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              className="w-full py-2 px-4 bg-pink-600 text-white font-semibold rounded-md hover:bg-pink-700 transition duration-300"
-            >
-              Book Appointment
-            </button>
-          </form>
+    // Fetch booked times when doctor and date are selected
+    useEffect(() => {
+        if (doctor && date) {
+            axios.get("http://localhost:3000/appointment/appointments", {
+                params: { doctorID: doctor, date }
+            })
+            .then(response => setBookedTimes(response.data.bookedTimes))
+            .catch(error => {
+                console.error("Error fetching booked times:", error);
+                setBookedTimes([]);
+            });
+        } else {
+            setBookedTimes([]);
+        }
+    }, [doctor, date]);
+
+    // Generate available times based on booked times
+    useEffect(() => {
+        const generateAvailableTimes = () => {
+            const times = [];
+            for (let hour = BUSINESS_HOURS_START; hour < BUSINESS_HOURS_END; hour++) {
+                for (let min = 0; min < 60; min += TIME_INTERVAL) {
+                    const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+                    times.push(timeStr);
+                }
+            }
+
+            // Exclude booked times
+            const available = times.filter(t => !bookedTimes.includes(t));
+            setAvailableTimes(available);
+            // Reset time selection if it's no longer available
+            if (!available.includes(time)) {
+                setTime("");
+            }
+        };
+
+        generateAvailableTimes();
+    }, [bookedTimes]);
+
+    // Handle form submission for booking an appointment
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        try {
+            const appointmentDateTime = `${date}T${time}:00`; // Format date and time
+            const token = localStorage.getItem("token");
+
+            const response = await axios.post("http://localhost:3000/appointment/book", 
+                { appointmentDateTime, reason, doctorID: doctor },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            setMessage(response.data.message); // Display success message
+            // Optionally, reset the form
+            setSpecialty("");
+            setDoctor("");
+            setDate("");
+            setTime("");
+            setReason("");
+            setBookedTimes([]);
+            setAvailableTimes([]);
+        } catch (error) {
+            setMessage(error.response?.data.message || "Error booking appointment");
+            console.error("Error booking appointment:", error);
+        }
+    };
+
+    return (
+        <div>
+            <h2>Book an Appointment</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Specialty:</label>
+                    <select value={specialty} onChange={(e) => setSpecialty(e.target.value)} required>
+                        <option value="">Select a specialty</option>
+                        {specialties.map((spec) => (
+                            <option key={spec.specialty} value={spec.specialty}>
+                                {spec.specialty}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label>Doctor:</label>
+                    <select value={doctor} onChange={(e) => setDoctor(e.target.value)} required>
+                        <option value="">Select a doctor</option>
+                        {doctors.map((doc) => (
+                            <option key={doc.doctorID} value={doc.doctorID}>
+                                Dr. {doc.firstName} {doc.lastName}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label>Date:</label>
+                    <input 
+                        type="date" 
+                        value={date} 
+                        onChange={(e) => setDate(e.target.value)} 
+                        required 
+                        min={new Date().toISOString().split("T")[0]} // Prevent selecting past dates
+                    />
+                </div>
+
+                <div>
+                    <label>Time:</label>
+                    {doctor && date ? (
+                        availableTimes.length > 0 ? (
+                            <select value={time} onChange={(e) => setTime(e.target.value)} required>
+                                <option value="">Select a time</option>
+                                {availableTimes.map((t) => (
+                                    <option key={t} value={t}>
+                                        {t}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : (
+                            <p>No available times for the selected doctor and date.</p>
+                        )
+                    ) : (
+                        <input 
+                            type="time" 
+                            value={time} 
+                            onChange={(e) => setTime(e.target.value)} 
+                            required 
+                            disabled 
+                            placeholder="Select a doctor and date first"
+                        />
+                    )}
+                </div>
+
+                <div>
+                    <label>Reason:</label>
+                    <textarea value={reason} onChange={(e) => setReason(e.target.value)} required />
+                </div>
+
+                <button type="submit" disabled={!time}>Book Appointment</button>
+            </form>
+
+            {message && <p>{message}</p>}
         </div>
-      </div>
-    </section>
-  );
+    );
 }
 
 export default BookPage;
