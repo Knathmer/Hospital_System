@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import {
   INSERT_ADDRESS_QUERY,
   INSERT_PATIENT_QUERY,
+  INSERT_EMERGENCY_CONTACT_QUERY,
 } from "../queries/constants/insertQueries.js";
 import {
   SELECT_ADDRESSID_QUERY,
@@ -17,9 +18,9 @@ import { getUserAndRole } from "../queries/user/getUserAndRole.js";
 const JWT_SECRET = process.env.JWT_SECRET; //Pulls the ENV secret key from .env
 
 // Helper function for getting or inserting an address
-async function getAddressID(addrStreet, addrZip, addrCity, addrState) {
+async function getAddressID(connection, addrStreet, addrZip, addrCity, addrState) {
   try {
-    const addresses = await query(SELECT_ADDRESSID_QUERY, [
+    const [addresses] = await connection.query(SELECT_ADDRESSID_QUERY, [
       addrStreet,
       addrZip,
       addrCity,
@@ -29,21 +30,21 @@ async function getAddressID(addrStreet, addrZip, addrCity, addrState) {
     if (addresses.length > 0) {
       return addresses[0].addressID;
     } else {
-      // Handle address insertion here
-
-      const insertResult = await query(INSERT_ADDRESS_QUERY, [
+      // Insert the new address
+      const [insertResult] = await connection.query(INSERT_ADDRESS_QUERY, [
         addrStreet,
         addrZip,
         addrCity,
         addrState,
       ]);
-      return insertResult.insertId; // MySQL returns the auto-increment ID this way.
+      return insertResult.insertId;
     }
   } catch (error) {
     console.error("Error checking or inserting address:", error);
     throw new Error("Database error");
   }
 }
+
 
 // Function to handle login request and JWT generation
 export async function login(req, res) {
@@ -120,37 +121,47 @@ export async function register(req, res) {
     // Insert or get the address ID
     console.log("Inserting or retrieving address ID");
     const addressID = await getAddressID(
+      connection,
       userData.addrStreet,
       userData.addrZip,
       userData.addrCity,
       userData.addrState
     );
+    
 
     console.log("Address ID obtained:", addressID);
 
     // Insert the patient
     console.log("Inserting patient information");
-    const insertResult = await connection.query(INSERT_PATIENT_QUERY, [
-      userData.firstName,
-      userData.lastName,
-      userData.dateOfBirth,
-      userData.gender,
-      userData.height,
-      userData.weight,
-      userData.phoneNumber,
-      userData.email,
-      userData.password,
-      new Date(), // lastLogin
-      userData.emergencyPhoneNumber,
-      userData.emergencyEmail,
-      "user",
-      new Date(), // createdAt
-      "user",
-      new Date(), // updatedAt
-      addressID,
+    const [insertResult] = await connection.query(INSERT_PATIENT_QUERY, [
+      userData.firstName,        // 1
+      userData.lastName,         // 2
+      userData.dateOfBirth,      // 3
+      userData.gender,           // 4
+      userData.phoneNumber,      // 5
+      userData.email,            // 6
+      userData.password,         // 7
+      new Date(),                // 8 - lastLogin
+      "user",                    // 9 - createdBy
+      new Date(),                // 10 - createdAt
+      "user",                    // 11 - updatedBy
+      new Date(),                // 12 - updatedAt
+      addressID,                 // 13
     ]);
+    
+    const patientID = insertResult.insertId;
+    console.log("Patient ID obtained:", patientID);
 
     console.log("Patient insert result:", insertResult);
+
+    const emergencyInsertResult = await connection.query(INSERT_EMERGENCY_CONTACT_QUERY, [
+      userData.emergencyFirstName,
+      userData.emergencyLastName,
+      userData.emergencyRelationship,
+      userData.emergencyPhoneNumber,
+      userData.emergencyEmail,
+      patientID,
+    ]);
 
     await connection.commit(); // Commit transaction
     console.log("Transaction committed");

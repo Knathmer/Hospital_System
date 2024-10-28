@@ -12,3 +12,4 @@ export const SELECT_ADDRESSID_QUERY = `
             FROM address
             WHERE addrStreet = ? AND addrZip = ? AND addrCity = ? AND addrState = ?;
         `;
+
