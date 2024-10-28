@@ -64,9 +64,22 @@ export async function login(req, res) {
     }
 
     const userID = user[userIDField];
+    let tokenPayload;
+
+    // Generate the JWT payload based on the user's role
+    if (role === "patient") {
+      tokenPayload = { patientID: userID, role };
+    } else if (role === "doctor") {
+      tokenPayload = { doctorID: userID, role };
+    } else if (role === "admin") {
+      tokenPayload = { adminID: userID, role };
+    } else {
+      return res.status(400).json({ message: "Unknown user role" });
+    }
+
     // Generate a JWT token with the user's ID and role
     const token = jwt.sign(
-      { id: userID, role: role }, // Payload (user id and role)
+      tokenPayload, // Payload (user id and role)
       JWT_SECRET, // Secret
       { expiresIn: "1h" } // Token expiration
     );
