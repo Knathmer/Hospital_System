@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Printer, Info, Trash2 } from "lucide-react";
 import MedicationCard from "../../components/patientComponents/MedicationCard.jsx";
+import NoMedicationFound from "../../components/patientComponents/NoMedicationFound.jsx";
 import NavbarPatient from "../../components/dashboards/patient/sections/header/NavbarPatient.jsx";
 import Footer from "../../components/ui/Footer.jsx";
 
@@ -89,9 +90,11 @@ export default function PrescriptionPage() {
                 Go to Manage My Pharmacies.
               </a>
             </p>
-            <button className="inline-flex h-9 items-center justify-center rounded-md bg-pink-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-pink-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-700 disabled:pointer-events-none disabled:opacity-50">
-              Request refills
-            </button>
+            {medications && medications.length > 0 && (
+              <button className="inline-flex h-9 items-center justify-center rounded-md bg-pink-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-pink-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-700 disabled:pointer-events-none disabled:opacity-50">
+                Request refills
+              </button>
+            )}
             {medications && medications.length > 0 ? (
               medications.map((med, index) => (
                 <MedicationCard
@@ -129,12 +132,14 @@ export default function PrescriptionPage() {
                 />
               ))
             ) : (
-              <p>No Medication Found.</p>
+              <NoMedicationFound />
             )}
             <div className="mt-6 pt-6 border-t">
-              <button className="flex items-center text-pink-600 hover:text-pink-700 hover:underline">
-                <span className="text-xl mr-2">+</span> Report a medication
-              </button>
+              {medications && medications.length > 0 && (
+                <button className="flex items-center text-pink-600 hover:text-pink-700 hover:underline">
+                  <span className="text-xl mr-2">+</span> Report a medication
+                </button>
+              )}
             </div>
           </div>
         </div>
