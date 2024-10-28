@@ -9,12 +9,13 @@ const RegistrationPage = () => {
     lastName: '',
     dateOfBirth: '',
     gender: '',
-    height: '',
-    weight: '',
     phoneNumber: '',
     email: '',
     password: '',
     confirmPassword: '',
+    emergencyFirstName: '',
+    emergencyLastName: '',
+    emergencyRelationship: '',
     emergencyPhoneNumber: '',
     emergencyEmail: '',
     addrStreet: '',
@@ -137,36 +138,6 @@ const RegistrationPage = () => {
                 </select>
               </div>
               <div>
-                <label htmlFor="height" className="block text-sm font-medium text-gray-700">Height (cm)</label>
-                <input
-                  type="number"
-                  id="height"
-                  name="height"
-                  value={formData.height}
-                  onChange={handleChange}
-                  step="0.01"
-                  min="0"
-                  max="999.99"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
-                />
-              </div>
-              <div>
-                <label htmlFor="weight" className="block text-sm font-medium text-gray-700">Weight (kg)</label>
-                <input
-                  type="number"
-                  id="weight"
-                  name="weight"
-                  value={formData.weight}
-                  onChange={handleChange}
-                  step="0.01"
-                  min="0"
-                  max="999.99"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
-                />
-              </div>
-              <div>
                 <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
                 <input
                   type="tel"
@@ -215,6 +186,48 @@ const RegistrationPage = () => {
                   onChange={handleChange}
                   required
                   maxLength="100"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Emergency Contact</h3>
+              </div>
+              <div>
+                <label htmlFor="emergencyFirstName" className="block text-sm font-medium text-gray-700">First Name</label>
+                <input
+                  type="text"
+                  id="emergencyFirstName"
+                  name="emergencyFirstName"
+                  value={formData.emergencyFirstName}
+                  onChange={handleChange}
+                  required
+                  maxLength="50"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                />
+              </div>
+              <div>
+                <label htmlFor="emergencyLastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+                <input
+                  type="text"
+                  id="emergencyLastName"
+                  name="emergencyLastName"
+                  value={formData.emergencyLastName}
+                  onChange={handleChange}
+                  required
+                  maxLength="50"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                />
+              </div>
+              <div>
+                <label htmlFor="emergencyRelationship" className="block text-sm font-medium text-gray-700">Relationship</label>
+                <input
+                  type="text"
+                  id="emergencyRelationship"
+                  name="emergencyRelationship"
+                  value={formData.emergencyRelationship}
+                  onChange={handleChange}
+                  required
+                  maxLength="50"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
                 />
               </div>
@@ -314,7 +327,7 @@ const RegistrationPage = () => {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <Link to="/login" className="font-medium text-pink-600 hover:text-pink-500">
+              <Link to="/login" className="font-medium  text-pink-600 hover:text-pink-500">
                 Sign in
               </Link>
             </p>
