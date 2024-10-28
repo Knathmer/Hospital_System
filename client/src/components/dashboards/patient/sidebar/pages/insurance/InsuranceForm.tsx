@@ -4,7 +4,7 @@
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // import { Checkbox } from "@/components/ui/checkbox"
 // import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Heart, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import Label from "../../../../../ui/Label";
@@ -13,9 +13,69 @@ import Select from "../../../../../ui/select/Select";
 import SelectItem from "../../../../../ui/select/SelectItem";
 import Checkbox from "../../../../../ui/Checkbox";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
+
+import axios from "axios";
+
 // import Link from "next/link"
 
 export default function InsuranceForm() {
+  const [formData, setFormData] = useState({
+    providerName: null,
+    policyNum: null,
+    covDetails: null,
+    covExpDate: null,
+  });
+
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    //e is the event object
+    const { name, value } = e.target; //Breaks down the element where changes took place into name and value (Destructuring input)
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      const response = await axios.post(
+        "http://localhost:3000/auth/patient/insurance",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200 && response.data) {
+        console.log("Add Medical History Successful!");
+      } else {
+        setError("Add Medical History failed. Please try again.");
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+      console.error("Medical History error:", error);
+    }
+  };
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -28,17 +88,31 @@ export default function InsuranceForm() {
             Back to Dashboard
           </Link>
           <h1 className="text-3xl font-bold mb-6">Insurance Information</h1>
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Primary Insurance</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <div>
                   <Label htmlFor="insuranceProvider">Insurance Provider</Label>
-                  <Input id="insuranceProvider" required />
+                  <Input
+                    type="text"
+                    id="providerName"
+                    name="providerName"
+                    value={formData.providerName}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 <div>
                   <Label htmlFor="policyNumber">Policy Number</Label>
-                  <Input id="policyNumber" required />
+                  <Input
+                    type="text"
+                    id="policyNum"
+                    name="policyNum"
+                    value={formData.policyNum}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 <div>
                   <Label htmlFor="groupNumber">Group Number</Label>
@@ -72,8 +146,12 @@ export default function InsuranceForm() {
                 <div>
                   <Label htmlFor="coverageDetails">Coverage Details</Label>
                   <Input
-                    id="coverageDetails"
+                    type="text"
+                    id="covDetails"
+                    name="covDetails"
                     placeholder="e.g., PPO, HMO, etc."
+                    value={formData.covDetails}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -81,7 +159,14 @@ export default function InsuranceForm() {
                   <Label htmlFor="coverageExpirationDate">
                     Coverage Expiration Date
                   </Label>
-                  <Input id="coverageExpirationDate" type="date" required />
+                  <Input
+                    id="covExpDate"
+                    name="covExpDate"
+                    type="date"
+                    value={formData.covExpDate}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
             </div>
