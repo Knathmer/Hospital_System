@@ -13,7 +13,9 @@ const QuickActions = () => {
         <NavButton variant="outline" to="/medical-history">
           Update Health Information
         </NavButton>
-        <NavButton variant="outline">View Billing Statements</NavButton>
+        <NavButton variant="outline" to="/insurance">
+          View Billing Statements
+        </NavButton>
       </div>
     </section>
   );
