@@ -6,7 +6,7 @@ export default function MedicationCard({
   instructions,
   prescriptionDetails = {},
   refillDetails = {},
-  //   pharmacyDetails = {},
+  pharmacyDetails = {},
   //   onRequestRefill,
   //   onRemove,
 }) {
@@ -22,7 +22,7 @@ export default function MedicationCard({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4">
         <div>
           <h4 className="font-semibold text-pink-600">Instructions</h4>
           <p className="break-words overflow-hidden">{instructions}</p>
@@ -39,9 +39,15 @@ export default function MedicationCard({
         </div>
         <div>
           <h4 className="font-semibold text-pink-600">Pharmacy Details</h4>
-          <p>{"N/A"}</p>
-          <p>{"N/A"}</p>
-          <p>{"N/A"}</p>
+          <p>
+            {pharmacyDetails.pharmacyName} - {pharmacyDetails.pharmacyCity},{" "}
+            {pharmacyDetails.pharmacyState}
+          </p>
+          <p>
+            {pharmacyDetails.pharmacyAddress}, {pharmacyDetails.pharmacyCity}{" "}
+            {pharmacyDetails.pharmacyState} {pharmacyDetails.pharmacyZip}
+          </p>
+          <p>{pharmacyDetails.pharmacyPhoneNum}</p>
         </div>
       </div>
       <div className="mt-6 flex items-center">
