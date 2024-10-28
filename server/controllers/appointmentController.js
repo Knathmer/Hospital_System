@@ -66,8 +66,8 @@ export async function bookAppointment(req, res) {
         // Book the appointment
         await connection.query(
             `INSERT INTO appointment 
-             (appointmentDateTime, reason, status, createdBy, updatedBy, patientID, doctorID)
-             VALUES (?, ?, 'Scheduled', 'user', 'user', ?, ?)`,
+             (appointmentDateTime, reason, status, patientID, doctorID)
+             VALUES (?, ?, 'Scheduled', ?, ?)`,
             [appointmentDateTime, reason, patientID, doctorID]
         );
 
