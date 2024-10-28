@@ -3,7 +3,6 @@ import pool from "../database.js"; // You can also import the pool if needed for
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
-import bcrypt from "bcrypt";
 import {
   INSERT_ADDRESS_QUERY,
   INSERT_PATIENT_QUERY,
