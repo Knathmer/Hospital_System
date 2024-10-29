@@ -60,10 +60,6 @@ export default function PrescriptionPage() {
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-black">
               Medications
             </h1>
-            <button className="flex items-center text-pink-600 hover:text-pink-700">
-              <Printer className="w-5 h-5 mr-2" />
-              Print
-            </button>
           </div>
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-xl font-bold tracking-tighter sm:text-2xl md:text-3xl mb-4 text-black">

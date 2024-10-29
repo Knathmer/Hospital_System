@@ -14,12 +14,6 @@ export default function MedicationCard({
     <div className="bg-white shadow rounded-lg p-6 mt-6">
       <div className="flex justify-between items-start">
         <h3 className="text-xl font-semibold text-pink-600">{name}</h3>
-        <button
-          className="text-pink-600 hover:text-pink-700"
-          aria-label="More information"
-        >
-          <Info className="w-5 h-5" />
-        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4">
@@ -56,14 +50,6 @@ export default function MedicationCard({
           className="text-pink-600 hover:text-pink-700 hover:underline"
         >
           Request refill
-        </button>
-        <div className="mx-4 h-4 w-px bg-gray-200"></div>
-        <button
-          //   onClick={onRemove}
-          className="text-red-600 hover:text-red-700 hover:underline flex items-center"
-        >
-          <Trash2 className="w-4 h-4 mr-1" />
-          Remove
         </button>
       </div>
     </div>
