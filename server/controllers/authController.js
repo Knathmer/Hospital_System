@@ -7,10 +7,12 @@ import {
   INSERT_ADDRESS_QUERY,
   INSERT_PATIENT_QUERY,
   INSERT_EMERGENCY_CONTACT_QUERY,
+  INSERT_DOCTOR_QUERY,
 } from "../queries/constants/insertQueries.js";
 import {
   SELECT_ADDRESSID_QUERY,
   SELECT_PATIENT_FROM_EMAIL_QUERY,
+  SELECT_DOCTOR_FROM_EMAIL_QUERY,
 } from "../queries/constants/selectQueries.js";
 import { getUserAndRole } from "../queries/user/getUserAndRole.js";
 
@@ -43,7 +45,6 @@ async function getAddressID(connection, addrStreet, addrZip, addrCity, addrState
     throw new Error("Database error");
   }
 }
-
 
 // Function to handle login request and JWT generation
 export async function login(req, res) {
@@ -180,3 +181,72 @@ export async function register(req, res) {
     }
   }
 }
+
+export async function registerDoctor(req, res) {
+  const {confirmPassword, ...userData } = req.body;
+  let connection;
+  try{
+    connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.beginTransaction(); // Begin transaction
+
+    const [existingUsers] = await connection.query(
+      SELECT_DOCTOR_FROM_EMAIL_QUERY,
+      [userData.email]
+    );
+
+    if(existingUsers.length > 0){
+      console.error("Email already exists");
+      await connection.rollback();
+      return res.status(400).json({ message: "Email already exists!" });
+    }
+
+    //Get the address to see if there is already a match
+    const addressID = await getAddressID(
+      connection,
+      userData.addrStreet,
+      userData.addrZip,
+      userData.addrCity,
+      userData.addrState
+    );
+
+    const [insertResult] = await connection.query(INSERT_DOCTOR_QUERY, [
+      userData.firstName,              // 1
+      userData.lastName,               // 2
+      userData.dateOfBirth,            // 3
+      userData.gender,                 // 4
+      userData.specialty,              // 5
+      userData.workPhoneNumber,        // 6
+      userData.workEmail,              // 7
+      userData.password,               // 8
+      new Date(),                      // 9 - lastLogin
+      userData.personalPhoneNumber,    // 10
+      userData.personalEmail,          // 11
+      "user",                          // 12 - createdBy
+      new Date(),                      // 13 - createdAt
+      "user",                          // 14 - updatedBy
+      new Date(),                      // 15 - updatedAt
+      userData.officeID,               // (This is officeID) Need to an additional form submission object that is for submitting the office code.
+      addressID,                       // 17
+    ]);
+
+    await connection.commit(); // Commit transaction
+    console.log("Transaction committed");
+    return res.status(200).json({ message: "Registration Successful!" });
+
+  } catch (error) {
+    if (connection) {
+      await connection.rollback(); // Rollback on error
+    }
+    console.error("Registration Error:", error.message || error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message || error,
+    });
+  } finally {
+    if (connection) {
+      connection.release(); // Release the connection back to the pool if it was successfully acquired
+    }
+  }
+}
+
+
