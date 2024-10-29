@@ -20,11 +20,21 @@ async function sendPendingEmails() {
         let [emails] = await query('SELECT * FROM email_queue WHERE status = "Pending"');
 
         // Ensure emails is always an array
-        if (!Array.isArray(emails)) {
+        if (!emails) {
+            console.log("No pending emails to send at this time.");
+            return;
+        } else if (!Array.isArray(emails)) {
             emails = [emails]; // Convert single result to an array
         }
 
+        // Process each email if there are pending emails
         for (let email of emails) {
+            // Check if email object has expected properties
+            if (!email.recipientEmail || !email.subject || !email.message) {
+                console.error("Email object missing properties:", email);
+                continue; // Skip this email if required properties are missing
+            }
+
             try {
                 // Send the email
                 await transporter.sendMail({
@@ -48,5 +58,5 @@ async function sendPendingEmails() {
     }
 }
 
-// Run the email sending function periodically (every hour), change to (sendPendingEmails, 60000) to run every minute, or (sendPendingEmails, 3600000) to run every hour
-setInterval(sendPendingEmails, 3600000);
+// Run the email sending function periodically (sendPendingEmails, 60000) for every minute, and (sendPendingEmails, 3600000) for every hour
+setInterval(sendPendingEmails, 3600000); // Run every hour
