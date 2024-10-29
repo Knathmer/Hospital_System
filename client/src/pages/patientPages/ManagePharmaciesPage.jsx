@@ -19,6 +19,9 @@ export default function ManagePharmaciesPage() {
     zipCode: "",
     phoneNumber: "",
   });
+  const [allPharmacies, setAllPharmacies] = useState([]);
+  const [selectedPharmacy, setSelectedPharmacy] = useState(null);
+  const [showAddPharmacyForm, setShowAddPharmacyForm] = useState(false);
 
   useEffect(() => {
     const fetchPharmacies = async () => {
@@ -49,7 +52,27 @@ export default function ManagePharmaciesPage() {
       }
     };
 
+    const fetchAllPharmacies = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          setError("User is not authenticated");
+          return;
+        }
+
+        const response = axios.get(
+          "http://localhost:3000/auth/patient/pharmacies",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setAllPharmacies(response.data.allPharmacies);
+      } catch (error) {
+        console.error("Error fetching all pharmacies: ", error);
+      }
+    };
+
     fetchPharmacies();
+    fetchAllPharmacies();
   }, []);
 
   const handleAddPharmacy = async () => {
