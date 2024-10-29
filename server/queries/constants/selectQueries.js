@@ -13,3 +13,12 @@ export const SELECT_ADDRESSID_QUERY = `
             WHERE addrStreet = ? AND addrZip = ? AND addrCity = ? AND addrState = ?;
         `;
 
+//Patient Medication Queries
+export const SELECT_PATIENT_MEDICATION_INFORMATION_QUERY = `SELECT p.medicationName, p.dosage, p.frequency, p.start,
+                                                            p.quantity, p.daySupply, p.instruction, d.lastName, d.firstName,
+                                                            ph.pharmacyName, ph.address, ph.city, ph.state, ph.zipCode, ph.phoneNumber
+                                                            FROM prescription AS p
+                                                            JOIN patient AS q ON p.patientID = q.patientID
+                                                            JOIN doctor AS d ON p.doctorID = d.doctorID
+                                                            JOIN pharmacy AS ph ON q.pharmacyID = ph.pharmacyID
+                                                            WHERE p.patientID = ?;`;
