@@ -31,7 +31,18 @@ export const SELECT_PATIENT_MEDICATION_INFORMATION_QUERY = `SELECT
                                                               p.patientID = ?;
 `;
 
-export const SELECT_PATIENT_PHARMACY_INFORMATION_QUERY = `SELECT p.pharmacyName, p.address, p.city, p.state, p.zipCode, p.phoneNumber
-                                                          FROM pharmacy AS p
-                                                          JOIN patient AS pa ON p.pharmacyID = pa.pharmacyID
-                                                          WHERE pa.patientID = ?;`;
+export const SELECT_PATIENT_PHARMACY_INFORMATION_QUERY = `
+                                                            SELECT
+                                                              p.pharmacyName,
+                                                              p.address,
+                                                              p.city,
+                                                              p.state,
+                                                              p.zipCode,
+                                                              p.phoneNumber
+                                                            FROM
+                                                              pharmacy AS p
+                                                            JOIN
+                                                              patient_pharmacy AS pp ON p.pharmacyID = pp.pharmacyID
+                                                            WHERE
+                                                              pp.patientID = ?;
+                                                            `;
