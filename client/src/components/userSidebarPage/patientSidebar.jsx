@@ -1,30 +1,39 @@
-import { useState } from 'react'
-import { Heart, Calendar, FileText, PillBottle, CreditCard, ShieldPlus,Settings, LogOut } from "lucide-react"
+import { useState } from 'react';
+import { Heart, Calendar, FileText, PillBottle, CreditCard, ShieldPlus, Settings, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import PatientDashboard from '../dashboards/patient/PatientDashboard.tsx';
+import SidebarToggleButton from '../ui/buttons/SidebarToggleButton'; // Import the toggle button
 
 export default function SimplifiedDashboard() {
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   const sidebarItems = {
-    "Patient Services": [
+    'Patient Services': [
       { id: 'dashboard', label: 'Dashboard', icon: Heart },
       { id: 'appointments', label: 'Appointments', icon: Calendar },
       { id: 'medical-records', label: 'Medical Records', icon: FileText },
       { id: 'medication', label: 'Medication', icon: PillBottle },
     ],
-    "Billing & Payments": [
+    'Billing & Payments': [
       { id: 'billing', label: 'Billing', icon: CreditCard },
       { id: 'insurance', label: 'Insurance', icon: ShieldPlus },
     ],
-  }
+  };
+
+  const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 relative transition-all duration-300">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r flex flex-col justify-between">
+      <aside
+        className={`transform transition-transform duration-300 ${
+          isSidebarVisible ? 'translate-x-0 w-64' : '-translate-x-64 w-0'
+        } bg-white border-r flex flex-col justify-between`}
+      >
         <div>
           <div className="p-4 border-b">
-            <Link href="/" className="flex items-center">
+            <Link to="/" className="flex items-center">
               <Heart className="h-6 w-6 text-pink-500" />
               <span className="ml-2 text-xl font-bold text-gray-900">WomenWell</span>
             </Link>
@@ -39,9 +48,10 @@ export default function SimplifiedDashboard() {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-pink-600">Welcome</h2>
-                <p className="text-sm text-gray-700">Dr. John Doe</p> {/* this needs to get updated */}
+                <p className="text-sm text-gray-700">Dr. John Doe</p>
               </div>
             </div>
+          {/* Sidebar Items*/}
           </div>
           <nav className="p-4">
             {Object.keys(sidebarItems).map((category) => (
@@ -84,27 +94,32 @@ export default function SimplifiedDashboard() {
         </div>
       </aside>
 
-      {/* Main Content */}
-    <main className="flex-1 p-8">
+      {/* Sidebar Toggle Button near the top, imported as a separate component */}
+      <SidebarToggleButton isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} />
+
+      {/* Main Content - Adjust width based on sidebar visibility */}
+      <main
+        className={`p-8 transition-all duration-300 ${
+          isSidebarVisible ? 'ml-64 max-w-screen-lg' : 'ml-0 w-full'
+        } mx-auto`}
+      >
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
-            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}
+          {activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}
         </h1>
         
-       {/* Link pages here to according sidebar items */}
+        {/* Link pages here according to sidebar items */}
         {activeTab === 'dashboard' && (
-            <div>
-            <p className="text-gray-700">Place dashboard file here</p>
-            </div>
+          <div>
+            <PatientDashboard />
+          </div>
         )}
-
         {activeTab === 'appointments' && (
-            <div>
+          <div>
             <p className="text-gray-700">Place appointment file here.</p>
             {/* Add appointments content here */}
-            </div>
+          </div>
         )}
-
-    </main>
+      </main>
     </div>
-  )
-} 
+  );
+}
