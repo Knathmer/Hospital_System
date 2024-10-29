@@ -28,3 +28,11 @@ export const INSERT_EMERGENCY_CONTACT_QUERY = `
   (firstName, lastName, relationship, emergencyPhoneNumber, emergencyEmail, patientID)
   VALUES (?, ?, ?, ?, ?, ?);
 `;
+
+export const INSERT_DOCTOR_QUERY = `
+  INSERT INTO doctor 
+  (firstName, lastName, dateOfBirth, gender, specialty, workPhoneNumber, 
+  workEmail, password, lastLogin, personalPhoneNumber, personalEmail, 
+  createdBy, createdAt, updatedBy, updatedAt, officeID, addressID)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+`;
