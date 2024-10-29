@@ -1,9 +1,4 @@
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/label"
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-// import { Checkbox } from "@/components/ui/checkbox"
-// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+// md:grid-cols-2
 import React, { useState, useEffect } from "react";
 import { Heart, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -91,7 +86,7 @@ export default function InsuranceForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Primary Insurance</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+              <div className="grid grid-cols-1  gap-4 ">
                 <div>
                   <Label htmlFor="insuranceProvider">Insurance Provider</Label>
                   <Input
@@ -114,21 +109,21 @@ export default function InsuranceForm() {
                     required
                   />
                 </div>
-                <div>
+                {/* <div>
                   <Label htmlFor="groupNumber">Group Number</Label>
                   <Input id="groupNumber" />
-                </div>
-                <div>
+                </div> */}
+                {/* <div>
                   <Label htmlFor="policyHolderName">Policy Holder Name</Label>
                   <Input id="policyHolderName" required />
-                </div>
-                <div>
+                </div> */}
+                {/* <div>
                   <Label htmlFor="policyHolderDOB">
                     Policy Holder Date of Birth
                   </Label>
                   <Input id="policyHolderDOB" type="date" required />
-                </div>
-                <div>
+                </div> */}
+                {/* <div>
                   <Label htmlFor="relationshipToPatient">
                     Relationship to Patient
                   </Label>
@@ -142,7 +137,7 @@ export default function InsuranceForm() {
                     <SelectItem value="child">Child</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </Select>
-                </div>
+                </div> */}
                 <div>
                   <Label htmlFor="coverageDetails">Coverage Details</Label>
                   <Input
@@ -223,7 +218,7 @@ export default function InsuranceForm() {
               </div>
             </div> */}
 
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Additional Information</h2>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
@@ -239,9 +234,9 @@ export default function InsuranceForm() {
                   </Label>
                 </div>
               </div>
-            </div>
+            </div> */}
 
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Emergency Contact</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -259,7 +254,7 @@ export default function InsuranceForm() {
                   <Input id="emergencyContactPhone" type="tel" required />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <div className="flex justify-end space-x-4">
               <FormSubmitButton />
