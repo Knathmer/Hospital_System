@@ -1,7 +1,7 @@
 // md:grid-cols-2
 import React, { useState, useEffect } from "react";
 import { Heart, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Label from "../../../../../ui/Label";
 import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/select/Select";
@@ -31,9 +31,11 @@ export default function InsuranceForm() {
       [name]: value,
     }));
   };
+  const nav = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError("");
 
     try {
@@ -54,9 +56,10 @@ export default function InsuranceForm() {
       );
 
       if (response.status === 200 && response.data) {
-        console.log("Add Medical History Successful!");
+        console.log("Add Insurance Successful!");
+        nav("/edit-insurance");
       } else {
-        setError("Add Medical History failed. Please try again.");
+        setError("Add Insurance failed. Please try again.");
       }
     } catch (error) {
       if (

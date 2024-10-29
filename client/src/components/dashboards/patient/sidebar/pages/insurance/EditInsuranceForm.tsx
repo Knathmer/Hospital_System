@@ -27,7 +27,6 @@ const fetchInsuranceData = async () => {
     const response = await axios.get(
       "http://localhost:3000/auth/patient/insurance-info",
       {
-        withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
         },

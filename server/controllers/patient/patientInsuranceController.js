@@ -2,7 +2,7 @@ import { query } from "../../database.js";
 
 export async function updateInsurance(req, res) {
   try {
-    const patientID = req.user.id;
+    const patientID = req.user.patientID;
     const { ...insurData } = req.body;
 
     console.log(`providerName: ${insurData.providerName}`);
@@ -30,7 +30,7 @@ export async function updateInsurance(req, res) {
 
 export async function postInsurance(req, res) {
   try {
-    const patientID = req.user.id;
+    const patientID = req.user.patientID;
     const { ...insurData } = req.body;
 
     console.log(`providerName: ${insurData.providerName}`);
@@ -58,7 +58,8 @@ export async function postInsurance(req, res) {
 
 export async function hasInsuranceInfo(req, res) {
   try {
-    const patientID = req.user.id;
+    const patientID = req.user.patientID;
+
     const INSURANCE_EXISTANCE_QUERY =
       "SELECT * FROM insurance WHERE patientID = ?";
 
