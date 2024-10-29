@@ -1,5 +1,8 @@
 import express from "express";
-import { postMedicalHistory } from "../../controllers/patient/patientMedicalHistoryController.js";
+import {
+  hasMedHistoryInfo,
+  postMedicalHistory,
+} from "../../controllers/patient/patientMedicalHistoryController.js";
 import {
   postInsurance,
   hasInsuranceInfo,
@@ -11,6 +14,7 @@ import { getPatientMedications } from "../../controllers/patient/patientMedicati
 const router = express.Router();
 
 router.post("/medical-history", postMedicalHistory);
+router.get("/medical-history-info", hasMedHistoryInfo);
 router.post("/insurance", postInsurance);
 router.get("/insurance-info", hasInsuranceInfo);
 router.put("/update-insurance", updateInsurance);
