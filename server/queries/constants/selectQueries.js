@@ -46,3 +46,8 @@ export const SELECT_PATIENT_PHARMACY_INFORMATION_QUERY = `
                                                             WHERE
                                                               pp.patientID = ?;
                                                             `;
+
+export const SELECT_PHARMACY_CHECK_EXISTS_ALREADY = `
+                                                            SELECT * FROM pharmacy
+                                                            WHERE pharmacyName = ? AND address = ? AND city = ? AND state = ? AND zipCode = ? AND phoneNumber = ?;
+                                                          `;

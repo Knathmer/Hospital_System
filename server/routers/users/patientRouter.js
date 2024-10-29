@@ -6,7 +6,11 @@ import {
   updateInsurance,
 } from "../../controllers/patient/patientInsuranceController.js";
 import medicationRouter from "../subRouters/medicationRouter.js";
-import { getAllPharmacies } from "../../controllers/patient/patientController.js";
+import {
+  getAllPharmacies,
+  postNewPharmacy,
+  postToPatientPharmacy,
+} from "../../controllers/patient/pharmacyController.js";
 
 const router = express.Router();
 
@@ -19,5 +23,7 @@ router.put("/update-insurance", updateInsurance);
 router.use("/medications", medicationRouter);
 
 router.get("/pharmacies", getAllPharmacies);
+router.post("/pharmacies", postNewPharmacy);
+router.post("/pharmacies/add", postToPatientPharmacy);
 
 export default router;

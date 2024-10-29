@@ -28,3 +28,5 @@ export const INSERT_EMERGENCY_CONTACT_QUERY = `
   (firstName, lastName, relationship, emergencyPhoneNumber, emergencyEmail, patientID)
   VALUES (?, ?, ?, ?, ?, ?);
 `;
+
+export const INSERT_NEW_PHARMACY_QUERY = `INSERT INTO pharmacy (pharmacyName, address, city, state, zipCode, phoneNumber) VALUES (?, ?, ?, ?, ?, ?)`;
