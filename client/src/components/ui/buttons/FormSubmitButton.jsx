@@ -1,6 +1,6 @@
 import React from "react";
 import NavButton from "./NavButton";
-import DefaultButton from "./defaultButton";
+import DefaultButton from "./DefaultButton";
 
 const FormSubmitButton = () => {
   return (

@@ -86,7 +86,7 @@ export async function postSurgeries(surgeryList, patientID) {
 
 export async function postMedicalHistory(req, res) {
   try {
-    const patientID = req.user.id;
+    const patientID = req.user.patientID;
     const { ...medData } = req.body;
     const allergiesList = medData.allAllergies;
     const disabilityList = medData.allDisabilities;
