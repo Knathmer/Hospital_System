@@ -86,6 +86,12 @@ export default function EditInsuranceForm() {
   //   loadInsuranceData();
   // }, []);
 
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return ""; // Handle empty case
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // Returns YYYY-MM-DD
+  };
+
   useEffect(() => {
     const loadInsuranceData = async () => {
       let data = await fetchInsuranceData();
@@ -98,12 +104,14 @@ export default function EditInsuranceForm() {
           providerName: data.providerName || "",
           policyNum: data.policy_number || "",
           covDetails: data.coverageDetails || "",
-          covExpDate: data.coverage_expiration_date || "",
+          covExpDate: formatDateForInput(data.coverage_expiration_date) || "",
         }));
       }
     };
-    loadInsuranceData();
-  }, []);
+    if (!isEditing) {
+      loadInsuranceData();
+    }
+  }, [!isEditing]);
 
   // const handleInputChange = (section, field, value) => {
   //   setFormData((prevData) => ({
@@ -220,6 +228,7 @@ export default function EditInsuranceForm() {
                   <Label htmlFor="insuranceProvider">Insurance Provider</Label>
                   <Input
                     id="insuranceProvider"
+                    name="providerName"
                     value={formData.providerName}
                     onChange={handleChange}
                     disabled={!isEditing}
@@ -230,6 +239,7 @@ export default function EditInsuranceForm() {
                   <Label htmlFor="policyNumber">Policy Number</Label>
                   <Input
                     id="policyNumber"
+                    name="policyNum"
                     value={formData.policyNum}
                     onChange={handleChange}
                     disabled={!isEditing}

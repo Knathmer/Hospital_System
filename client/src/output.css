@@ -809,10 +809,6 @@ video {
   max-width: 24rem;
 }
 
-.max-w-screen-md {
-  max-width: 768px;
-}
-
 .flex-1 {
   flex: 1 1 0%;
 }
