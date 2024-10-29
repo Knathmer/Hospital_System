@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Heart } from 'lucide-react';
@@ -20,10 +20,26 @@ const RegisterDoctor = () => {
     addrZip: '',
     addrCity: '',
     addrState: '',
+    officeID: '',
   });
 
+  const [offices, setOffices] = useState([]);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchOffices = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/dataFetch/getOfficeLocations');
+        setOffices(response.data); // Set the offices in state
+      } catch (error) {
+        console.error('Error fetching office locations:', error);
+        setError('Failed to load office locations');
+      }
+    };
+    fetchOffices();
+  }, []);
+
+  const navigate = useNavigate(); //Allows navigation
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -257,7 +273,27 @@ const RegisterDoctor = () => {
                   maxLength="100"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
                 />
-              </div>
+               </div>
+              <div>
+              <label htmlFor="officeID" className="block text-sm font-medium text-gray-700">
+                Office Location
+                </label>
+                <select
+                  id="officeID"
+                  name="officeID"
+                  value={formData.officeID}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                >
+              <option value="">Select Office</option>
+              {offices.map((office) => (
+                <option key={office.officeID} value={office.officeID}>
+                  {office.officeName}
+                </option>
+              ))}
+            </select>
+          </div>
             </div>
             {/* Address Fields */}
             <div>
