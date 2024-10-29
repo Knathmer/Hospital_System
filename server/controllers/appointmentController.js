@@ -67,7 +67,7 @@ export async function bookAppointment(req, res) {
         await connection.query(
             `INSERT INTO appointment 
              (appointmentDateTime, reason, status, patientID, doctorID)
-             VALUES (?, ?, 'Scheduled', ?, ?)`,
+             VALUES (?, ?, 'Requested', ?, ?)`,
             [appointmentDateTime, reason, patientID, doctorID]
         );
 
@@ -118,5 +118,63 @@ export async function getAppointmentsByDoctorAndDate(req, res) {
     } catch (error) {
         console.error("Error fetching appointments:", error);
         res.status(500).json({ error: "Error fetching appointments" });
+    }
+}
+
+// Function to get appointments for the logged-in doctor
+export async function getDoctorAppointments(req, res) {
+    const doctorID = req.user.doctorID; // Get doctorID from token
+
+    if (!doctorID) {
+        return res.status(401).json({ error: "Doctor must be logged in" });
+    }
+
+    try {
+        const appointments = await query(
+            `SELECT appointment.*, 
+                    patient.firstName as patientFirstName, 
+                    patient.lastName as patientLastName,
+                    patient.dateOfBirth as patientDOB,
+                    patient.gender as patientGender,
+                    patient.phoneNumber as patientPhoneNumber,
+                    patient.email as patientEmail
+             FROM appointment
+             JOIN patient ON appointment.patientID = patient.patientID
+             WHERE appointment.doctorID = ?`,
+            [doctorID]
+        );
+
+        res.json(appointments);
+    } catch (error) {
+        console.error("Error fetching appointments:", error);
+        res.status(500).json({ error: "Error fetching appointments" });
+    }
+}
+
+// Function to update an appointment
+export async function updateAppointment(req, res) {
+    const doctorID = req.user.doctorID;
+    if (!doctorID) {
+        return res.status(401).json({ error: "Doctor must be logged in" });
+    }
+
+    const { appointmentID, reason, status } = req.body;
+
+    try {
+        // Update the appointment if it belongs to the doctor
+        const result = await query(
+            `UPDATE appointment SET reason = ?, status = ?
+             WHERE appointmentID = ? AND doctorID = ?`,
+            [reason, status, appointmentID, doctorID]
+        );
+
+        if (result.affectedRows > 0) {
+            res.json({ message: 'Appointment updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Appointment not found or not authorized' });
+        }
+    } catch (error) {
+        console.error('Error updating appointment:', error);
+        res.status(500).json({ error: 'Error updating appointment' });
     }
 }
