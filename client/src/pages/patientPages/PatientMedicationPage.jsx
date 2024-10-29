@@ -5,6 +5,7 @@ import MedicationCard from "../../components/patientComponents/MedicationCard.js
 import NoMedicationFound from "../../components/patientComponents/NoMedicationFound.jsx";
 import NavbarPatient from "../../components/dashboards/patient/sections/header/NavbarPatient.jsx";
 import Footer from "../../components/ui/Footer.jsx";
+import { Link } from "react-router-dom";
 
 export default function PrescriptionPage() {
   const [medications, setMedications] = useState([]);
@@ -82,9 +83,12 @@ export default function PrescriptionPage() {
             </p>
             <p className="text-sm text-gray-600 mb-4">
               Need to update your list of pharmacies?{" "}
-              <a href="#" className="text-pink-600 hover:underline">
+              <Link
+                to="manage-pharmacies"
+                className="text-pink-600 hover:underline"
+              >
                 Go to Manage My Pharmacies.
-              </a>
+              </Link>
             </p>
             {medications && medications.length > 0 && (
               <button className="inline-flex h-9 items-center justify-center rounded-md bg-pink-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-pink-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-700 disabled:pointer-events-none disabled:opacity-50">
