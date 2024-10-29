@@ -117,17 +117,18 @@ export default function PrescriptionPage() {
                     daySupply: med.daySupply,
                   }}
                   pharmacyDetails={{
-                    pharmacyName: med.pharmacyName,
-                    pharmacyAddress: med.address,
-                    pharmacyCity: med.city,
-                    pharmacyState: med.state,
-                    pharmacyZip: med.zipCode,
-                    pharmacyPhoneNum:
-                      med.phoneNumber.slice(0, 3) +
-                      "-" +
-                      med.phoneNumber.slice(3, 6) +
-                      "-" +
-                      med.phoneNumber.slice(6),
+                    pharmacyName: med.pharmacyName || "NULL",
+                    pharmacyAddress: med.address || "",
+                    pharmacyCity: med.city || "",
+                    pharmacyState: med.state || "",
+                    pharmacyZip: med.zipCode || "",
+                    pharmacyPhoneNum: med.phoneNumber
+                      ? med.phoneNumber.slice(0, 3) +
+                        "-" +
+                        med.phoneNumber.slice(3, 6) +
+                        "-" +
+                        med.phoneNumber.slice(6)
+                      : "",
                   }}
                 />
               ))
