@@ -3,7 +3,7 @@ import { query } from "../../database.js";
 export const getPatientMedications = async (req, res) => {
   try {
     // This is the patient's primary key, which was stored in the JWT Payload.
-    const patientID = req.user.id;
+    const patientID = req.user.patientID;
 
     const patientMedicationInformation = await query(
       SELECT_PATIENT_MEDICATION_INFORMATION_QUERY,
