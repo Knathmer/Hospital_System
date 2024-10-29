@@ -8,9 +8,9 @@ import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar.jsx'
 
 // files attached to sidebar item
 import PatientDashboard from '../dashboards/patient/PatientDashboard.tsx';
-import SidebarToggleButton from '../ui/buttons/SidebarToggleButton'; // Import the toggle button
+import SidebarToggleButton from '../ui/buttons/SidebarToggleButton.jsx'; // Import the toggle button
 
-export default function SimplifiedDashboard() {
+export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
