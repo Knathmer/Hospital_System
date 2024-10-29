@@ -225,8 +225,8 @@ export async function registerDoctor(req, res) {
       new Date(),                      // 13 - createdAt
       "user",                          // 14 - updatedBy
       new Date(),                      // 15 - updatedAt
-      2,                        // (This is officeID) Need to an additional form submission object that is for submitting the office code.
-      addressID,                        // 17
+      userData.officeID,               // (This is officeID) Need to an additional form submission object that is for submitting the office code.
+      addressID,                       // 17
     ]);
 
     await connection.commit(); // Commit transaction
