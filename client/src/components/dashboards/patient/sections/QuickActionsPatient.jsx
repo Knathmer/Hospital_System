@@ -60,11 +60,14 @@ const QuickActions = () => {
         }
       ); // Adjust the endpoint as needed
       const medHistoryInfo = await response.data.data;
-      console.log(`response.data: ${medHistoryInfo[0]}`);
+      console.log("med-history-info:", medHistoryInfo);
+      const entries = Object.values(medHistoryInfo[0]).some(
+        (array) => array.length > 0
+      );
 
       if (response.data) {
         // Check if insurance info exists
-        if (medHistoryInfo.length > 0) {
+        if (entries) {
           nav("/edit-medical-history"); // Redirect to edit page
         } else {
           nav("/medical-history"); // Redirect to form page

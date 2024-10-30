@@ -2,6 +2,8 @@ import { bulkQuery, query } from "../../database.js";
 import {
   INSERT_ALLERGY_QUERY,
   INSERT_DISABILITY_QUERY,
+  INSERT_SURGERY_QUERY,
+  INSERT_VACCINE_QUERY,
 } from "../../queries/constants/insertQueries.js";
 
 export async function hasMedicationInfo(patientID) {
@@ -125,13 +127,16 @@ export async function hasMedHistoryInfo(req, res) {
     const surgeryInfo = await hasSurgeryInfo(patientID);
     const medicationInfo = await hasMedicationInfo(patientID);
 
-    const response = {
-      vaccine: vaccineInfo,
-      allergy: allergyInfo,
-      disability: disabilityInfo,
-      surgery: surgeryInfo,
-      medication: medicationInfo,
-    };
+    const response = [
+      {
+        vaccine: vaccineInfo,
+        allergy: allergyInfo,
+        disability: disabilityInfo,
+        surgery: surgeryInfo,
+        medication: medicationInfo,
+      },
+    ];
+    console.log("response-med-info:", allergyInfo);
 
     return res.status(200).json({
       message: "Get Medical History Successful!",
@@ -155,8 +160,8 @@ export async function postAllergies(allergiesList, patientID) {
     ]);
 
     console.log(`allergies: ${allergies}`);
-    // const insertResult = await bulkQuery(INSERT_ALLERGY_QUERY, [allergies]);
-    // console.log("Patient insert result:", insertResult);
+    const insertResult = await bulkQuery(INSERT_ALLERGY_QUERY, [allergies]);
+    console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
   } catch (error) {
@@ -172,10 +177,11 @@ export async function postDisabilities(disabilityList, patientID) {
       patientID,
     ]);
     console.log(`disabilities: ${disabilities}`);
-    // const insertResult = await bulkQuery(INSERT_DISABILITY_QUERY, [
-    //   disabilities,
-    // ]);
-    // console.log("Patient insert result:", insertResult);
+    const insertResult = await bulkQuery(INSERT_DISABILITY_QUERY, [
+      disabilities,
+      patientID,
+    ]);
+    console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
   } catch (error) {
@@ -183,6 +189,30 @@ export async function postDisabilities(disabilityList, patientID) {
     // res.status(500).json({ message: "Server error fetching prescriptions" });
   }
 }
+
+export async function postMedications(medicationList, patientID) {
+  try {
+    const INSERT_MEDICATION_QUERY =
+      "INSERT INTO other_prescriptions (medicationName, patientID) VALUES ?";
+
+    const medications = medicationList.map((disability) => [
+      disability.name,
+      patientID,
+    ]);
+    console.log(`disabilities: ${medications}`);
+    const insertResult = await bulkQuery(INSERT_MEDICATION_QUERY, [
+      medications,
+      patientID,
+    ]);
+    console.log("Patient insert medication result:", insertResult);
+
+    // return res.status(200).json({ message: "Insert Allergies Successful!" });
+  } catch (error) {
+    console.error("Error Fetching the prescriptions: ", error);
+    // res.status(500).json({ message: "Server error fetching prescriptions" });
+  }
+}
+
 export async function postVaccines(vaccineList, patientID) {
   try {
     const vaccines = vaccineList.map((vaccine) => [
@@ -192,10 +222,11 @@ export async function postVaccines(vaccineList, patientID) {
       patientID,
     ]);
     console.log(`vaccines: ${vaccines}`);
-    // const insertResult = await bulkQuery(INSERT_VACCINE_QUERY, [
-    //   vaccines,
-    // ]);
-    // console.log("Patient insert result:", insertResult);
+    const insertResult = await bulkQuery(INSERT_VACCINE_QUERY, [
+      vaccines,
+      patientID,
+    ]);
+    console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
   } catch (error) {
@@ -213,10 +244,8 @@ export async function postSurgeries(surgeryList, patientID) {
       patientID,
     ]);
     console.log(`surgeries: ${surgeries}`);
-    // const insertResult = await bulkQuery(INSERT_SURGERY_QUERY, [
-    //   surgery,
-    // ]);
-    // console.log("Patient insert result:", insertResult);
+    const insertResult = await bulkQuery(INSERT_SURGERY_QUERY, [surgery]);
+    console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
   } catch (error) {

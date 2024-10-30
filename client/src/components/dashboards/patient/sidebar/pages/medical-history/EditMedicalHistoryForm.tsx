@@ -9,13 +9,17 @@
 import { Heart, ArrowLeft, Plus, Trash2, Edit2 } from "lucide-react";
 // import Link from "next/link"
 import { Link, useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DefaultButton from "../../../../../ui/buttons/DefaultButton";
 import Label from "../../../../../ui/Label";
 import Input from "../../../../../ui/Input";
 import Checkbox from "../../../../../ui/Checkbox";
+import SelectItem from "../../../../../ui/select/SelectItem";
+import Select from "../../../../../ui/select/Select";
+import axios from "axios";
 
 export default function EditMedicalHistoryForm() {
+  const [error, setError] = useState("");
   const [vaccines, setVaccines] = useState([
     { name: "", date: "", doctor: "" },
   ]);
@@ -23,7 +27,7 @@ export default function EditMedicalHistoryForm() {
   const [allergies, setAllergies] = useState([
     { name: "", reaction: "", severity: "" },
   ]);
-  const [disabilities, setDisablilities] = useState([{ name: "" }]);
+  const [disabilities, setDisabilities] = useState([{ name: "" }]);
   const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -32,6 +36,15 @@ export default function EditMedicalHistoryForm() {
     allVaccines: vaccines,
     allSurgeries: surgeries,
   });
+
+  const [medications, setMedications] = useState([{ name: "" }]);
+  const addMedication = () => {
+    setMedications([...medications, { name: "" }]);
+  };
+
+  const removeMedication = (index: number) => {
+    setMedications(medications.filter((_, i) => i !== index));
+  };
 
   const addVaccine = () => {
     setVaccines([...vaccines, { name: "", date: "", doctor: "" }]);
@@ -58,15 +71,164 @@ export default function EditMedicalHistoryForm() {
   };
 
   const addDisability = () => {
-    setDisablilities([...disabilities, { name: "" }]);
+    setDisabilities([...disabilities, { name: "" }]);
   };
 
   const removeDisability = (index: number) => {
-    setDisablilities(disabilities.filter((_, i) => i !== index));
+    setDisabilities(disabilities.filter((_, i) => i !== index));
   };
 
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
+  };
+
+  const toDictAllergy = (list) => {
+    if (!Array.isArray(list) || list.length === 0) {
+      return [{ name: "", reaction: "", severity: "" }];
+    }
+    const listOfObjects = list.map((item) => {
+      return {
+        name: item.allergen || "",
+        reaction: item.reaction || "",
+        severity: item.severity || "",
+      };
+    });
+    return listOfObjects;
+  };
+
+  const toDictVaccine = (list) => {
+    if (!Array.isArray(list) || list.length === 0) {
+      return [{ name: "", date: "", doctor: "" }];
+    }
+    const listOfObjects = list.map((item) => {
+      return {
+        name: item.vaccineName ? item.vaccineName : "",
+        date: item.dateAdministered || "",
+        doctor: "",
+      };
+    });
+    return listOfObjects;
+  };
+
+  const toDictSurgery = (list) => {
+    if (!Array.isArray(list) || list.length === 0) {
+      return [{ name: "", date: "" }];
+    }
+    const listOfObjects = list.map((item) => {
+      return {
+        name: item.surgeryType || "",
+        date: item.surgeryDateTime || "",
+      };
+    });
+    return listOfObjects;
+  };
+
+  const toDictDisability = (list) => {
+    if (!Array.isArray(list) || list.length === 0) {
+      return [{ name: "" }];
+    }
+    const listOfObjects = list.map((item) => {
+      return {
+        name: item.disabilityType || "",
+      };
+    });
+    return listOfObjects;
+  };
+
+  const toDictMedication = (list) => {
+    if (!Array.isArray(list) || list.length === 0) {
+      return [{ name: "" }];
+    }
+    const listOfObjects = list.map((item) => {
+      console.log("item-med:");
+      return {
+        name: item.medicationName,
+      };
+    });
+    return listOfObjects;
+  };
+
+  useEffect(() => {
+    // Fetch data from backend
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          throw new Error("No token found");
+        }
+
+        const response = await axios.get(
+          "http://localhost:3000/auth/patient/medical-history-info",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        ); //
+        if (!response) throw new Error("Network response was not ok");
+
+        console.log("response-med-info2:", response.data.data[0].medication);
+
+        const allergy = toDictAllergy(response.data.data[0].allergy);
+        const vaccine = toDictVaccine(response.data.data[0].vaccine);
+        const surgery = toDictSurgery(response.data.data[0].surgery);
+        const disability = toDictDisability(response.data.data[0].disability);
+        const medication = toDictMedication(response.data.data[0].medication);
+        // Set the state with fetched data
+        setVaccines(vaccine);
+        setSurgeries(surgery);
+        setAllergies(allergy);
+        setDisabilities(disability);
+        setMedications(medication);
+      } catch (error) {
+        console.error("Error fetching medical history:", error);
+      }
+    };
+    if (!isEditing) {
+      fetchData();
+    }
+  }, [!isEditing]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      const response = await axios.post(
+        "http://localhost:3000/auth/patient/medical-history",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200 && response.data) {
+        console.log("Add Medical History Successful!");
+      } else {
+        setError("Add Medical History failed. Please try again.");
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+      console.error("Medical History error:", error);
+    }
+    setIsEditing(false);
   };
 
   return (
@@ -150,13 +312,148 @@ export default function EditMedicalHistoryForm() {
             </div> */}
 
             <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Family Medical History</h2>
+              <div className="space-y-2">
+                <Label>
+                  Has anyone in your family been diagnosed with the following?
+                </Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {[
+                    "Heart Disease",
+                    "Diabetes",
+                    "Cancer",
+                    "High Blood Pressure",
+                    "Stroke",
+                    "Mental Illness",
+                  ].map((condition) => (
+                    <div
+                      key={condition}
+                      className="flex items-center space-x-2"
+                    >
+                      <Checkbox
+                        id={condition.toLowerCase().replace(/\s/g, "-")}
+                        disabled={!isEditing}
+                      />
+                      <Label
+                        htmlFor={condition.toLowerCase().replace(/\s/g, "-")}
+                      >
+                        {condition}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Allergies</h2>
+              {allergies.map((allergy, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <Input
+                    placeholder="Allergy name"
+                    value={allergy.name}
+                    onChange={(e) => {
+                      const newAllergies = [...allergies];
+                      newAllergies[index].name = e.target.value;
+                      setAllergies(newAllergies);
+                    }}
+                    disabled={!isEditing}
+                  />
+                  <Input
+                    placeholder="Reaction"
+                    value={allergy.reaction}
+                    onChange={(e) => {
+                      const newAllergies = [...allergies];
+                      newAllergies[index].reaction = e.target.value;
+                      setAllergies(newAllergies);
+                    }}
+                    disabled={!isEditing}
+                  />
+
+                  <Select
+                    id="severity"
+                    name="severity"
+                    value={allergy.severity}
+                    onChange={(e) => {
+                      const newAllergies = [...allergies];
+                      newAllergies[index].severity = e.target.value;
+                      setAllergies(newAllergies);
+                    }}
+                    disabled={!isEditing}
+                  >
+                    <SelectItem value=""> Select Severity</SelectItem>
+                    <SelectItem value="Mild"> Mild</SelectItem>
+                    <SelectItem value="Moderate"> Moderate</SelectItem>
+                    <SelectItem value="Severe"> Severe</SelectItem>
+                  </Select>
+
+                  {isEditing && (
+                    <DefaultButton
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeAllergy(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </DefaultButton>
+                  )}
+                </div>
+              ))}
+              {isEditing && (
+                <DefaultButton
+                  type="button"
+                  variant="outline"
+                  onClick={addAllergy}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Allergy
+                </DefaultButton>
+              )}
+            </div>
+
+            <div className="space-y-4">
               <h2 className="text-xl font-semibold">Current Medications</h2>
-              <div>
+              {medications.map((medication, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <Input
+                    placeholder="Medication name"
+                    value={medication.name}
+                    onChange={(e) => {
+                      const newMedications = [...medications];
+                      newMedications[index].name = e.target.value;
+                      setMedications(newMedications);
+                    }}
+                    disabled={!isEditing}
+                  />
+
+                  {isEditing && (
+                    <DefaultButton
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeMedication(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </DefaultButton>
+                  )}
+                </div>
+              ))}
+              {isEditing && (
+                <DefaultButton
+                  type="button"
+                  variant="outline"
+                  onClick={addMedication}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Medication
+                </DefaultButton>
+              )}
+              {/* <div>
                 <Label htmlFor="medications">
                   Please list any medications you are currently taking:
                 </Label>
-                {/* <Textarea id="medications" placeholder="Enter your current medications here" disabled={!isEditing} /> */}
-              </div>
+                <Textarea id="medications" placeholder="Enter your current medications here" disabled={!isEditing} />
+              </div> */}
             </div>
 
             <div className="space-y-4">
@@ -220,6 +517,41 @@ export default function EditMedicalHistoryForm() {
 
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Disability Information</h2>
+              {disabilities.map((disability, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <Input
+                    placeholder="Disability name"
+                    value={disability.name}
+                    onChange={(e) => {
+                      const newDisabilities = [...disabilities];
+                      newDisabilities[index].name = e.target.value;
+                      setDisabilities(newDisabilities);
+                    }}
+                    disabled={!isEditing}
+                  />
+
+                  {isEditing && (
+                    <DefaultButton
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeDisability(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </DefaultButton>
+                  )}
+                </div>
+              ))}
+              {isEditing && (
+                <DefaultButton
+                  type="button"
+                  variant="outline"
+                  onClick={addDisability}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Disability
+                </DefaultButton>
+              )}
               {/* <div>
                 <Label>Do you have any disabilities?</Label>
                 <RadioGroup defaultValue="no" disabled={!isEditing}>
@@ -233,12 +565,12 @@ export default function EditMedicalHistoryForm() {
                   </div>
                 </RadioGroup>
               </div> */}
-              <div>
+              {/* <div>
                 <Label htmlFor="disabilities">
                   If yes, please describe your disabilities:
                 </Label>
-                {/* <Textarea id="disabilities" placeholder="Enter your disability information here" disabled={!isEditing} /> */}
-              </div>
+                <Textarea id="disabilities" placeholder="Enter your disability information here" disabled={!isEditing} />
+              </div> */}
             </div>
 
             <div className="space-y-4">
@@ -289,45 +621,20 @@ export default function EditMedicalHistoryForm() {
               )}
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Family Medical History</h2>
-              <div className="space-y-2">
-                <Label>
-                  Has anyone in your family been diagnosed with the following?
-                </Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {[
-                    "Heart Disease",
-                    "Diabetes",
-                    "Cancer",
-                    "High Blood Pressure",
-                    "Stroke",
-                    "Mental Illness",
-                  ].map((condition) => (
-                    <div
-                      key={condition}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        id={condition.toLowerCase().replace(/\s/g, "-")}
-                        disabled={!isEditing}
-                      />
-                      <Label
-                        htmlFor={condition.toLowerCase().replace(/\s/g, "-")}
-                      >
-                        {condition}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
             {isEditing && (
               <div className="flex justify-end space-x-4">
-                <DefaultButton variant="outline">Save as Draft</DefaultButton>
-                <DefaultButton className="bg-pink-500 text-white hover:bg-pink-600">
-                  Submit Form
+                <DefaultButton
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  variant="outline"
+                >
+                  Cancel
+                </DefaultButton>
+                <DefaultButton
+                  type="submit"
+                  className="bg-pink-500 text-white hover:bg-pink-600"
+                >
+                  Update Medical History
                 </DefaultButton>
               </div>
             )}

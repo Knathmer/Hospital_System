@@ -9,7 +9,7 @@ import SelectItem from "../../../../../ui/select/SelectItem";
 import Checkbox from "../../../../../ui/Checkbox";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
 
-import { Heart, ArrowLeft } from "lucide-react";
+import { Heart, ArrowLeft, Edit2 } from "lucide-react";
 import DefaultButton from "../../../../../ui/buttons/DefaultButton";
 
 import axios from "axios";
@@ -215,10 +215,22 @@ export default function EditInsuranceForm() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Link>
-          <h1 className="text-3xl font-bold mb-6">Insurance Information</h1>
-          <DefaultButton onClick={() => setIsEditing(!isEditing)}>
-            {isEditing ? "Cancel Editing" : "Edit Information"}
-          </DefaultButton>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold mb-6">Insurance Information</h1>
+            <DefaultButton onClick={() => setIsEditing(!isEditing)}>
+              {isEditing ? (
+                <>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Cancel
+                </>
+              ) : (
+                <>
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Edit
+                </>
+              )}
+            </DefaultButton>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Primary Insurance</h2>
