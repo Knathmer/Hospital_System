@@ -34,7 +34,7 @@ export default function MedicalHistoryForm() {
   });
 
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const nav = useNavigate();
 
   // Update formData when allergies change
   useEffect(() => {
@@ -79,6 +79,7 @@ export default function MedicalHistoryForm() {
 
       if (response.status === 200 && response.data) {
         console.log("Add Medical History Successful!");
+        nav("/edit-medical-history");
       } else {
         setError("Add Medical History failed. Please try again.");
       }
@@ -97,7 +98,7 @@ export default function MedicalHistoryForm() {
   };
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
-      <NavbarPatient />
+      <NavbarPatient linkTo={"/patient/dashboard"} />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <Link
