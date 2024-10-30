@@ -7,8 +7,8 @@ import LogoSidebar from './sidebarItems/UserLogoSidebar.jsx';
 import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar.jsx'
 
 // files attached to sidebar item
-import PatientDashboard from '../dashboards/patient/PatientDashboard.tsx';
-import SidebarToggleButton from '../ui/buttons/SidebarToggleButton.jsx'; // Import the toggle button
+import PatientDashboard from '../PatientDashboard.tsx';
+import SidebarToggleButton from '../../../ui/buttons/SidebarToggleButton.jsx';
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState('dashboard');
