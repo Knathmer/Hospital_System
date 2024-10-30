@@ -42,6 +42,48 @@ const QuickActions = () => {
       console.error("Error fetching insurance info:", error);
     }
   };
+
+  const handleMedHistoryClick = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("No token found");
+      }
+      // Fetch insurance information from the server (replace with your API endpoint)
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/medical-history-info",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      ); // Adjust the endpoint as needed
+      const medHistoryInfo = await response.data.data;
+      console.log("med-history-info:", medHistoryInfo);
+      const entries = Object.values(medHistoryInfo[0]).some(
+        (array) => array.length > 0
+      );
+
+      if (response.data) {
+        // Check if insurance info exists
+        if (entries) {
+          nav("/edit-medical-history"); // Redirect to edit page
+        } else {
+          nav("/medical-history"); // Redirect to form page
+        }
+      } else {
+        // Handle errors (optional)
+        console.error(
+          "Failed to fetch medical history info",
+          response.statusText
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching medical history info:", error);
+    }
+  };
+
   return (
     <section className="mt-12">
       <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
@@ -56,9 +98,9 @@ const QuickActions = () => {
         <DefaultButton variant="outline" onClick={handleInsuranceClick}>
           Insurance Information
         </DefaultButton>
-        <NavButton variant="outline" to="/medical-history">
+        <DefaultButton variant="outline" onClick={handleMedHistoryClick}>
           Update Health Information
-        </NavButton>
+        </DefaultButton>
         <NavButton variant="outline">View Billing Statements</NavButton>
       </div>
     </section>

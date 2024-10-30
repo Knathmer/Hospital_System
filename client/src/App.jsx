@@ -23,6 +23,7 @@ import WomensHealthLandingPage from "./components/frontpages/landingpage/WomensH
 import MedicalHistoryForm from "./components/dashboards/patient/sidebar/pages/medical-history/MedicalHistoryForm.tsx";
 import InsuranceForm from "./components/dashboards/patient/sidebar/pages/insurance/InsuranceForm.tsx";
 import EditInsuranceForm from "./components/dashboards/patient/sidebar/pages/insurance/EditInsuranceForm.tsx";
+import EditMedicalHistoryForm from "./components/dashboards/patient/sidebar/pages/medical-history/EditMedicalHistoryForm.tsx";
 
 function App() {
   return (
@@ -36,6 +37,10 @@ function App() {
       <Route path="/book" element={<BookPage />} />
       <Route path="/register" element={<RegistrationPage />} />
       <Route path="/medical-history" element={<MedicalHistoryForm />} />
+      <Route
+        path="/edit-medical-history"
+        element={<EditMedicalHistoryForm />}
+      />
       <Route path="/insurance" element={<InsuranceForm />} />
       <Route path="/edit-insurance" element={<EditInsuranceForm />} />
 
