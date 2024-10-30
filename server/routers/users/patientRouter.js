@@ -6,6 +6,7 @@ import {
   updateInsurance,
 } from "../../controllers/patient/patientInsuranceController.js";
 import { getPatientMedications } from "../../controllers/patient/patientMedicationsControllers.js";
+// import { welcomeUserName } from "../../controllers/patient/patientController.js";
 //import { patientController } from '../../controllers/patientController.js';
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.post("/insurance", postInsurance);
 router.get("/insurance-info", hasInsuranceInfo);
 router.put("/update-insurance", updateInsurance);
 router.get("/medications", getPatientMedications);
+// router.get("/welcome-user-name",welcomeUserName);
 
 export default router;

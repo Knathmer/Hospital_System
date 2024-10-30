@@ -21,3 +21,6 @@ export const SELECT_PATIENT_MEDICATION_INFORMATION_QUERY = `SELECT p.medicationN
                                                             JOIN doctor AS d ON p.doctorID = d.doctorID
                                                             JOIN pharmacy AS ph ON q.pharmacyID = ph.pharmacyID
                                                             WHERE p.patientID = ?`;
+
+export const SELECT_PATIENT_NAMES =
+"SELECT firstName, lastName FROM patient WHERE patientID = ?";
