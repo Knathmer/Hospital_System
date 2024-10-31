@@ -33,15 +33,22 @@ export default function MedicationCard({
         </div>
         <div>
           <h4 className="font-semibold text-pink-600">Pharmacy Details</h4>
-          <p>
-            {pharmacyDetails.pharmacyName} - {pharmacyDetails.pharmacyCity},{" "}
-            {pharmacyDetails.pharmacyState}
-          </p>
-          <p>
-            {pharmacyDetails.pharmacyAddress}, {pharmacyDetails.pharmacyCity}{" "}
-            {pharmacyDetails.pharmacyState} {pharmacyDetails.pharmacyZip}
-          </p>
-          <p>{pharmacyDetails.pharmacyPhoneNum}</p>
+          {pharmacyDetails.pharmacyName !== "NULL" ? (
+            <>
+              <p>
+                {pharmacyDetails.pharmacyName} - {pharmacyDetails.pharmacyCity},{" "}
+                {pharmacyDetails.pharmacyState}
+              </p>
+              <p>
+                {pharmacyDetails.pharmacyAddress},{" "}
+                {pharmacyDetails.pharmacyCity} {pharmacyDetails.pharmacyState}{" "}
+                {pharmacyDetails.pharmacyZip}
+              </p>
+              <p>{pharmacyDetails.pharmacyPhoneNum}</p>
+            </>
+          ) : (
+            <p></p>
+          )}
         </div>
       </div>
       <div className="mt-6 flex items-center">
