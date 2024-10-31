@@ -5,6 +5,11 @@ import fruitRouter from "./routers/edibles.js";
 import authRouter from "./routers/auth.js";
 import appointmentRouter from "./routers/appointment.js";
 
+import './sendEmails.js';
+
+import dataFetchRouter from "./routers/dataFetch.js";
+
+
 const app = express();
 
 // CORS options configuration
@@ -22,6 +27,7 @@ app.use(bodyParser.json());  // Parse JSON requests
 app.use("/edibles", fruitRouter);
 app.use("/auth", authRouter);
 app.use("/appointment", appointmentRouter);
+app.use('/dataFetch', dataFetchRouter);
 
 // Start the server
 app.listen(3000, () => {

@@ -1,8 +1,154 @@
-import { bulkQuery } from "../../database.js";
+import { bulkQuery, query } from "../../database.js";
 import {
   INSERT_ALLERGY_QUERY,
   INSERT_DISABILITY_QUERY,
+  INSERT_SURGERY_QUERY,
+  INSERT_VACCINE_QUERY,
 } from "../../queries/constants/insertQueries.js";
+
+export async function hasMedicationInfo(patientID) {
+  try {
+    console.log("med");
+    const MEDICATION_EXISTANCE_QUERY =
+      "SELECT * FROM other_prescription WHERE patientID = ?";
+
+    const result = await query(MEDICATION_EXISTANCE_QUERY, [patientID]);
+    console.log("Patient select result:", result);
+
+    return result;
+
+    // return res.status(200).json({
+    //   message: "Get Vaccine Successful!",
+    //   data: result,
+    // });
+  } catch (error) {
+    console.error("Error Fetching the prescriptions: ", error);
+    // res.status(500).json({
+    //   message: "Server error fetching prescriptions",
+    // });
+  }
+}
+
+export async function hasSurgeryInfo(patientID) {
+  try {
+    console.log("sur");
+    const SURGERY_EXISTANCE_QUERY = "SELECT * FROM surgery WHERE patientID = ?";
+
+    const result = await query(SURGERY_EXISTANCE_QUERY, [patientID]);
+    console.log("Patient select result:", result);
+
+    return result;
+
+    // return res.status(200).json({
+    //   message: "Get Vaccine Successful!",
+    //   data: result,
+    // });
+  } catch (error) {
+    console.error("Error Fetching the prescriptions: ", error);
+    // res.status(500).json({
+    //   message: "Server error fetching prescriptions",
+    // });
+  }
+}
+
+export async function hasDisabilityInfo(patientID) {
+  try {
+    console.log("dis");
+    const DISABILITY_EXISTANCE_QUERY =
+      "SELECT * FROM disability WHERE patientID = ?";
+
+    const result = await query(DISABILITY_EXISTANCE_QUERY, [patientID]);
+    console.log("Patient select result:", result);
+
+    return result;
+
+    // return res.status(200).json({
+    //   message: "Get Vaccine Successful!",
+    //   data: result,
+    // });
+  } catch (error) {
+    console.error("Error Fetching the prescriptions: ", error);
+    // res.status(500).json({
+    //   message: "Server error fetching prescriptions",
+    // });
+  }
+}
+
+export async function hasAllergyInfo(patientID) {
+  try {
+    console.log("all");
+    const ALLERGY_EXISTANCE_QUERY = "SELECT * FROM allergy WHERE patientID = ?";
+
+    const result = await query(ALLERGY_EXISTANCE_QUERY, [patientID]);
+    console.log("Patient select result:", result);
+
+    return result;
+
+    // return res.status(200).json({
+    //   message: "Get Vaccine Successful!",
+    //   data: result,
+    // });
+  } catch (error) {
+    console.error("Error Fetching the prescriptions: ", error);
+    // res.status(500).json({
+    //   message: "Server error fetching prescriptions",
+    // });
+  }
+}
+
+export async function hasVaccineInfo(patientID) {
+  try {
+    console.log("vac");
+    const VACCINE_EXISTANCE_QUERY = "SELECT * FROM vaccine WHERE patientID = ?";
+
+    const result = await query(VACCINE_EXISTANCE_QUERY, [patientID]);
+    console.log("Patient select result:", result);
+    return result;
+
+    // return res.status(200).json({
+    //   message: "Get Vaccine Successful!",
+    //   data: result,
+    // });
+  } catch (error) {
+    console.error("Error Fetching the prescriptions: ", error);
+    // res.status(500).json({
+    //   message: "Server error fetching prescriptions",
+    // });
+  }
+}
+
+export async function hasMedHistoryInfo(req, res) {
+  try {
+    const patientID = req.user.patientID;
+
+    const vaccineInfo = await hasVaccineInfo(patientID);
+    const allergyInfo = await hasAllergyInfo(patientID);
+    const disabilityInfo = await hasDisabilityInfo(patientID);
+    const surgeryInfo = await hasSurgeryInfo(patientID);
+    const medicationInfo = await hasMedicationInfo(patientID);
+
+    const response = [
+      {
+        vaccine: vaccineInfo,
+        allergy: allergyInfo,
+        disability: disabilityInfo,
+        surgery: surgeryInfo,
+        medication: medicationInfo,
+      },
+    ];
+    console.log("response-med-info:", allergyInfo);
+
+    return res.status(200).json({
+      message: "Get Medical History Successful!",
+      data: response,
+    });
+  } catch (error) {
+    console.error("Error Fetching the prescriptions: ", error);
+    res.status(500).json({
+      message: "Server error fetching prescriptions",
+    });
+  }
+}
 
 export async function postAllergies(allergiesList, patientID) {
   try {
@@ -14,8 +160,8 @@ export async function postAllergies(allergiesList, patientID) {
     ]);
 
     console.log(`allergies: ${allergies}`);
-    // const insertResult = await bulkQuery(INSERT_ALLERGY_QUERY, [allergies]);
-    // console.log("Patient insert result:", insertResult);
+    const insertResult = await bulkQuery(INSERT_ALLERGY_QUERY, [allergies]);
+    console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
   } catch (error) {
@@ -31,10 +177,11 @@ export async function postDisabilities(disabilityList, patientID) {
       patientID,
     ]);
     console.log(`disabilities: ${disabilities}`);
-    // const insertResult = await bulkQuery(INSERT_DISABILITY_QUERY, [
-    //   disabilities,
-    // ]);
-    // console.log("Patient insert result:", insertResult);
+    const insertResult = await bulkQuery(INSERT_DISABILITY_QUERY, [
+      disabilities,
+      patientID,
+    ]);
+    console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
   } catch (error) {
@@ -42,6 +189,30 @@ export async function postDisabilities(disabilityList, patientID) {
     // res.status(500).json({ message: "Server error fetching prescriptions" });
   }
 }
+
+export async function postMedications(medicationList, patientID) {
+  try {
+    const INSERT_MEDICATION_QUERY =
+      "INSERT INTO other_prescriptions (medicationName, patientID) VALUES ?";
+
+    const medications = medicationList.map((disability) => [
+      disability.name,
+      patientID,
+    ]);
+    console.log(`disabilities: ${medications}`);
+    const insertResult = await bulkQuery(INSERT_MEDICATION_QUERY, [
+      medications,
+      patientID,
+    ]);
+    console.log("Patient insert medication result:", insertResult);
+
+    // return res.status(200).json({ message: "Insert Allergies Successful!" });
+  } catch (error) {
+    console.error("Error Fetching the prescriptions: ", error);
+    // res.status(500).json({ message: "Server error fetching prescriptions" });
+  }
+}
+
 export async function postVaccines(vaccineList, patientID) {
   try {
     const vaccines = vaccineList.map((vaccine) => [
@@ -51,10 +222,11 @@ export async function postVaccines(vaccineList, patientID) {
       patientID,
     ]);
     console.log(`vaccines: ${vaccines}`);
-    // const insertResult = await bulkQuery(INSERT_VACCINE_QUERY, [
-    //   vaccines,
-    // ]);
-    // console.log("Patient insert result:", insertResult);
+    const insertResult = await bulkQuery(INSERT_VACCINE_QUERY, [
+      vaccines,
+      patientID,
+    ]);
+    console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
   } catch (error) {
@@ -72,10 +244,8 @@ export async function postSurgeries(surgeryList, patientID) {
       patientID,
     ]);
     console.log(`surgeries: ${surgeries}`);
-    // const insertResult = await bulkQuery(INSERT_SURGERY_QUERY, [
-    //   surgery,
-    // ]);
-    // console.log("Patient insert result:", insertResult);
+    const insertResult = await bulkQuery(INSERT_SURGERY_QUERY, [surgery]);
+    console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
   } catch (error) {

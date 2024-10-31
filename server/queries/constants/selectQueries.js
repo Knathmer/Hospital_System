@@ -10,8 +10,7 @@ export const SELECT_ADMIN_FROM_EMAIL_QUERY =
 export const SELECT_ADDRESSID_QUERY = `
             SELECT addressID
             FROM address
-            WHERE addrStreet = ? AND addrZip = ? AND addrCity = ? AND addrState = ?;
-        `;
+            WHERE addrStreet = ? AND addrZip = ? AND addrCity = ? AND addrState = ?`;
 
 //Patient Medication Queries
 export const SELECT_PATIENT_MEDICATION_INFORMATION_QUERY = `SELECT
@@ -51,3 +50,4 @@ export const SELECT_PHARMACY_CHECK_EXISTS_ALREADY = `
                                                             SELECT * FROM pharmacy
                                                             WHERE pharmacyName = ? AND address = ? AND city = ? AND state = ? AND zipCode = ? AND phoneNumber = ?;
                                                           `;
+
