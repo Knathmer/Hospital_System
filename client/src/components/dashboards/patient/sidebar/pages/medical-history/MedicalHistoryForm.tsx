@@ -14,6 +14,8 @@ import Allergies from "./sections/Allergies";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
 
 import axios from "axios";
+import { baseUrl } from "../../../../../../../../server/server";
+import { patientPath } from "../../../../../../../../server/routers/users/patientRouter";
 
 export default function MedicalHistoryForm() {
   const [allergies, setAllergies] = useState([
@@ -68,7 +70,7 @@ export default function MedicalHistoryForm() {
       }
 
       const response = await axios.post(
-        "http://localhost:3000/auth/patient/medical-history",
+        `${baseUrl}${patientPath}/medical-history`,
         formData,
         {
           headers: {

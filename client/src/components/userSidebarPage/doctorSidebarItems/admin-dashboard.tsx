@@ -1,8 +1,19 @@
-import React from 'react'
-import Button from "../../../components/ui/button"
-import Input from "../../../components/ui/input"
-import { Hospital, Users, Calendar, Bell, Settings, LogOut, BarChart, UserPlus, FileText, AlertTriangle } from "lucide-react"
-import { Link } from 'react-router-dom';
+import React from "react";
+import Button from "../../../components/ui/button";
+// import Input from "../../../components/ui/input"
+import {
+  Hospital,
+  Users,
+  Calendar,
+  Bell,
+  Settings,
+  LogOut,
+  BarChart,
+  UserPlus,
+  FileText,
+  AlertTriangle,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function AdminDashboard() {
   return (
@@ -10,19 +21,33 @@ export default function AdminDashboard() {
       <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-sm">
         <Link className="flex items-center justify-center" to="#">
           <Hospital className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">AdminPortal</span>
+          <span className="ml-2 text-2xl font-bold text-gray-900">
+            AdminPortal
+          </span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
+            to="#"
+          >
             Dashboard
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
+            to="#"
+          >
             Staff
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
+            to="#"
+          >
             Patients
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" to="#">
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
+            to="#"
+          >
             Reports
           </Link>
         </nav>
@@ -43,13 +68,16 @@ export default function AdminDashboard() {
                 <span className="font-medium">Beds Occupied:</span> 78%
               </li>
               <li>
-                <span className="font-medium">Average Wait Time:</span> 35 minutes
+                <span className="font-medium">Average Wait Time:</span> 35
+                minutes
               </li>
               <li>
                 <span className="font-medium">Surgeries Scheduled:</span> 12
               </li>
             </ul>
-            <Button className="mt-4 bg-pink-500 text-white hover:bg-pink-600">View Detailed Report</Button>
+            <Button className="mt-4 bg-pink-500 text-white hover:bg-pink-600">
+              View Detailed Report
+            </Button>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
@@ -70,7 +98,9 @@ export default function AdminDashboard() {
                 <span className="font-medium">Staff Requests:</span> 8 pending
               </li>
             </ul>
-            <Button variant="outline" className="mt-4">Manage Staff</Button>
+            <Button variant="outline" className="mt-4">
+              Manage Staff
+            </Button>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
@@ -79,11 +109,17 @@ export default function AdminDashboard() {
             </h2>
             <ul className="space-y-2">
               <li className="text-sm">Emergency Room at 90% capacity</li>
-              <li className="text-sm">Maintenance scheduled for MRI machine #2</li>
+              <li className="text-sm">
+                Maintenance scheduled for MRI machine #2
+              </li>
               <li className="text-sm">New COVID-19 guidelines issued</li>
-              <li className="text-sm">Pharmacy inventory running low on key medications</li>
+              <li className="text-sm">
+                Pharmacy inventory running low on key medications
+              </li>
             </ul>
-            <Button variant="outline" className="mt-4">View All Notifications</Button>
+            <Button variant="outline" className="mt-4">
+              View All Notifications
+            </Button>
           </div>
         </div>
         <section className="mt-12">
@@ -128,7 +164,9 @@ export default function AdminDashboard() {
                 <span>New medical equipment installed in Radiology</span>
               </li>
             </ul>
-            <Button variant="link" className="mt-4">View All Activities</Button>
+            <Button variant="link" className="mt-4">
+              View All Activities
+            </Button>
           </div>
         </section>
       </main>
@@ -151,5 +189,5 @@ export default function AdminDashboard() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

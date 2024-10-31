@@ -20,4 +20,6 @@ router.get("/insurance-info", hasInsuranceInfo);
 router.put("/update-insurance", updateInsurance);
 router.get("/medications", getPatientMedications);
 
+export const patientPath = "/auth/patient";
+
 export default router;

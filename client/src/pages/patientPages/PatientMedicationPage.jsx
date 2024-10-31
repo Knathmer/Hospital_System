@@ -24,7 +24,7 @@ export default function PrescriptionPage() {
         }
 
         const response = await axios.get(
-          "http://localhost:3000/auth/patient/medications",
+          `${baseUrl}${patientPath}/medications`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 

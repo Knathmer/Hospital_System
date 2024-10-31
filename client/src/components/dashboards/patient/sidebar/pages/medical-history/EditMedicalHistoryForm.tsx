@@ -17,6 +17,8 @@ import Checkbox from "../../../../../ui/Checkbox";
 import SelectItem from "../../../../../ui/select/SelectItem";
 import Select from "../../../../../ui/select/Select";
 import axios from "axios";
+import { baseUrl } from "../../../../../../../../server/server";
+import { patientPath } from "../../../../../../../../server/routers/users/patientRouter";
 
 export default function EditMedicalHistoryForm() {
   const [error, setError] = useState("");
@@ -159,7 +161,7 @@ export default function EditMedicalHistoryForm() {
         }
 
         const response = await axios.get(
-          "http://localhost:3000/auth/patient/medical-history-info",
+          `${baseUrl}${patientPath}/medical-history-info`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -202,7 +204,7 @@ export default function EditMedicalHistoryForm() {
       }
 
       const response = await axios.post(
-        "http://localhost:3000/auth/patient/medical-history",
+        `${baseUrl}${patientPath}/medical-history`,
         formData,
         {
           headers: {

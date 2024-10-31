@@ -1,65 +1,69 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Heart } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Heart } from "lucide-react";
 
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    gender: '',
-    phoneNumber: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    emergencyFirstName: '',
-    emergencyLastName: '',
-    emergencyRelationship: '',
-    emergencyPhoneNumber: '',
-    emergencyEmail: '',
-    addrStreet: '',
-    addrZip: '',
-    addrCity: '',
-    addrState: '',
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    gender: "",
+    phoneNumber: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    emergencyFirstName: "",
+    emergencyLastName: "",
+    emergencyRelationship: "",
+    emergencyPhoneNumber: "",
+    emergencyEmail: "",
+    addrStreet: "",
+    addrZip: "",
+    addrCity: "",
+    addrState: "",
   });
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/auth/register', formData);
+      const response = await axios.post(`${baseUrl}/auth/register`, formData);
 
       if (response.status === 200 && response.data) {
         console.log("Registration Successful!");
-        navigate('/login');
+        navigate("/login");
       } else {
-        setError('Registration failed. Please try again.');
+        setError("Registration failed. Please try again.");
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         setError(error.response.data.message);
       } else {
-        setError('An error occurred. Please try again.');
+        setError("An error occurred. Please try again.");
       }
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
     }
   };
 
@@ -68,14 +72,20 @@ const RegistrationPage = () => {
       <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
         <Link className="flex items-center justify-center" to="/">
           <Heart className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">WomenWell</span>
+          <span className="ml-2 text-2xl font-bold text-gray-900">
+            WomenWell
+          </span>
         </Link>
       </header>
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-2xl space-y-8 bg-white p-8 rounded-lg shadow-xl">
           <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-gray-900">Join WomenWell</h1>
-            <p className="mt-2 text-sm text-gray-600">Create your account and start your wellness journey</p>
+            <h1 className="text-3xl font-extrabold text-gray-900">
+              Join WomenWell
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Create your account and start your wellness journey
+            </p>
           </div>
 
           {error && <p className="text-red-500 text-center">{error}</p>}
@@ -83,7 +93,12 @@ const RegistrationPage = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  First Name
+                </label>
                 <input
                   type="text"
                   id="firstName"
@@ -96,7 +111,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Last Name
+                </label>
                 <input
                   type="text"
                   id="lastName"
@@ -109,7 +129,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">Date of Birth</label>
+                <label
+                  htmlFor="dateOfBirth"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Date of Birth
+                </label>
                 <input
                   type="date"
                   id="dateOfBirth"
@@ -121,7 +146,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-700">Gender</label>
+                <label
+                  htmlFor="gender"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Gender
+                </label>
                 <select
                   id="gender"
                   name="gender"
@@ -138,7 +168,12 @@ const RegistrationPage = () => {
                 </select>
               </div>
               <div>
-                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                <label
+                  htmlFor="phoneNumber"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Phone Number
+                </label>
                 <input
                   type="tel"
                   id="phoneNumber"
@@ -151,7 +186,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Email
+                </label>
                 <input
                   type="email"
                   id="email"
@@ -164,7 +204,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Password
+                </label>
                 <input
                   type="password"
                   id="password"
@@ -177,7 +222,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Confirm Password
+                </label>
                 <input
                   type="password"
                   id="confirmPassword"
@@ -190,10 +240,17 @@ const RegistrationPage = () => {
                 />
               </div>
               <div className="md:col-span-2">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Emergency Contact</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Emergency Contact
+                </h3>
               </div>
               <div>
-                <label htmlFor="emergencyFirstName" className="block text-sm font-medium text-gray-700">First Name</label>
+                <label
+                  htmlFor="emergencyFirstName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  First Name
+                </label>
                 <input
                   type="text"
                   id="emergencyFirstName"
@@ -206,7 +263,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="emergencyLastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+                <label
+                  htmlFor="emergencyLastName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Last Name
+                </label>
                 <input
                   type="text"
                   id="emergencyLastName"
@@ -219,7 +281,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="emergencyRelationship" className="block text-sm font-medium text-gray-700">Relationship</label>
+                <label
+                  htmlFor="emergencyRelationship"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Relationship
+                </label>
                 <input
                   type="text"
                   id="emergencyRelationship"
@@ -232,7 +299,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="emergencyPhoneNumber" className="block text-sm font-medium text-gray-700">Emergency Phone Number</label>
+                <label
+                  htmlFor="emergencyPhoneNumber"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Emergency Phone Number
+                </label>
                 <input
                   type="tel"
                   id="emergencyPhoneNumber"
@@ -245,7 +317,12 @@ const RegistrationPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="emergencyEmail" className="block text-sm font-medium text-gray-700">Emergency Email</label>
+                <label
+                  htmlFor="emergencyEmail"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Emergency Email
+                </label>
                 <input
                   type="email"
                   id="emergencyEmail"
@@ -259,10 +336,17 @@ const RegistrationPage = () => {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Address</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Address
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="addrStreet" className="block text-sm font-medium text-gray-700">Street</label>
+                  <label
+                    htmlFor="addrStreet"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Street
+                  </label>
                   <input
                     type="text"
                     id="addrStreet"
@@ -275,7 +359,12 @@ const RegistrationPage = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="addrZip" className="block text-sm font-medium text-gray-700">ZIP Code</label>
+                  <label
+                    htmlFor="addrZip"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    ZIP Code
+                  </label>
                   <input
                     type="text"
                     id="addrZip"
@@ -288,7 +377,12 @@ const RegistrationPage = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="addrCity" className="block text-sm font-medium text-gray-700">City</label>
+                  <label
+                    htmlFor="addrCity"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    City
+                  </label>
                   <input
                     type="text"
                     id="addrCity"
@@ -301,7 +395,12 @@ const RegistrationPage = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="addrState" className="block text-sm font-medium text-gray-700">State</label>
+                  <label
+                    htmlFor="addrState"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    State
+                  </label>
                   <input
                     type="text"
                     id="addrState"
@@ -326,8 +425,11 @@ const RegistrationPage = () => {
           </form>
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="font-medium  text-pink-600 hover:text-pink-500">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-medium  text-pink-600 hover:text-pink-500"
+              >
                 Sign in
               </Link>
             </p>
