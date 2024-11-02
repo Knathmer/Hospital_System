@@ -71,6 +71,37 @@ export default function ManagePharmaciesPage() {
     }
   };
 
+  const handleRemovePharmacy = async (pharmacyID) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setError("User is not authenticated!");
+        return;
+      }
+
+      console.log(`hello ${pharmacyID}`);
+      await axios.delete(
+        `http://localhost:3000/auth/patient/pharmacies/${pharmacyID}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      await fetchPharmacies();
+    } catch (error) {
+      console.error("Error removing pharmacy: ", error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("Error removing pharmacy");
+      }
+    }
+  };
+
   useEffect(() => {
     fetchPharmacies();
     fetchAllPharmacies();
@@ -208,13 +239,14 @@ export default function ManagePharmaciesPage() {
             </h2>
             <p className="text-sm text-gray-600 mb-4">
               Manage your list of pharmacies below. You can add new pharmacies,
-              edit existing ones, or remove pharmacies from your list.
+              or remove pharmacies from your list.
             </p>
 
             {pharmacies && pharmacies.length > 0 ? (
-              pharmacies.map((pharmacy, index) => (
+              pharmacies.map((pharmacy) => (
                 <PharmacyCard
-                  key={index}
+                  key={pharmacy.pharmacyID}
+                  pharmacyID={pharmacy.pharmacyID}
                   pharmacyName={pharmacy.pharmacyName}
                   address={pharmacy.address}
                   city={pharmacy.city}
@@ -227,6 +259,7 @@ export default function ManagePharmaciesPage() {
                     "-" +
                     pharmacy.phoneNumber.slice(6)
                   }
+                  onRemove={handleRemovePharmacy}
                 />
               ))
             ) : (

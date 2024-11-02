@@ -33,11 +33,6 @@ export const getPatientPharmacy = async (req, res) => {
       [patientID]
     );
 
-    //If the user has no pharmacies attached to them then return the following message.
-    if (patientPharmacyInformation.length === 0) {
-      return res.status(404).json({ message: "No pharmacies found" });
-    }
-
     //If the user does have a pharmacy send back the query result.
     res.status(200).json({ patientPharmacyInformation });
   } catch (error) {
