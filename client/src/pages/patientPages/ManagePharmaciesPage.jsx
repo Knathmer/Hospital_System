@@ -80,7 +80,6 @@ export default function ManagePharmaciesPage() {
         return;
       }
 
-      console.log(`hello ${pharmacyID}`);
       await axios.delete(
         `http://localhost:3000/auth/patient/pharmacies/${pharmacyID}`,
         {
