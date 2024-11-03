@@ -102,6 +102,7 @@ export default function PrescriptionPage() {
               medications.map((med, index) => (
                 <MedicationCard
                   key={index}
+                  refillCard={false}
                   name={med.medicationName}
                   instructions={med.instruction}
                   prescriptionDetails={{

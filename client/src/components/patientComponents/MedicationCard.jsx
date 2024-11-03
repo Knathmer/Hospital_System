@@ -2,6 +2,8 @@ import React from "react";
 import { Info, Trash2 } from "lucide-react";
 
 export default function MedicationCard({
+  prescriptionID,
+  refillCard,
   name,
   instructions,
   prescriptionDetails = {},
@@ -28,8 +30,21 @@ export default function MedicationCard({
         </div>
         <div>
           <h4 className="font-semibold text-pink-600">Refill Details</h4>
-          <p>Quantity {refillDetails.quantity || "N/A"}</p>
-          <p>Day supply {refillDetails.daySupply || "N/A"}</p>
+          {!refillCard ? (
+            <>
+              <p>Quantity {refillDetails.quantity || "N/A"}</p>
+              <p>Day supply {refillDetails.daySupply || "N/A"}</p>
+            </>
+          ) : (
+            <>
+              <p>Quantity {refillDetails.quantity || "N/A"}</p>
+              <p>Day supply {refillDetails.daySupply || "N/A"}</p>
+              <p>
+                Refill Count {prescriptionDetails.refillsRemaining} /
+                {prescriptionDetails.refillCount}
+              </p>
+            </>
+          )}
         </div>
         <div>
           <h4 className="font-semibold text-pink-600">Pharmacy Details</h4>

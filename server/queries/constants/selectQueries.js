@@ -14,20 +14,20 @@ export const SELECT_ADDRESSID_QUERY = `
 
 //Patient Medication Queries
 export const SELECT_PATIENT_MEDICATION_INFORMATION_QUERY = `SELECT
-                                                              p.medicationName, p.dosage, p.frequency, p.start,
-                                                              p.quantity, p.daySupply, p.instruction,
-                                                              d.lastName, d.firstName,
-                                                              ph.pharmacyName, ph.address, ph.city, ph.state, ph.zipCode, ph.phoneNumber
-                                                            FROM
-                                                              prescription AS p
-                                                            JOIN
-                                                              patient AS q ON p.patientID = q.patientID
-                                                            JOIN
-                                                              doctor AS d ON p.doctorID = d.doctorID
-                                                            LEFT JOIN
-                                                              pharmacy AS ph ON p.pharmacyID = ph.pharmacyID
-                                                            WHERE
-                                                              p.patientID = ?;
+    p.prescriptionID, p.medicationName, p.dosage, p.frequency, p.start,
+    p.quantity, p.daySupply, p.instruction, p.refillCount, p.refillsRemaining,
+    d.lastName, d.firstName,
+    ph.pharmacyName, ph.address, ph.city, ph.state, ph.zipCode, ph.phoneNumber
+FROM
+    prescription AS p
+JOIN
+    patient AS q ON p.patientID = q.patientID
+JOIN
+    doctor AS d ON p.doctorID = d.doctorID
+LEFT JOIN
+    pharmacy AS ph ON p.pharmacyID = ph.pharmacyID
+WHERE
+    p.patientID = ?;
 `;
 
 export const SELECT_PATIENT_PHARMACY_INFORMATION_QUERY = `
@@ -50,4 +50,3 @@ export const SELECT_PHARMACY_CHECK_EXISTS_ALREADY = `
                                                             SELECT * FROM pharmacy
                                                             WHERE pharmacyName = ? AND address = ? AND city = ? AND state = ? AND zipCode = ? AND phoneNumber = ?;
                                                           `;
-
