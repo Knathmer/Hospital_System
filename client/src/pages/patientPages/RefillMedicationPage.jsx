@@ -1,24 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Printer, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import NavbarPatient from "../../components/dashboards/patient/sections/header/NavbarPatient";
 import axios from "axios";
-import MedicationCard from "../../components/patientComponents/MedicationCard";
-import NoMedicationsCard from "../../components/patientComponents/NoMedicationFound";
-
-function SelectedRefillCard({ name, dosage }) {
-  return (
-    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-      <h3 className="text-lg font-semibold text-pink-600">{name}</h3>
-      <p className="text-sm text-gray-600">{dosage}</p>
-    </div>
-  );
-}
+import CurrentPrescriptionCard from "../../components/patientComponents/CurrentPrescriptionCard";
+import SelectedRefillCard from "../../components/patientComponents/SelectedPrescriptionCard";
+import PreviousRefillCard from "../../components/patientComponents/PreviousRefillCard";
+import Footer from "../../components/ui/Footer";
 
 export default function RefillPrescriptionsPage() {
   const [patientsCurrentPrescriptions, setPatientsCurrentPrescriptions] =
     useState([]);
   const [selectedRefills, setSelectedRefills] = useState([]);
+  const [refillHistory, setRefillHistory] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -52,11 +46,39 @@ export default function RefillPrescriptionsPage() {
     }
   };
 
+  const fetchRefillHistory = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setError("User is not authorized!");
+        return;
+      }
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/medications/refill-history",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setRefillHistory(response.data.history);
+    } catch (error) {
+      console.error("Error fetching previous refills:", error);
+      setError("Error fetching previous refills.");
+    }
+  };
+
   useEffect(() => {
     fetchCurrentPrescriptions();
+    fetchRefillHistory();
   }, []);
 
   const handleSelectRefill = (medication) => {
+    if (medication.refillCount === 0) {
+      // corrected
+      alert("Cannot refill this prescription. No refills remaining");
+      return;
+    }
+
     if (
       !selectedRefills.find(
         (item) => item.prescriptionID === medication.prescriptionID
@@ -75,9 +97,13 @@ export default function RefillPrescriptionsPage() {
         return;
       }
 
+      const prescriptionIDs = selectedRefills.map(
+        (refill) => refill.prescriptionID
+      );
+
       await axios.post(
         "http://localhost:3000/auth/patient/medications/refill",
-        { prescriptionIDs: refillRequests },
+        { prescriptionIDs },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -94,9 +120,9 @@ export default function RefillPrescriptionsPage() {
       <NavbarPatient />
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-1 sm:px-0">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-black">
-              Refill Medications
+          <div className="px-4 py-6 sm:px-0">
+            <h1 className="text-3xl font-bold text-pink-600 mb-2">
+              Refill Prescriptions
             </h1>
             <div className="mb-4">
               <Link
@@ -107,90 +133,77 @@ export default function RefillPrescriptionsPage() {
                 Back to Medications
               </Link>
             </div>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="w-full md:w-1/2">
+            {error && <p className="text-red-500 mb-4">{error}</p>}{" "}
+            {/* Display error if any */}
+            <div className="flex flex-col lg:flex-row gap-6">
+              <div className="w-full lg:w-1/3">
                 <h2 className="text-xl font-semibold mb-4">
                   Current Prescriptions
                 </h2>
                 {patientsCurrentPrescriptions &&
-                patientsCurrentPrescriptions.length !== 0 ? (
-                  patientsCurrentPrescriptions.map((medication) => (
-                    <MedicationCard
-                      key={medication.prescriptionID}
-                      refillCard={true}
-                      name={medication.medicationName}
-                      instructions={medication.instruction}
-                      prescriptionDetails={{
-                        prescribed: new Date(
-                          medication.start
-                        ).toLocaleDateString("en-US", {
+                patientsCurrentPrescriptions.length > 0 ? (
+                  patientsCurrentPrescriptions.map((prescription) => (
+                    <CurrentPrescriptionCard
+                      key={prescription.id}
+                      name={prescription.medicationName}
+                      dosage={prescription.dosage}
+                      frequency={prescription.frequency}
+                      date={new Date(prescription.start).toLocaleDateString(
+                        "en-US",
+                        {
                           month: "2-digit",
                           day: "2-digit",
                           year: "numeric",
-                        }),
-                        approvedBy: `${medication.firstName} ${medication.lastName}`,
-                        quantity: medication.quantity,
-                        daySupply: medication.daySupply,
-                        refillsRemaining: medication.refillsRemaining,
-                        refillCount: medication.refillCount,
-                      }}
-                      pharmacyDetails={{
-                        pharmacyName: medication.pharmacyName || "NULL",
-                        pharmacyAddress: medication.address || "",
-                        pharmacyCity: medication.city || "",
-                        pharmacyState: medication.state || "",
-                        pharmacyZip: medication.zipCode || "",
-                        pharmacyPhoneNum: medication.phoneNumber
-                          ? medication.phoneNumber.slice(0, 3) +
-                            "-" +
-                            medication.phoneNumber.slice(3, 6) +
-                            "-" +
-                            medication.phoneNumber.slice(6)
-                          : "",
-                      }}
-                      onRequestRefill={() => handleSelectRefill(medication)}
+                        }
+                      )}
+                      refillCount={prescription.refillCount}
+                      prescriptionID={prescription.prescriptionID}
+                      onSelectRefill={handleSelectRefill}
                     />
                   ))
                 ) : (
-                  <NoMedicationsCard />
+                  <p>No Medications Available</p>
                 )}
               </div>
-              <div className="w-full md:w-1/2">
+              <div className="w-full lg:w-1/3">
                 <h2 className="text-xl font-semibold mb-4">Selected Refills</h2>
-                {selectedRefills.length > 0 ? (
-                  selectedRefills.map((refill) => (
-                    <SelectedRefillCard
-                      key={refill.prescriptionID}
-                      name={refill.medicationName}
-                      dosage={refill.dosage}
-                    />
-                  ))
-                ) : (
-                  <p>No medications selected for refill.</p>
-                )}
+                {selectedRefills.map((refill) => (
+                  <SelectedRefillCard key={refill.prescriptionID} {...refill} />
+                ))}
                 <button
                   className="w-full bg-pink-600 text-white py-2 px-4 rounded-lg hover:bg-pink-700 transition-colors mt-4"
                   onClick={handleRequestRefills}
-                  disabled={selectedRefills.length === 0}
+                  disabled={selectedRefills.length === 0} // Disable if no refills selected
                 >
                   Request Refills
                 </button>
+              </div>
+              <div className="w-full lg:w-1/3">
+                <h2 className="text-xl font-semibold mb-4">Refill History</h2>
+                {refillHistory && refillHistory.length > 0 ? (
+                  refillHistory.map((refill) => (
+                    <PreviousRefillCard
+                      key={refill.refillID} // Changed to refill.refillID for uniqueness
+                      name={refill.medicationName}
+                      status={refill.status}
+                      requestDate={new Date(
+                        refill.requestDate
+                      ).toLocaleDateString("en-US", {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    />
+                  ))
+                ) : (
+                  <p>No Refill History Available</p>
+                )}
               </div>
             </div>
           </div>
         </div>
       </main>
-      <footer className="bg-white shadow-sm mt-8">
-        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <p className="text-sm text-gray-500">
-            © 2023 WomenWell. All rights reserved.
-          </p>
-          <button className="flex items-center text-pink-600 hover:text-pink-700">
-            <Printer className="w-5 h-5 mr-2" />
-            Print
-          </button>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
