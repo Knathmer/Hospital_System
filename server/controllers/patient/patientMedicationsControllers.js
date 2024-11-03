@@ -58,29 +58,70 @@ export const postPatientRefill = async (req, res) => {
       return res.status(400).json({ message: "Missing prescription IDs." });
     }
 
+    const pendingRequests = [];
+
     // Prepare to store promises for refill insertions
     const refillPromises = prescriptionIDs.map(async (prescriptionID) => {
-      // Query to find doctorID based on prescriptionID
+      // Step 1: Check if there is already a pending refill request for this prescription
+      const [existingPending] = await query(
+        "SELECT refillID FROM refill WHERE prescriptionID = ? AND patientID = ? AND status = 'Pending'",
+        [prescriptionID, patientID]
+      );
+
+      if (existingPending) {
+        pendingRequests.push(prescriptionID);
+        return null; // Skip this request
+      }
+
+      // Step 2: Query to find doctorID based on prescriptionID
       const [doctorResult] = await query(
-        "SELECT doctorID FROM prescription WHERE prescriptionID = ?",
+        "SELECT doctorID, refillCount FROM prescription WHERE prescriptionID = ?",
         [prescriptionID]
       );
 
       const doctorID = doctorResult ? doctorResult.doctorID : null;
+      const refillCount = doctorResult ? doctorResult.refillCount : 0;
 
-      // Insert into refill table
-      return query(
+      if (refillCount <= 0) {
+        pendingRequests.push(prescriptionID);
+        return null; // Skip this request if no refills are remaining
+      }
+
+      // Step 3: Insert into refill table
+      await query(
         "INSERT INTO refill (patientID, prescriptionID, doctorID, status) VALUES (?, ?, ?, 'Pending')",
         [patientID, prescriptionID, doctorID]
       );
+
+      // Step 4: Decrement the refill count by 1
+      await query(
+        "UPDATE prescription SET refillCount = refillCount - 1 WHERE prescriptionID = ?",
+        [prescriptionID]
+      );
+
+      return prescriptionID; // Return the prescription ID if it was successfully inserted
     });
 
     // Execute all insertions
-    await Promise.all(refillPromises);
+    const results = await Promise.all(refillPromises);
 
-    res
-      .status(201)
-      .json({ message: "Refill requests submitted successfully." });
+    const successfullyProcessed = results.filter((result) => result !== null);
+    if (pendingRequests.length === prescriptionIDs.length) {
+      return res.status(400).json({
+        message:
+          "All selected prescriptions already have pending refill requests or no refills remaining.",
+      });
+    } else if (pendingRequests.length > 0) {
+      return res.status(201).json({
+        message: `Refill requests submitted successfully for some prescriptions. The following already have pending requests or no refills remaining: ${pendingRequests.join(
+          ", "
+        )}`,
+      });
+    } else {
+      return res.status(201).json({
+        message: "Refill requests submitted successfully.",
+      });
+    }
   } catch (error) {
     console.error("Error posting refill request:", error);
     res.status(500).json({ message: "Error submitting refill requests." });

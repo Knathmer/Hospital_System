@@ -2,12 +2,14 @@ import React from "react";
 
 export default function PreviousRefillCard({ name, status, requestDate }) {
   const getStatusColor = (status) => {
-    switch (status) {
-      case "pending":
+    switch (
+      status // Normalize the status to lowercase
+    ) {
+      case "Pending":
         return "text-yellow-500";
-      case "approved":
+      case "Approved":
         return "text-green-500";
-      case "denied":
+      case "Denied":
         return "text-red-500";
       default:
         return "text-gray-600";

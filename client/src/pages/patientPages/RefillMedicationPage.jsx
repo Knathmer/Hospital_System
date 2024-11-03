@@ -13,16 +13,20 @@ export default function RefillPrescriptionsPage() {
     useState([]);
   const [selectedRefills, setSelectedRefills] = useState([]);
   const [refillHistory, setRefillHistory] = useState([]);
-  const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [refillLoading, setRefillLoading] = useState(false);
 
   const fetchCurrentPrescriptions = async () => {
     try {
       setLoading(true);
+      setErrorMessage(""); // Clear existing errors
+
       const token = localStorage.getItem("token");
 
       if (!token) {
-        setError("Patient is not authorized");
+        setErrorMessage("Patient is not authorized");
         return;
       }
 
@@ -37,9 +41,9 @@ export default function RefillPrescriptionsPage() {
     } catch (error) {
       console.error("Error fetching medications: ", error);
       if (error.response && error.response.status === 401) {
-        setError("Session expired. Please log in again");
+        setErrorMessage("Session expired. Please log in again");
       } else {
-        setError("Error fetching medications");
+        setErrorMessage("Error fetching medications");
       }
     } finally {
       setLoading(false);
@@ -51,7 +55,7 @@ export default function RefillPrescriptionsPage() {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        setError("User is not authorized!");
+        setErrorMessage("User is not authorized!");
         return;
       }
 
@@ -63,7 +67,7 @@ export default function RefillPrescriptionsPage() {
       setRefillHistory(response.data.history);
     } catch (error) {
       console.error("Error fetching previous refills:", error);
-      setError("Error fetching previous refills.");
+      setErrorMessage("Error fetching previous refills.");
     }
   };
 
@@ -74,8 +78,7 @@ export default function RefillPrescriptionsPage() {
 
   const handleSelectRefill = (medication) => {
     if (medication.refillCount === 0) {
-      // corrected
-      alert("Cannot refill this prescription. No refills remaining");
+      setErrorMessage("Cannot refill this prescription. No refills remaining");
       return;
     }
 
@@ -90,10 +93,14 @@ export default function RefillPrescriptionsPage() {
 
   const handleRequestRefills = async () => {
     try {
+      setRefillLoading(true); // Start loading
+      setErrorMessage(""); // Clear any existing error messages
+      setSuccessMessage(""); // Clear any existing success messages
+
       const token = localStorage.getItem("token");
 
       if (!token) {
-        setError("Patient is not authorized");
+        setErrorMessage("Patient is not authorized");
         return;
       }
 
@@ -101,17 +108,35 @@ export default function RefillPrescriptionsPage() {
         (refill) => refill.prescriptionID
       );
 
-      await axios.post(
+      // Send refill request to the backend
+      const response = await axios.post(
         "http://localhost:3000/auth/patient/medications/refill",
         { prescriptionIDs },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Refill requests submitted successfully.");
-      setSelectedRefills([]);
+      // Handle response based on server response status
+      if (response.status === 201) {
+        setSuccessMessage(response.data.message);
+        setSelectedRefills([]);
+
+        // Fetch the latest refill history and current prescriptions
+        await fetchRefillHistory();
+        await fetchCurrentPrescriptions(); // Re-fetch current prescriptions to reflect updated refill counts
+      }
     } catch (error) {
       console.error("Error submitting refill requests: ", error);
-      setError("Error submitting refill requests");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage("Error submitting refill requests. Please try again.");
+      }
+    } finally {
+      setRefillLoading(false); // End loading
     }
   };
 
@@ -133,8 +158,19 @@ export default function RefillPrescriptionsPage() {
                 Back to Medications
               </Link>
             </div>
-            {error && <p className="text-red-500 mb-4">{error}</p>}{" "}
-            {/* Display error if any */}
+            {/* Display error and success messages */}
+            <div className="mb-4">
+              {errorMessage && (
+                <p className="text-red-700 bg-red-100 border border-red-400 rounded p-4 mb-4">
+                  {errorMessage}
+                </p>
+              )}
+              {successMessage && (
+                <p className="text-green-700 bg-green-100 border border-green-400 rounded p-4 mb-4">
+                  {successMessage}
+                </p>
+              )}
+            </div>
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="w-full lg:w-1/3">
                 <h2 className="text-xl font-semibold mb-4">
@@ -173,9 +209,9 @@ export default function RefillPrescriptionsPage() {
                 <button
                   className="w-full bg-pink-600 text-white py-2 px-4 rounded-lg hover:bg-pink-700 transition-colors mt-4"
                   onClick={handleRequestRefills}
-                  disabled={selectedRefills.length === 0} // Disable if no refills selected
+                  disabled={selectedRefills.length === 0 || refillLoading} // Disable if no refills selected or loading
                 >
-                  Request Refills
+                  {refillLoading ? "Submitting..." : "Request Refills"}
                 </button>
               </div>
               <div className="w-full lg:w-1/3">
