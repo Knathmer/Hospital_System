@@ -8,7 +8,7 @@ import SelectItem from "../../../../../../ui/select/SelectItem";
 
 const Allergies = ({ allergies, setAllergies }) => {
   const addAllergy = () => {
-    setAllergies([...allergies, { name: "", reaction: "", severity: "" }]);
+    setAllergies([...allergies, { name: "", reaction: null, severity: null }]);
   };
 
   const removeAllergy = (index: number) => {
