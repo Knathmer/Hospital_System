@@ -13,7 +13,9 @@ import {
   getAllPharmacies,
   postNewPharmacy,
   postToPatientPharmacy,
+  deletePharmacyFromPatient,
 } from "../../controllers/patient/pharmacyController.js";
+// import { de } from "date-fns/locale";
 
 const router = express.Router();
 
@@ -27,6 +29,7 @@ router.put("/update-insurance", updateInsurance);
 router.use("/medications", medicationRouter);
 
 router.get("/pharmacies", getAllPharmacies);
+router.delete(`/pharmacies/:pharmacyID`, deletePharmacyFromPatient);
 router.post("/pharmacies", postNewPharmacy);
 router.post("/pharmacies/add", postToPatientPharmacy);
 

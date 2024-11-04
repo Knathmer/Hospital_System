@@ -148,3 +148,32 @@ export const postToPatientPharmacy = async (req, res) => {
       .json({ message: "Error associating pharmacy with patient" });
   }
 };
+
+export const deletePharmacyFromPatient = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+    const pharmacyID = req.params.pharmacyID;
+
+    console.log(pharmacyID);
+
+    const patientPharmacyExists = await query(
+      "SELECT * FROM patient_pharmacy WHERE patientID = ? AND pharmacyID = ?",
+      [patientID, pharmacyID]
+    );
+
+    if (patientPharmacyExists.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Pharmacy association not found" });
+    }
+
+    await query(
+      "DELETE FROM patient_pharmacy WHERE patientID = ? AND pharmacyID = ?",
+      [patientID, pharmacyID]
+    );
+
+    res.status(200).json({ message: "Pharmacy association removed" });
+  } catch (error) {
+    res.status(500).json({ message: "Error removing pharmacy association" });
+  }
+};
