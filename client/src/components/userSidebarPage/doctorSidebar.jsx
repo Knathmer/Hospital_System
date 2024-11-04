@@ -1,15 +1,24 @@
 import { useState } from 'react'
-import { Heart, Calendar, FileText, CalendarClock, Settings, LogOut } from "lucide-react"
-import { Link } from 'react-router-dom';
+import { Heart, Calendar, FileText, CalendarClock } from "lucide-react"
+// import { Link } from 'react-router-dom';
 
-export default function SimplifiedDashboard() {
+// Sidebar Components
+import LogoSidebar from '../dashboards/patient/sidebar/sidebarItems/UserLogoSidebar';
+// import PatientNameDisplay from '../dashboards/patient/sidebar/sidebarItems/WelcomeUserName';
+import DoctorNameDisplay from '../dashboards/patient/sidebar/sidebarItems/WelcomeDocName';
+import UserSettingsAndLogout from '../dashboards/patient/sidebar/sidebarItems/BottomItemsSidebar';
+import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
+
+// Files Linked
+
+export default function DocDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
   const sidebarItems = {
-    "": [
-      { id: 'dashboard', label: 'Home', icon: Heart }
-    ],
-    " ": [
+  
+    "Services": [
       { id: 'dashboard', label: 'Home', icon: Heart },
       { id: 'appointments', label: 'Appointments', icon: Calendar },
       { id: 'schedule', label: 'Schedule', icon: CalendarClock },
@@ -21,28 +30,20 @@ export default function SimplifiedDashboard() {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r flex flex-col justify-between">
+      <aside
+        className={`transform transition-transform duration-300 fixed h-screen z-50 ${
+          isSidebarVisible ? 'translate-x-0 w-64' : '-translate-x-64 w-0'
+        } bg-white border-r flex flex-col justify-between`}
+      >
         <div>
           <div className="p-4 border-b">
-            <Link href="/" className="flex items-center">
-              <Heart className="h-6 w-6 text-pink-500" />
-              <span className="ml-2 text-xl font-bold text-gray-900">WomenWell</span>
-            </Link>
-            {/* User Profile Image */}
-            <div className="flex items-center mt-6 p-4 bg-pink-50 rounded-lg shadow-md">
-              <div className="mr-4">
-                <img
-                  src="https://via.placeholder.com/80"
-                  alt="Doctor"
-                  className="w-20 h-20 rounded-full object-cover border-2 border-pink-500"
-                />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-pink-600">Welcome</h2>
-                <p className="text-sm text-gray-700">Dr. John Doe</p> {/* this needs to get updated */}
-              </div>
-            </div>
+            {/* WomenWell - logo */}
+            < LogoSidebar />
+            
+            {/* User Profile Image and Name */}
+            < DoctorNameDisplay />
           </div>
+          
           <nav className="p-4">
             {Object.keys(sidebarItems).map((category) => (
               <div key={category} className="mb-6">
@@ -65,24 +66,12 @@ export default function SimplifiedDashboard() {
         </div>
 
         {/* User Settings and Logout at the bottom */}
-        <div className="p-4 border-t">
-          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Account Settings</h4>
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`flex items-center w-full px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-              activeTab === 'settings' ? 'text-pink-600 bg-pink-100' : 'text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            <Settings className="h-5 w-5 mr-3" />
-            Settings
-          </button>
-
-          <button className="flex items-center w-full px-4 py-2 mt-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200">
-            <LogOut className="h-5 w-5 mr-3" />
-            Logout
-          </button>
-        </div>
+        <UserSettingsAndLogout activeTab={activeTab} setActiveTab={setActiveTab} />
       </aside>
+
+      {/* Sidebar Toggle Button near the top, imported as a separate component */}
+      <SidebarToggleButton isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} />
+
 
       {/* Main Content */}
     <main className="flex-1 p-8">
