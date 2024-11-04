@@ -23,26 +23,44 @@ export default function EditMedicalHistoryForm() {
   const [vaccines, setVaccines] = useState([
     { name: "", date: "", doctor: "" },
   ]);
+  const [medications, setMedications] = useState([{ name: "" }]);
   const [surgeries, setSurgeries] = useState([{ name: "", date: "" }]);
   const [allergies, setAllergies] = useState([
     { name: "", reaction: "", severity: "" },
   ]);
   const [disabilities, setDisabilities] = useState([{ name: "" }]);
+
+  const [removedMeds, setRemovedMeds] = useState([{ name: "" }]);
+  const [removedVacs, setRemovedVacs] = useState([
+    { name: "", date: "", doctor: "" },
+  ]);
+  const [removedSurs, setRemovedSurs] = useState([{ name: "", date: "" }]);
+  const [removedAllerg, setRemovedAllerg] = useState([
+    { name: "", reaction: "", severity: "" },
+  ]);
+  const [removedDisas, setRemovedDisas] = useState([{ name: "" }]);
+
   const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
     allAllergies: allergies,
+    removedAllergies: removedAllerg,
     allDisabilities: disabilities,
+    removedDisabilities: removedDisas,
+    allMedications: medications,
+    removedMedications: removedMeds,
     allVaccines: vaccines,
+    removedVaccines: removedVacs,
     allSurgeries: surgeries,
+    removedSurgeries: removedSurs,
   });
 
-  const [medications, setMedications] = useState([{ name: "" }]);
   const addMedication = () => {
     setMedications([...medications, { name: "" }]);
   };
 
   const removeMedication = (index: number) => {
+    setRemovedMeds([...removedMeds, { name: medications[index].name }]);
     setMedications(medications.filter((_, i) => i !== index));
   };
 
@@ -51,6 +69,16 @@ export default function EditMedicalHistoryForm() {
   };
 
   const removeVaccine = (index: number) => {
+    console.log("removedVacs0: ", removedVacs);
+    // Create the new removed vaccine object
+    const removedVaccine = {
+      name: vaccines[index].name,
+      date: vaccines[index].date,
+      doctor: vaccines[index].doctor,
+    };
+
+    setRemovedVacs((prevRemovedVacs) => [...prevRemovedVacs, removedVaccine]);
+    console.log("removedVacs: ", removedVacs);
     setVaccines(vaccines.filter((_, i) => i !== index));
   };
 
@@ -59,6 +87,10 @@ export default function EditMedicalHistoryForm() {
   };
 
   const removeSurgery = (index: number) => {
+    setRemovedSurs([
+      ...removedSurs,
+      { name: surgeries[index].name, date: surgeries[index].date },
+    ]);
     setSurgeries(surgeries.filter((_, i) => i !== index));
   };
 
@@ -67,6 +99,14 @@ export default function EditMedicalHistoryForm() {
   };
 
   const removeAllergy = (index: number) => {
+    setRemovedAllerg([
+      ...removedAllerg,
+      {
+        name: allergies[index].name,
+        reaction: allergies[index].reaction,
+        severity: allergies[index].severity,
+      },
+    ]);
     setAllergies(allergies.filter((_, i) => i !== index));
   };
 
@@ -75,6 +115,7 @@ export default function EditMedicalHistoryForm() {
   };
 
   const removeDisability = (index: number) => {
+    setRemovedDisas([...removedDisas, { name: disabilities[index].name }]);
     setDisabilities(disabilities.filter((_, i) => i !== index));
   };
 
@@ -148,6 +189,34 @@ export default function EditMedicalHistoryForm() {
     return listOfObjects;
   };
 
+  // Update formData whenever any related state changes
+  useEffect(() => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      allAllergies: allergies,
+      removedAllergies: removedAllerg,
+      allDisabilities: disabilities,
+      removedDisabilities: removedDisas,
+      allMedications: medications,
+      removedMedications: removedMeds,
+      allVaccines: vaccines,
+      removedVaccines: removedVacs,
+      allSurgeries: surgeries,
+      removedSurgeries: removedSurs,
+    }));
+  }, [
+    allergies,
+    removedAllerg,
+    disabilities,
+    removedDisas,
+    medications,
+    removedMeds,
+    vaccines,
+    removedVacs,
+    surgeries,
+    removedSurs,
+  ]);
+
   useEffect(() => {
     // Fetch data from backend
     const fetchData = async () => {
@@ -201,10 +270,11 @@ export default function EditMedicalHistoryForm() {
         throw new Error("No token found");
       }
 
-      const response = await axios.post(
-        "http://localhost:3000/auth/patient/medical-history",
-        formData,
+      const response = await axios.delete(
+        "http://localhost:3000/auth/patient/remove-medical-history",
+
         {
+          data: formData,
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -289,7 +359,7 @@ export default function EditMedicalHistoryForm() {
               )}
             </DefaultButton>
           </div>
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Medical History</h2>
               <div>

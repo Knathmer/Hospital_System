@@ -250,7 +250,7 @@ export async function postSurgeries(surgeryList, patientID) {
       patientID,
     ]);
     console.log(`surgeries: ${surgeries}`);
-    const insertResult = await bulkQuery(INSERT_SURGERY_QUERY, [surgery]);
+    const insertResult = await bulkQuery(INSERT_SURGERY_QUERY, [surgeries]);
     console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
