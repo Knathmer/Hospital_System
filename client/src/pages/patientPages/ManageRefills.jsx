@@ -234,6 +234,7 @@ export default function ManageRefillsPage() {
                     selectedRefills.map((refill) => (
                       <SelectedRefillCard
                         key={refill.prescriptionID}
+                        prescriptionID={refill.prescriptionID}
                         name={refill.name}
                         dosage={refill.dosage}
                         frequency={refill.frequency}
