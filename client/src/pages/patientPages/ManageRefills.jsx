@@ -97,9 +97,16 @@ export default function ManageRefillsPage() {
 
   // Handle Unselecting a Refill
   const handleUnselectRefill = (prescriptionID) => {
-    setSelectedRefills(
-      selectedRefills.filter((item) => item.prescriptionID !== prescriptionID)
+    const refillToRemove = selectedRefills.find(
+      (refill) => refill.prescriptionID === prescriptionID
     );
+
+    if (refillToRemove) {
+      const updatedSelectedRefills = selectedRefills.filter(
+        (refill) => refill.prescriptionID !== prescriptionID
+      );
+      setSelectedRefills(updatedSelectedRefills);
+    }
   };
 
   // Handle Requesting Refills
