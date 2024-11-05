@@ -37,7 +37,8 @@ export const SELECT_PATIENT_PHARMACY_INFORMATION_QUERY = `
                                                               p.city,
                                                               p.state,
                                                               p.zipCode,
-                                                              p.phoneNumber
+                                                              p.phoneNumber,
+                                                              p.pharmacyID
                                                             FROM
                                                               pharmacy AS p
                                                             JOIN
@@ -51,7 +52,6 @@ export const SELECT_PHARMACY_CHECK_EXISTS_ALREADY = `
                                                             WHERE pharmacyName = ? AND address = ? AND city = ? AND state = ? AND zipCode = ? AND phoneNumber = ?;
                                                           `;
 
-
 // User Role's Names
 export const SELECT_PATIENT_NAMES =
   "SELECT firstName, lastName FROM patient WHERE patientID = ?";
@@ -61,3 +61,4 @@ export const SELECT_DOCTOR_NAMES =
 
  export const SELECT_ADMIN_NAMES =
   "SELECT firstName, lastName from admin WHERE adminID = ?";
+
