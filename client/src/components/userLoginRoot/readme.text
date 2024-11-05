@@ -1,0 +1,5 @@
+Folder Overview
+
+This folder contains the sidebar components for each user type. These sidebars allow each user to access different files and pages (these files/pages are located in "users" folder).
+
+The files in this folder serve as the entry point when users log in, enabling them to navigate and view the pages available to their user type.
