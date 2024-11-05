@@ -15,6 +15,7 @@ export default function ManageRefillsPage() {
     useState([]);
   const [selectedRefills, setSelectedRefills] = useState([]);
   const [refillHistory, setRefillHistory] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -77,6 +78,7 @@ export default function ManageRefillsPage() {
   useEffect(() => {
     fetchCurrentPrescriptions();
     fetchRefillHistory();
+    fetchPendingRequests();
   }, []);
 
   // Handle Selecting a Refill
@@ -92,6 +94,27 @@ export default function ManageRefillsPage() {
       )
     ) {
       setSelectedRefills([...selectedRefills, medication]);
+    }
+  };
+
+  const fetchPendingRequests = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setErrorMessage("Patient is not authenticated!");
+        return;
+      }
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/medications/pending-requests",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setPendingRequests(response.data.pendingRequest);
+    } catch (error) {
+      console.error("Error fetching pending refill requests:", error);
+      setErrorMessage("Error fetching pending refill requests.");
     }
   };
 
@@ -265,11 +288,13 @@ export default function ManageRefillsPage() {
 
               {/* Refill History Section */}
               <div className="mt-8">
-                <h2 className="text-xl font-bold mb-4">Refill History</h2>
-                {refillHistory.length === 0 ? (
-                  <p className="text-gray-600">No refill history available.</p>
+                <h2 className="text-xl font-bold mb-4">Pending Refills</h2>
+                {pendingRequests.length === 0 ? (
+                  <p className="text-gray-600">
+                    No pending refill requests currently available.
+                  </p>
                 ) : (
-                  refillHistory.map((refill) => (
+                  pendingRequests.map((refill) => (
                     <PreviousRefillCard
                       key={refill.refillID}
                       name={refill.medicationName}

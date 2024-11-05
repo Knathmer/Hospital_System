@@ -2,6 +2,7 @@ import {
   SELECT_PATIENT_MEDICATION_INFORMATION_QUERY,
   SELECT_PATIENT_PHARMACY_INFORMATION_QUERY,
   GET_REFILL_HISTORY,
+  GET_PENDING_REQUESTS,
 } from "../../queries/constants/selectQueries.js";
 import { query } from "../../database.js";
 export const getPatientMedications = async (req, res) => {
@@ -138,5 +139,29 @@ export const getRefillHistory = async (req, res) => {
   } catch (error) {
     console.error("Error getting refill history request:", error);
     res.status(500).json({ message: "Error getting refill history requests." });
+  }
+};
+
+export const getPendingRequests = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+
+    const pendingRequest = await query(GET_PENDING_REQUESTS, [patientID]);
+
+    if (pendingRequest.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "Currently no pending refill requests" });
+    }
+
+    res.status(200).json({ pendingRequest });
+  } catch (error) {
+    console.error(
+      "Error fetching patient's pending refill information ",
+      error
+    );
+    res
+      .status(500)
+      .json({ message: "Server error fetching pending refill information" });
   }
 };

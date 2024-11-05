@@ -56,3 +56,5 @@ export const GET_REFILL_HISTORY = `SELECT r.refillID, pr.medicationName, r.statu
                                    JOIN prescription pr ON r.prescriptionID = pr.prescriptionID
                                    WHERE r.patientID = ?
                                    ORDER BY r.requestDate DESC;`;
+
+export const GET_PENDING_REQUESTS = `SELECT r.refillID, pr.medicationName, r.status, r.requestDate FROM refill AS r JOIN prescription AS pr ON r.prescriptionID = pr.prescriptionID WHERE r.patientID = ? AND r.status = 'Pending' ORDER BY r.requestDate DESC;`;
