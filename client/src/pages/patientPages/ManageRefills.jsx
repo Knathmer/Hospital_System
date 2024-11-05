@@ -189,6 +189,29 @@ export default function ManageRefillsPage() {
     }
   };
 
+  // Implement Auto-Dismiss for Error and Success Messages
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 6000); // 6 seconds
+
+      // Cleanup the timer if the component unmounts or if errorMessage changes
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 8000); // 8 seconds
+
+      // Cleanup the timer if the component unmounts or if successMessage changes
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Navbar */}
