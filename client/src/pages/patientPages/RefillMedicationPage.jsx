@@ -6,6 +6,7 @@ import axios from "axios";
 import CurrentPrescriptionCard from "../../components/patientComponents/CurrentPrescriptionCard";
 import SelectedRefillCard from "../../components/patientComponents/SelectedPrescriptionCard";
 import PreviousRefillCard from "../../components/patientComponents/PreviousRefillCard";
+import TabButton from "../../components/patientComponents/TabButton";
 import Footer from "../../components/ui/Footer";
 
 export default function RefillPrescriptionsPage() {
@@ -17,6 +18,17 @@ export default function RefillPrescriptionsPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [refillLoading, setRefillLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("request");
+
+  const tabs = [
+    { id: "request", label: "Request Refills" },
+    { id: "history", label: "Refill History" },
+  ];
+
+  const ActiveComponent =
+    tabs.find((tab) => tab.id === activeTab).id === "request"
+      ? RequestRefill
+      : RefillHistory;
 
   const fetchCurrentPrescriptions = async () => {
     try {
@@ -170,6 +182,18 @@ export default function RefillPrescriptionsPage() {
                   {successMessage}
                 </p>
               )}
+            </div>
+            <div className="mb-4 border-b border-gray-200">
+              <div className="flex flex-wrap -mb-px">
+                {tabs.map((tab) => (
+                  <TabButton
+                    key={tab.id}
+                    label={tab.label}
+                    isActive={activeTab === tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                  />
+                ))}
+              </div>
             </div>
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="w-full lg:w-1/3">
