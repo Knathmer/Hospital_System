@@ -7,6 +7,7 @@ import MedicationPage from "../pages/patientPages/PatientMedicationPage.jsx";
 import PatientSidebar from "../components/dashboards/patient/sidebar/patientSidebar.jsx";
 import ManagePharmaciesPage from "../pages/patientPages/ManagePharmaciesPage.jsx";
 import RefillMedicationsPage from "../pages/patientPages/RefillMedicationPage.jsx";
+import ManageRefillsPage from "../pages/patientPages/ManageRefills.jsx";
 
 const PatientRoutes = () => {
   return (
@@ -17,7 +18,7 @@ const PatientRoutes = () => {
       <Route path="medications">
         <Route index element={<MedicationPage />} />
         <Route path="manage-pharmacies" element={<ManagePharmaciesPage />} />
-        <Route path="refill-medications" element={<RefillMedicationsPage />} />
+        <Route path="refill-medications" element={<ManageRefillsPage />} />
       </Route>
       {/* Add other patient routes here */}
     </Routes>
