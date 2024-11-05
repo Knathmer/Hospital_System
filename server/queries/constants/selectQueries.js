@@ -51,9 +51,10 @@ export const SELECT_PHARMACY_CHECK_EXISTS_ALREADY = `
                                                             WHERE pharmacyName = ? AND address = ? AND city = ? AND state = ? AND zipCode = ? AND phoneNumber = ?;
                                                           `;
 
-export const GET_REFILL_HISTORY = `SELECT r.refillID, pr.medicationName, r.status, r.requestDate 
+export const GET_REFILL_HISTORY = `SELECT r.refillID, pr.medicationName, r.status, r.requestDate, d.firstName, d.lastName, r.notes
                                    FROM refill AS r
                                    JOIN prescription pr ON r.prescriptionID = pr.prescriptionID
+                                   JOIN doctor d ON r.doctorID = d.doctorID
                                    WHERE r.patientID = ?
                                    ORDER BY r.requestDate DESC;`;
 

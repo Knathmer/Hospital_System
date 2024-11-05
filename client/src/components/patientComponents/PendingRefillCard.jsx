@@ -1,7 +1,7 @@
 import React from "react";
 import { Clock } from "lucide-react";
 
-export default function PreviousRefillCard({ name, status, requestDate }) {
+export default function PendingRefillCard({ name, status, requestDate }) {
   const getStatusColor = (status) => {
     switch (
       status // Normalize the status to lowercase

@@ -1,7 +1,7 @@
 import React from "react";
 import CurrentPrescriptionCard from "./CurrentPrescriptionCard";
 import SelectedRefillCard from "./SelectedPrescriptionCard";
-import PreviousRefillCard from "./PreviousRefillCard";
+import PendingRefillCard from "./PendingRefillCard";
 import { Plus } from "lucide-react";
 export default function RequestRefills({
   patientsCurrentPrescriptions,
@@ -86,7 +86,7 @@ export default function RequestRefills({
           </p>
         ) : (
           pendingRequests.map((refill) => (
-            <PreviousRefillCard
+            <PendingRefillCard
               key={refill.refillID}
               name={refill.medicationName}
               status={refill.status}

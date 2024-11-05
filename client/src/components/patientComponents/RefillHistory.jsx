@@ -1,5 +1,5 @@
 import React from "react";
-import PreviousRefillCard from "./PreviousRefillCard";
+import RefillHistoryCard from "./RefillHistoryCard";
 
 export default function RefillHistory({ refillHistory }) {
   return (
@@ -12,10 +12,12 @@ export default function RefillHistory({ refillHistory }) {
           </p>
         ) : (
           refillHistory.map((refill) => (
-            <PreviousRefillCard
+            <RefillHistoryCard
               key={refill.refillID}
               name={refill.medicationName}
               status={refill.status}
+              notes={refill.notes}
+              approvedBy={refill.firstName + " " + refill.lastName}
               requestDate={new Date(refill.requestDate).toLocaleDateString(
                 "en-US",
                 {
