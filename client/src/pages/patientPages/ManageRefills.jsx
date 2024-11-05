@@ -4,12 +4,10 @@ import { ArrowLeft, Plus, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import NavbarPatient from "../../components/dashboards/patient/sections/header/NavbarPatient";
 import Footer from "../../components/ui/Footer";
-import CurrentPrescriptionCard from "../../components/patientComponents/CurrentPrescriptionCard";
-import SelectedRefillCard from "../../components/patientComponents/SelectedPrescriptionCard";
-import PreviousRefillCard from "../../components/patientComponents/PreviousRefillCard";
 import TabButton from "../../components/patientComponents/TabButton";
 import axios from "axios";
 import RequestRefills from "../../components/patientComponents/RequestRefills";
+import RefillHistory from "../../components/patientComponents/RefillHistory";
 
 export default function ManageRefillsPage() {
   // State Management
@@ -28,10 +26,10 @@ export default function ManageRefillsPage() {
     { id: "history", label: "Refill History" },
   ];
 
-  // const ActiveComponent =
-  //   tabs.find((tab) => tab.id === activeTab).id === "request"
-  //     ? RequestRefill
-  //     : RefillHistory;
+  const ActiveComponent =
+    tabs.find((tab) => tab.id === activeTab).id === "request"
+      ? RequestRefills
+      : RefillHistory;
 
   // Fetch Current Prescriptions
   const fetchCurrentPrescriptions = async () => {
@@ -251,7 +249,7 @@ export default function ManageRefillsPage() {
                 loading={loading}
               />
             ) : (
-              <p>Hello World</p>
+              <RefillHistory refillHistory={refillHistory} />
             )}
           </div>
         </div>

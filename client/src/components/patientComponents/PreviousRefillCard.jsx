@@ -24,9 +24,9 @@ export default function PreviousRefillCard({ name, status, requestDate }) {
         {/* <p className={`text-sm ${getStatusColor(status)}`}>Status: {status}</p> */}
         <p className="text-sm text-gray-600">Requested on: {requestDate}</p>
       </div>
-      <div className="flex items-center text-yellow-500">
+      <div className={`flex items-center ${getStatusColor(status)}`}>
         <Clock className="w-5 h-5 mr-2 " />
-        Pending
+        {status}
       </div>
     </div>
   );
