@@ -1,14 +1,15 @@
 import { useState } from 'react';
+import { Heart, Calendar, FileText, PillBottle, CreditCard, ShieldPlus} from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Heart, Calendar, FileText, PillBottle, CreditCard, ShieldPlus, Settings, LogOut } from 'lucide-react';
 
-// sidebar items/sections
+// Sidebar Components
 import LogoSidebar from './sidebarItems/UserLogoSidebar.jsx';
-import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar.jsx'
-
-// files attached to sidebar item
-import PatientDashboard from '../PatientDashboard.tsx';
+import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar.jsx';
+import PatientNameDisplay from './sidebarItems/WelcomePatientName.jsx';
 import SidebarToggleButton from '../../../ui/buttons/SidebarToggleButton.jsx';
+
+// Files Linked
+import PatientDashboard from '../PatientDashboard.tsx';
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -38,25 +39,13 @@ export default function PatientSidebar() {
       >
         <div>
           <div className="p-4 border-b">
-            {/* "WomenWell" */}
-            <LogoSidebar /> 
-            {/* User Profile Image */}
-            <div className="flex items-center mt-6 p-4 bg-pink-50 rounded-lg shadow-md">
-              <div className="mr-4">
-                <img
-                  src="https://via.placeholder.com/80"
-                  alt="Doctor"
-                  className="w-20 h-20 rounded-full object-cover border-2 border-pink-500"
-                />
-              </div>
-              {/* this section needs to show data query for user's first and last name */}
-              <div>
-                <h2 className="text-lg font-bold text-pink-600">Welcome</h2>
-                <p className="text-sm text-gray-700">Dr. John Doe</p>
-              </div>
-            </div>
+            {/* WomenWell - logo */}
+            <LogoSidebar />
+            
+            {/* User Profile Image and Name */}
+            <PatientNameDisplay />
           </div>
-          {/* Sidebar Items, eventually needs to show data query for user type*/} 
+          
           <nav className="p-4">
             {Object.keys(sidebarItems).map((category) => (
               <div key={category} className="mb-6">

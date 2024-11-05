@@ -37,7 +37,8 @@ export const SELECT_PATIENT_PHARMACY_INFORMATION_QUERY = `
                                                               p.city,
                                                               p.state,
                                                               p.zipCode,
-                                                              p.phoneNumber
+                                                              p.phoneNumber,
+                                                              p.pharmacyID
                                                             FROM
                                                               pharmacy AS p
                                                             JOIN
@@ -58,4 +59,17 @@ export const GET_REFILL_HISTORY = `SELECT r.refillID, pr.medicationName, r.statu
                                    WHERE r.patientID = ?
                                    ORDER BY r.requestDate DESC;`;
 
+
 export const GET_PENDING_REQUESTS = `SELECT r.refillID, pr.medicationName, r.status, r.requestDate FROM refill AS r JOIN prescription AS pr ON r.prescriptionID = pr.prescriptionID WHERE r.patientID = ? AND r.status = 'Pending' ORDER BY r.requestDate DESC;`;
+
+// User Role's Names
+export const SELECT_PATIENT_NAMES =
+  "SELECT firstName, lastName FROM patient WHERE patientID = ?";
+
+export const SELECT_DOCTOR_NAMES = 
+ "SELECT firstName, lastName FROM doctor WHERE doctorID = ?";
+
+ export const SELECT_ADMIN_NAMES =
+  "SELECT firstName, lastName from admin WHERE adminID = ?";
+
+
