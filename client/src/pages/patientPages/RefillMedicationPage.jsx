@@ -146,7 +146,7 @@ export default function RefillPrescriptionsPage() {
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
-            <h1 className="text-3xl font-bold text-pink-600 mb-2">
+            <h1 className="text-3xl font-bold text-black mb-2">
               Refill Prescriptions
             </h1>
             <div className="mb-4">
