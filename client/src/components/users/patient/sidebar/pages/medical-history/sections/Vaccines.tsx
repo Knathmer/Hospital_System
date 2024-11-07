@@ -6,7 +6,7 @@ import DefaultButton from "../../../../../../ui/buttons/DefaultButton";
 
 const Vaccines = ({ vaccines, setVaccines }) => {
   const addVaccine = () => {
-    setVaccines([...vaccines, { name: "", date: "", doctor: null }]);
+    setVaccines([...vaccines, { name: "", date: null, doctor: null }]);
   };
 
   const removeVaccine = (index: number) => {

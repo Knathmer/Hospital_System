@@ -1,13 +1,5 @@
-"use client";
-
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import { Textarea } from "@/components/ui/textarea"
-// import { Checkbox } from "@/components/ui/checkbox"
-// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-// import { Label } from "@/components/ui/label"
 import { Heart, ArrowLeft, Plus, Trash2, Edit2 } from "lucide-react";
-// import Link from "next/link"
+
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import DefaultButton from "../../../../../ui/buttons/DefaultButton";
@@ -23,26 +15,51 @@ export default function EditMedicalHistoryForm() {
   const [vaccines, setVaccines] = useState([
     { name: "", date: "", doctor: "" },
   ]);
+  const [medications, setMedications] = useState([{ name: "" }]);
   const [surgeries, setSurgeries] = useState([{ name: "", date: "" }]);
   const [allergies, setAllergies] = useState([
     { name: "", reaction: "", severity: "" },
   ]);
   const [disabilities, setDisabilities] = useState([{ name: "" }]);
+
+  const [removedMeds, setRemovedMeds] = useState([{ name: "" }]);
+  const [removedVacs, setRemovedVacs] = useState([
+    { name: "", date: "", doctor: "" },
+  ]);
+  const [removedSurs, setRemovedSurs] = useState([{ name: "", date: "" }]);
+  const [removedAllerg, setRemovedAllerg] = useState([
+    { name: "", reaction: "", severity: "" },
+  ]);
+  const [removedDisas, setRemovedDisas] = useState([{ name: "" }]);
+
   const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
     allAllergies: allergies,
+
     allDisabilities: disabilities,
+
+    allMedications: medications,
+
     allVaccines: vaccines,
+
     allSurgeries: surgeries,
   });
 
-  const [medications, setMedications] = useState([{ name: "" }]);
+  const [formDataRemoved, setFormDataRemoved] = useState({
+    removedAllergies: removedAllerg,
+    removedDisabilities: removedDisas,
+    removedMedications: removedMeds,
+    removedVaccines: removedVacs,
+    removedSurgeries: removedSurs,
+  });
+
   const addMedication = () => {
     setMedications([...medications, { name: "" }]);
   };
 
   const removeMedication = (index: number) => {
+    setRemovedMeds([...removedMeds, { name: medications[index].name }]);
     setMedications(medications.filter((_, i) => i !== index));
   };
 
@@ -51,6 +68,16 @@ export default function EditMedicalHistoryForm() {
   };
 
   const removeVaccine = (index: number) => {
+    console.log("removedVacs0: ", removedVacs);
+    // Create the new removed vaccine object
+    const removedVaccine = {
+      name: vaccines[index].name,
+      date: vaccines[index].date,
+      doctor: vaccines[index].doctor,
+    };
+
+    setRemovedVacs((prevRemovedVacs) => [...prevRemovedVacs, removedVaccine]);
+    console.log("removedVacs: ", removedVacs);
     setVaccines(vaccines.filter((_, i) => i !== index));
   };
 
@@ -59,6 +86,10 @@ export default function EditMedicalHistoryForm() {
   };
 
   const removeSurgery = (index: number) => {
+    setRemovedSurs([
+      ...removedSurs,
+      { name: surgeries[index].name, date: surgeries[index].date },
+    ]);
     setSurgeries(surgeries.filter((_, i) => i !== index));
   };
 
@@ -67,6 +98,14 @@ export default function EditMedicalHistoryForm() {
   };
 
   const removeAllergy = (index: number) => {
+    setRemovedAllerg([
+      ...removedAllerg,
+      {
+        name: allergies[index].name,
+        reaction: allergies[index].reaction,
+        severity: allergies[index].severity,
+      },
+    ]);
     setAllergies(allergies.filter((_, i) => i !== index));
   };
 
@@ -75,6 +114,7 @@ export default function EditMedicalHistoryForm() {
   };
 
   const removeDisability = (index: number) => {
+    setRemovedDisas([...removedDisas, { name: disabilities[index].name }]);
     setDisabilities(disabilities.filter((_, i) => i !== index));
   };
 
@@ -148,52 +188,45 @@ export default function EditMedicalHistoryForm() {
     return listOfObjects;
   };
 
+  // Update formData whenever any related state changes
   useEffect(() => {
-    // Fetch data from backend
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("token");
+    const filteredAllergies = allergies.filter((allergy) => allergy.name);
+    console.log("allergy filter", filteredAllergies);
+    const filteredDisabilites = disabilities.filter(
+      (disability) => disability.name
+    );
+    console.log("disablilty filter", filteredDisabilites);
+    const filteredVaccines = vaccines.filter((vaccine) => vaccine.name);
+    console.log("vaccine unfilter", vaccines);
+    console.log("vaccine filter", filteredVaccines);
+    const filteredSurgeries = surgeries.filter((surgery) => surgery.name);
+    console.log("surgeries filter", filteredSurgeries);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      allAllergies: allergies,
+      allDisabilities: disabilities,
+      allMedications: medications,
+      allVaccines: vaccines,
+      allSurgeries: surgeries,
+    }));
+  }, [allergies, disabilities, medications, vaccines, surgeries]);
 
-        if (!token) {
-          throw new Error("No token found");
-        }
+  // Update formDataRemoved whenever any related state changes
+  useEffect(() => {
+    setFormDataRemoved((prevFormData) => ({
+      ...prevFormData,
+      removedAllergies: removedAllerg,
+      removedDisabilities: removedDisas,
+      removedMedications: removedMeds,
+      removedVaccines: removedVacs,
+      removedSurgeries: removedSurs,
+    }));
+  }, [removedAllerg, removedDisas, removedMeds, removedVacs, removedSurs]);
 
-        const response = await axios.get(
-          "http://localhost:3000/auth/patient/medical-history-info",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        ); //
-        if (!response) throw new Error("Network response was not ok");
+  // Step 2: Save initial values to a ref or a separate state
+  const [initialFormData, setInitialFormData] = useState(formData);
 
-        console.log("response-med-info2:", response.data.data[0].medication);
-
-        const allergy = toDictAllergy(response.data.data[0].allergy);
-        const vaccine = toDictVaccine(response.data.data[0].vaccine);
-        const surgery = toDictSurgery(response.data.data[0].surgery);
-        const disability = toDictDisability(response.data.data[0].disability);
-        const medication = toDictMedication(response.data.data[0].medication);
-        // Set the state with fetched data
-        setVaccines(vaccine);
-        setSurgeries(surgery);
-        setAllergies(allergy);
-        setDisabilities(disability);
-        setMedications(medication);
-      } catch (error) {
-        console.error("Error fetching medical history:", error);
-      }
-    };
-    if (!isEditing) {
-      fetchData();
-    }
-  }, [!isEditing]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-
+  const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
 
@@ -201,10 +234,62 @@ export default function EditMedicalHistoryForm() {
         throw new Error("No token found");
       }
 
-      const response = await axios.post(
-        "http://localhost:3000/auth/patient/medical-history",
-        formData,
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/medical-history-info",
         {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      ); //
+      if (!response) throw new Error("Network response was not ok");
+
+      console.log("response-med-info2:", response.data.data[0].medication);
+
+      const allergy = toDictAllergy(response.data.data[0].allergy);
+      const vaccine = toDictVaccine(response.data.data[0].vaccine);
+      const surgery = toDictSurgery(response.data.data[0].surgery);
+      const disability = toDictDisability(response.data.data[0].disability);
+      const medication = toDictMedication(response.data.data[0].medication);
+      // Set the state with fetched data
+      setVaccines(vaccine);
+      setSurgeries(surgery);
+      setAllergies(allergy);
+      setDisabilities(disability);
+      setMedications(medication);
+
+      setInitialFormData(formData);
+    } catch (error) {
+      console.error("Error fetching medical history:", error);
+    }
+  };
+
+  useEffect(() => {
+    // On component mount, save the initial form data
+    setInitialFormData(formData);
+  }, [!isEditing]);
+
+  useEffect(() => {
+    // Fetch data from backend
+    fetchData();
+    if (!isEditing) {
+      fetchData();
+    }
+  }, [!isEditing]);
+
+  const removeMedicalHistory = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      const response = await axios.delete(
+        "http://localhost:3000/auth/patient/remove-medical-history",
+
+        {
+          data: formDataRemoved,
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -212,9 +297,9 @@ export default function EditMedicalHistoryForm() {
       );
 
       if (response.status === 200 && response.data) {
-        console.log("Add Medical History Successful!");
+        console.log("Remove Medical History Successful!");
       } else {
-        setError("Add Medical History failed. Please try again.");
+        setError("Remove Medical History failed. Please try again.");
       }
     } catch (error) {
       if (
@@ -228,6 +313,117 @@ export default function EditMedicalHistoryForm() {
       }
       console.error("Medical History error:", error);
     }
+  };
+
+  const updateMedicalHistory = async () => {
+    try {
+      console.log("ENTER UPDATEMEDHISTORY CLIENT: ");
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("No token found");
+      }
+      console.log("FORM DATA: ", formData);
+      console.log("INITIAL FORM DATA: ", initialFormData);
+      let filteredFormData = {
+        allAllergies: formData.allAllergies.filter(
+          (allergy) =>
+            !initialFormData.allAllergies.some(
+              (initAllergy) =>
+                initAllergy.name.trim().toLowerCase() ===
+                allergy.name.trim().toLowerCase()
+            )
+        ),
+        allDisabilities: formData.allDisabilities.filter(
+          (disability) =>
+            !initialFormData.allDisabilities.some(
+              (initDis) =>
+                initDis.name.trim().toLocaleLowerCase() ===
+                disability.name.trim().toLowerCase()
+            )
+        ),
+        allMedications: formData.allMedications.filter(
+          (medication) =>
+            !initialFormData.allMedications.some(
+              (initMed) =>
+                initMed.name.trim().toLowerCase() ===
+                medication.name.trim().toLowerCase()
+            )
+        ),
+        allVaccines: formData.allVaccines.filter(
+          (vaccine) =>
+            !initialFormData.allVaccines.some(
+              (initVac) =>
+                initVac.name.trim().toLowerCase() ===
+                vaccine.name.trim().toLowerCase()
+            )
+        ),
+        allSurgeries: formData.allSurgeries.filter(
+          (surgery) =>
+            !initialFormData.allSurgeries.some(
+              (initSurg) =>
+                initSurg.name.trim().toLowerCase() ===
+                surgery.name.trim().toLowerCase()
+            )
+        ),
+      };
+
+      filteredFormData = {
+        allAllergies: filteredFormData.allAllergies.filter(
+          (allergy) => allergy.name
+        ),
+        allDisabilities: filteredFormData.allDisabilities.filter(
+          (disability) => disability.name
+        ),
+        allMedications: filteredFormData.allMedications.filter(
+          (medication) => medication.name
+        ),
+        allVaccines: filteredFormData.allVaccines.filter(
+          (vaccine) => vaccine.name
+        ),
+        allSurgeries: filteredFormData.allSurgeries.filter(
+          (surgery) => surgery.name
+        ),
+      };
+
+      console.log("FILTERED FORM DATA: ", filteredFormData);
+      //setFormData(filteredFormData);
+
+      const response = await axios.post(
+        "http://localhost:3000/auth/patient/update-medical-history",
+        filteredFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200 && response.data) {
+        console.log("Update Medical History Successful!");
+      } else {
+        setError("Update Medical History failed. Please try again.");
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+      console.error("Medical History error:", error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    removeMedicalHistory();
+    updateMedicalHistory();
+
     setIsEditing(false);
   };
 
@@ -264,7 +460,7 @@ export default function EditMedicalHistoryForm() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <Link
-            to="#"
+            to="/patient/dashboard"
             className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -289,7 +485,7 @@ export default function EditMedicalHistoryForm() {
               )}
             </DefaultButton>
           </div>
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Medical History</h2>
               <div>
@@ -357,7 +553,12 @@ export default function EditMedicalHistoryForm() {
                       newAllergies[index].name = e.target.value;
                       setAllergies(newAllergies);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (allergy.name ===
+                        initialFormData.allAllergies[index]?.name &&
+                        initialFormData.allAllergies[index]?.name) ||
+                      !isEditing
+                    }
                   />
                   <Input
                     placeholder="Reaction"
@@ -367,7 +568,12 @@ export default function EditMedicalHistoryForm() {
                       newAllergies[index].reaction = e.target.value;
                       setAllergies(newAllergies);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (allergy.reaction ===
+                        initialFormData.allAllergies[index]?.reaction &&
+                        initialFormData.allAllergies[index]?.reaction) ||
+                      !isEditing
+                    }
                   />
 
                   <Select
@@ -379,7 +585,12 @@ export default function EditMedicalHistoryForm() {
                       newAllergies[index].severity = e.target.value;
                       setAllergies(newAllergies);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (allergy.severity ===
+                        initialFormData.allAllergies[index]?.severity &&
+                        initialFormData.allAllergies[index]?.severity) ||
+                      !isEditing
+                    }
                   >
                     <SelectItem value=""> Select Severity</SelectItem>
                     <SelectItem value="Mild"> Mild</SelectItem>
@@ -423,7 +634,12 @@ export default function EditMedicalHistoryForm() {
                       newMedications[index].name = e.target.value;
                       setMedications(newMedications);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (medication.name ===
+                        initialFormData.allMedications[index]?.name &&
+                        initialFormData.allMedications[index]?.name) ||
+                      !isEditing
+                    }
                   />
 
                   {isEditing && (
@@ -468,7 +684,12 @@ export default function EditMedicalHistoryForm() {
                       newVaccines[index].name = e.target.value;
                       setVaccines(newVaccines);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (vaccine.name ===
+                        initialFormData.allVaccines[index]?.name &&
+                        initialFormData.allVaccines[index]?.name) ||
+                      !isEditing
+                    }
                   />
                   <Input
                     type="date"
@@ -478,7 +699,12 @@ export default function EditMedicalHistoryForm() {
                       newVaccines[index].date = e.target.value;
                       setVaccines(newVaccines);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (vaccine.date ===
+                        initialFormData.allVaccines[index]?.date &&
+                        initialFormData.allVaccines[index]?.date) ||
+                      !isEditing
+                    }
                   />
                   <Input
                     placeholder="Doctor name"
@@ -488,7 +714,12 @@ export default function EditMedicalHistoryForm() {
                       newVaccines[index].doctor = e.target.value;
                       setVaccines(newVaccines);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (vaccine.doctor ===
+                        initialFormData.allVaccines[index]?.doctor &&
+                        initialFormData.allVaccines[index]?.doctor) ||
+                      !isEditing
+                    }
                   />
 
                   {isEditing && (
@@ -527,7 +758,12 @@ export default function EditMedicalHistoryForm() {
                       newDisabilities[index].name = e.target.value;
                       setDisabilities(newDisabilities);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (disability.name ===
+                        initialFormData.allDisabilities[index]?.name &&
+                        initialFormData.allDisabilities[index]?.name) ||
+                      !isEditing
+                    }
                   />
 
                   {isEditing && (
@@ -585,7 +821,12 @@ export default function EditMedicalHistoryForm() {
                       newSurgeries[index].name = e.target.value;
                       setSurgeries(newSurgeries);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (surgery.name ===
+                        initialFormData.allSurgeries[index]?.name &&
+                        initialFormData.allSurgeries[index]?.name) ||
+                      !isEditing
+                    }
                   />
                   <Input
                     type="date"
@@ -595,7 +836,12 @@ export default function EditMedicalHistoryForm() {
                       newSurgeries[index].date = e.target.value;
                       setSurgeries(newSurgeries);
                     }}
-                    disabled={!isEditing}
+                    disabled={
+                      (surgery.date ===
+                        initialFormData.allSurgeries[index]?.date &&
+                        initialFormData.allSurgeries[index]?.date) ||
+                      !isEditing
+                    }
                   />
                   {isEditing && (
                     <DefaultButton

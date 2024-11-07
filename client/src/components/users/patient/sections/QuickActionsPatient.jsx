@@ -99,7 +99,7 @@ const QuickActions = () => {
           Insurance Information
         </DefaultButton>
         <DefaultButton variant="outline" onClick={handleMedHistoryClick}>
-          Update Health Information
+          Update Medical History
         </DefaultButton>
         <NavButton variant="outline">View Billing Statements</NavButton>
       </div>
