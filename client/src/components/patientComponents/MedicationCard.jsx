@@ -75,14 +75,6 @@ export default function MedicationCard({
           )}
         </div>
       </div>
-      <div className="mt-6 flex items-center">
-        <button
-          //   onClick={onRequestRefill}
-          className="text-pink-600 hover:text-pink-700 hover:underline"
-        >
-          Request refill
-        </button>
-      </div>
     </div>
   );
 }
