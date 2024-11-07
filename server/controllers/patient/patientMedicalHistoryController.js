@@ -164,8 +164,8 @@ export async function postAllergies(allergiesList, patientID) {
   try {
     const allergies = allergiesList.map((allergy) => [
       allergy.name,
-      allergy.reaction,
-      allergy.severity,
+      allergy.reaction || null,
+      allergy.severity || null,
       patientID,
     ]);
 
@@ -203,7 +203,7 @@ export async function postDisabilities(disabilityList, patientID) {
 export async function postMedications(medicationList, patientID) {
   try {
     const INSERT_MEDICATION_QUERY =
-      "INSERT INTO other_prescriptions (medicationName, patientID) VALUES ?";
+      "INSERT INTO other_prescription (medicationName, patientID) VALUES ?";
 
     const medications = medicationList.map((disability) => [
       disability.name,
@@ -226,9 +226,9 @@ export async function postVaccines(vaccineList, patientID) {
   try {
     const vaccines = vaccineList.map((vaccine) => [
       vaccine.name,
-      vaccine.date,
+      vaccine.date || null,
       patientID,
-      vaccine.doctor,
+      vaccine.doctor || null,
     ]);
     console.log(`vaccines: ${vaccines}`);
     const insertResult = await bulkQuery(INSERT_VACCINE_QUERY, [vaccines]);

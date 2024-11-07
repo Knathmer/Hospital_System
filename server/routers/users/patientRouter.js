@@ -14,7 +14,10 @@ import {
   postNewPharmacy,
   postToPatientPharmacy,
 } from "../../controllers/patient/pharmacyController.js";
-import { removeMedHistory } from "../../controllers/patient/patientEditMedicalHistoryController.js";
+import {
+  removeMedHistory,
+  updateMedHistory,
+} from "../../controllers/patient/patientEditMedicalHistoryController.js";
 
 const router = express.Router();
 
@@ -24,6 +27,7 @@ router.post("/insurance", postInsurance);
 router.get("/insurance-info", hasInsuranceInfo);
 router.put("/update-insurance", updateInsurance);
 router.delete("/remove-medical-history", removeMedHistory);
+router.post("/update-medical-history", updateMedHistory);
 
 //Since medications will have many sub routes, create a sub router for the path "/auth/patient/medications/*"
 router.use("/medications", medicationRouter);

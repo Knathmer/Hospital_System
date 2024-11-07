@@ -1,4 +1,11 @@
 import { bulkQuery, query } from "../../database.js";
+import {
+  postAllergies,
+  postDisabilities,
+  postMedications,
+  postSurgeries,
+  postVaccines,
+} from "./patientMedicalHistoryController.js";
 
 export async function updateAllergies(allergyList, patientID) {}
 
@@ -39,21 +46,26 @@ export async function updateMedHistory(req, res) {
     const disabilityList = medData.allDisabilities;
     const vaccineList = medData.allVaccines;
     const surgeryList = medData.allSurgeries;
+    const medicationList = medData.allMedications;
 
     if (allergiesList.length > 0) {
-      updateAllergies(allergiesList, patientID);
+      await postAllergies(allergiesList, patientID);
     }
 
     if (disabilityList.length > 0) {
-      updateDisabilities(disabilityList, patientID);
+      await postDisabilities(disabilityList, patientID);
     }
 
     if (vaccineList.length > 0) {
-      updateVaccines(vaccineList, patientID);
+      await postVaccines(vaccineList, patientID);
     }
 
     if (surgeryList.length > 0) {
-      updateSurgeries(surgeryList, patientID);
+      await postSurgeries(surgeryList, patientID);
+    }
+
+    if (medicationList.length > 0) {
+      await postMedications(medicationList, patientID);
     }
     return res
       .status(200)
@@ -180,6 +192,35 @@ export async function removeSurgeries(surgeryList, patientID) {
   }
 }
 
+export async function removeMedications(medicationList, patientID) {
+  try {
+    console.log("surgeryList: ", medicationList);
+    const medications = medicationList.map((medication) => medication.name);
+
+    const placeholders = medications.map(() => "?").join(",");
+    console.log("placeholders: ", placeholders);
+    console.log("pID: ", patientID);
+
+    const REMOVE_MEDICATION_QUERY = `
+    DELETE FROM other_prescription 
+    WHERE medicationName IN (${placeholders}) 
+    AND patientID = ?;`;
+
+    console.log("Delete Medication parameters:", [...medications, patientID]);
+
+    const insertResult = await bulkQuery(REMOVE_MEDICATION_QUERY, [
+      ...medications,
+      patientID,
+    ]);
+    console.log("Medication delete result:", insertResult);
+
+    // return res.status(200).json({ message: "Insert Allergies Successful!" });
+  } catch (error) {
+    console.error("Error Fetching the prescriptions: ", error);
+    // res.status(500).json({ message: "Server error fetching prescriptions" });
+  }
+}
+
 export async function removeMedHistory(req, res) {
   try {
     const patientID = req.user.patientID;
@@ -189,6 +230,7 @@ export async function removeMedHistory(req, res) {
     const disabilityList = medData.removedDisabilities;
     const vaccineList = medData.removedVaccines;
     const surgeryList = medData.removedSurgeries;
+    const medicationList = medData.removedMedications;
 
     if (allergiesList.length > 0) {
       removeAllergies(allergiesList, patientID);
@@ -205,6 +247,11 @@ export async function removeMedHistory(req, res) {
     if (surgeryList.length > 0) {
       removeSurgeries(surgeryList, patientID);
     }
+
+    if (medicationList.length > 0) {
+      removeMedications(medicationList, patientID);
+    }
+
     return res
       .status(200)
       .json({ message: "Remove Medical History Successful!" });
