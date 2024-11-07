@@ -3,7 +3,7 @@ import axios from "axios";
 import { Printer, Info, Trash2 } from "lucide-react";
 import MedicationCard from "../../components/patientComponents/MedicationCard.jsx";
 import NoMedicationFound from "../../components/patientComponents/NoMedicationFound.jsx";
-import NavbarPatient from "../../components/dashboards/patient/sections/header/NavbarPatient.jsx";
+import NavbarPatient from "../../components/users/patient/sections/header/NavbarPatient.jsx";
 import Footer from "../../components/ui/Footer.jsx";
 import { Link } from "react-router-dom";
 
@@ -91,14 +91,18 @@ export default function PrescriptionPage() {
               </Link>
             </p>
             {medications && medications.length > 0 && (
-              <button className="inline-flex h-9 items-center justify-center rounded-md bg-pink-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-pink-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-700 disabled:pointer-events-none disabled:opacity-50">
+              <Link
+                to="refill-medications"
+                className="inline-flex h-9 items-center justify-center rounded-md bg-pink-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-pink-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-700 disabled:pointer-events-none disabled:opacity-50"
+              >
                 Request refills
-              </button>
+              </Link>
             )}
             {medications && medications.length > 0 ? (
               medications.map((med, index) => (
                 <MedicationCard
                   key={index}
+                  refillCard={false}
                   name={med.medicationName}
                   instructions={med.instruction}
                   prescriptionDetails={{

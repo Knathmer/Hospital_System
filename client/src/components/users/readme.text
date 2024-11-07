@@ -1,0 +1,11 @@
+Folder Overview
+
+This folder contains three main subfolders, each designated for a specific user type:
+1. Patient
+2. Doctor
+3. Admin
+
+Each subfolder holds files related to its respective user type. 
+
+Note: 
+To ensure each user type can view the necessary files, be sure to import them into the relevant [UserType]Sidebar.jsx file which is located in "userLoginRoot" folder. 

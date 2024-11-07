@@ -6,12 +6,12 @@ import axios from "axios";
 
 // Public routes
 
-import AboutPage from "./components/frontpages/AboutPage.jsx";
-import AppointmentsPage from "./components/frontpages/AppointmentsPage.jsx";
-import DoctorsPage from "./components/frontpages/DoctorsPage.jsx";
-import LoginPage from "./components/frontpages/authpages/LoginPage.jsx";
-import BookPage from "./components/frontpages/BookPage.jsx";
-import RegistrationPage from "./components/frontpages/authpages/RegistrationPage.jsx";
+import AboutPage from "./components/landingPage/AboutPage.jsx";
+import AppointmentsPage from "./components/landingPage/AppointmentsPage.jsx";
+import DoctorsPage from "./components/landingPage/DoctorsPage.jsx";
+import LoginPage from "./components/landingPage/authpages/LoginPage.jsx";
+import BookPage from "./components/landingPage/BookPage.jsx";
+import RegistrationPage from "./components/landingPage/authpages/RegistrationPage.jsx";
 
 // Role-specific route imports
 import AdminRoutes from "./routers/AdminRoutes.jsx";
@@ -19,11 +19,11 @@ import DoctorRoutes from "./routers/DoctorRoutes.jsx";
 import PatientRoutes from "./routers/PatientRoutes.jsx";
 
 import "./styles.css"; // This imports tailwind css file.
-import WomensHealthLandingPage from "./components/frontpages/landingpage/WomensHealthLandingPage.tsx";
-import MedicalHistoryForm from "./components/dashboards/patient/sidebar/pages/medical-history/MedicalHistoryForm.tsx";
-import InsuranceForm from "./components/dashboards/patient/sidebar/pages/insurance/InsuranceForm.tsx";
-import EditInsuranceForm from "./components/dashboards/patient/sidebar/pages/insurance/EditInsuranceForm.tsx";
-import EditMedicalHistoryForm from "./components/dashboards/patient/sidebar/pages/medical-history/EditMedicalHistoryForm.tsx";
+import WomensHealthLandingPage from "./components/landingPage/landingpage/WomensHealthLandingPage.tsx";
+import MedicalHistoryForm from "./components/users/patient/sidebar/pages/medical-history/MedicalHistoryForm.tsx";
+import InsuranceForm from "./components/users/patient/sidebar/pages/insurance/InsuranceForm.tsx";
+import EditInsuranceForm from "./components/users/patient/sidebar/pages/insurance/EditInsuranceForm.tsx";
+import EditMedicalHistoryForm from "./components/users/patient/sidebar/pages/medical-history/EditMedicalHistoryForm.tsx";
 
 function App() {
   return (
