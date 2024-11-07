@@ -262,13 +262,6 @@ export default function PrescriptionPage() {
             ) : (
               <NoMedicationFound />
             )}
-            <div className="mt-6 pt-6 border-t">
-              {medications && medications.length > 0 && (
-                <button className="flex items-center text-pink-600 hover:text-pink-700 hover:underline">
-                  <span className="text-xl mr-2">+</span> Report a medication
-                </button>
-              )}
-            </div>
           </div>
         </div>
       </main>
