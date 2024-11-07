@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Plus, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import NavbarPatient from "../../components/dashboards/patient/sections/header/NavbarPatient";
+import NavbarPatient from "../../components/users/patient/sections/header/NavbarPatient";
 import Footer from "../../components/ui/Footer";
 import TabButton from "../../components/patientComponents/TabButton";
 import axios from "axios";
