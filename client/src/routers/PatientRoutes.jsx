@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router-dom";
 //import PatientSidebar from "../components/dashboards/patient/sidebar/PatientSidebar.jsx";
 //import PatientDashboard from "../components/dashboards/patient/PatientDashboard.tsx";
 import MedicationPage from "../pages/patientPages/PatientMedicationPage.jsx";
-import PatientSidebar from "../components/dashboards/patient/sidebar/patientSidebar.jsx";
+import PatientSidebar from "../components/userLoginRoot/PatientSidebar.jsx";
 import ManagePharmaciesPage from "../pages/patientPages/ManagePharmaciesPage.jsx";
 // import RefillMedicationsPage from "../pages/patientPages/RefillMedicationPage.jsx";
 import ManageRefillsPage from "../pages/patientPages/ManageRefills.jsx";

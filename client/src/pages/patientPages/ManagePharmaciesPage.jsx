@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import axios from "axios";
 import { PlusCircle, ArrowLeft } from "lucide-react";
-import NavbarPatient from "../../components/dashboards/patient/sections/header/NavbarPatient";
+import NavbarPatient from "../../components/users/patient/sections/header/NavbarPatient.jsx";
 import Footer from "../../components/ui/Footer";
 import { Link } from "react-router-dom";
 import PharmacyCard from "../../components/patientComponents/PharmacyCard.jsx";

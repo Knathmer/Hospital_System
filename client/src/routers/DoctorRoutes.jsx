@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import DoctorDashboard from "../components/dashboards/doctor/DoctorDashboard";
-import DocDashboard from "../components/userSidebarPage/DoctorSidebar";
+import DoctorDashboard from "../components/users/doctor/DoctorDashboard";
+import DocDashboard from "../components/userLoginRoot/DoctorSidebar";
 
 const DoctorRoutes = () => {
   return (

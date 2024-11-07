@@ -3,10 +3,10 @@ import { Heart, Calendar, FileText, CalendarClock } from "lucide-react"
 // import { Link } from 'react-router-dom';
 
 // Sidebar Components
-import LogoSidebar from '../dashboards/patient/sidebar/sidebarItems/UserLogoSidebar';
+import LogoSidebar from './sidebarItems/UserLogoSidebar';
 // import PatientNameDisplay from '../dashboards/patient/sidebar/sidebarItems/WelcomeUserName';
-import DoctorNameDisplay from '../dashboards/patient/sidebar/sidebarItems/WelcomeDocName';
-import UserSettingsAndLogout from '../dashboards/patient/sidebar/sidebarItems/BottomItemsSidebar';
+import DoctorNameDisplay from './sidebarItems/WelcomeDocName';
+import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar';
 import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
 
 // Files Linked

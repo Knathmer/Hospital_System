@@ -1,6 +1,6 @@
 import React from 'react'
-import Button from "../../../components/ui/button"
-import Input from "../../../components/ui/input"
+import Button from "../../ui/button"
+import Input from "../../ui/input"
 import { Hospital, Users, Calendar, Bell, Settings, LogOut, BarChart, UserPlus, FileText, AlertTriangle } from "lucide-react"
 import { Link } from 'react-router-dom';
 

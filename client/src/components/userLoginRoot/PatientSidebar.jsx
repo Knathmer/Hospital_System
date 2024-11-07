@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom';
 import LogoSidebar from './sidebarItems/UserLogoSidebar.jsx';
 import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar.jsx';
 import PatientNameDisplay from './sidebarItems/WelcomePatientName.jsx';
-import SidebarToggleButton from '../../../ui/buttons/SidebarToggleButton.jsx';
+import SidebarToggleButton from '../ui/buttons/SidebarToggleButton.jsx';
 
 // Files Linked
-import PatientDashboard from '../PatientDashboard.tsx';
+import PatientDashboard from '../users/patient/PatientDashboard.tsx';
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState('dashboard');

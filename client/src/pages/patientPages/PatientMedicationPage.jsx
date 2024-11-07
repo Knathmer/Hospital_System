@@ -3,7 +3,7 @@ import axios from "axios";
 import { Printer, Info, Trash2 } from "lucide-react";
 import MedicationCard from "../../components/patientComponents/MedicationCard.jsx";
 import NoMedicationFound from "../../components/patientComponents/NoMedicationFound.jsx";
-import NavbarPatient from "../../components/dashboards/patient/sections/header/NavbarPatient.jsx";
+import NavbarPatient from "../../components/users/patient/sections/header/NavbarPatient.jsx";
 import Footer from "../../components/ui/Footer.jsx";
 import { Link } from "react-router-dom";
 

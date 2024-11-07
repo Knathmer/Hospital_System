@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Heart, House, Logs, UserRoundPen ,Settings, LogOut, UserCog, ChartSpline , ShieldAlert} from "lucide-react"
 import { Link } from 'react-router-dom';
-import AdminDashboard from './doctorSidebarItems/admin-dashboard';
+import AdminDashboard from './userSidebarPage/doctorSidebarItems/admin-dashboard';
 
 export default function SimplifiedDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
