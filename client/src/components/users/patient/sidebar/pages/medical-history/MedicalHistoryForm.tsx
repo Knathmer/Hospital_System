@@ -17,14 +17,14 @@ import axios from "axios";
 
 export default function MedicalHistoryForm() {
   const [allergies, setAllergies] = useState([
-    { name: null, reaction: null, severity: "" },
+    { name: "", reaction: null, severity: null },
   ]);
   const [disabilities, setDisablilities] = useState([{ name: "" }]);
   const [vaccines, setVaccines] = useState([
-    { name: "", date: "", doctor: null },
+    { name: "", date: null, doctor: null },
   ]);
   const [surgeries, setSurgeries] = useState([
-    { name: "", date: "", doctor: null },
+    { name: "", date: null, doctor: null },
   ]);
   const [formData, setFormData] = useState({
     allAllergies: allergies,
@@ -38,12 +38,23 @@ export default function MedicalHistoryForm() {
 
   // Update formData when allergies change
   useEffect(() => {
+    const filteredAllergies = allergies.filter((allergy) => allergy.name);
+    console.log("allergy filter", filteredAllergies);
+    const filteredDisabilites = disabilities.filter(
+      (disability) => disability.name
+    );
+    console.log("disablilty filter", filteredDisabilites);
+    const filteredVaccines = vaccines.filter((vaccine) => vaccine.name);
+    console.log("vaccine unfilter", vaccines);
+    console.log("vaccine filter", filteredVaccines);
+    const filteredSurgeries = surgeries.filter((surgery) => surgery.name);
+    console.log("surgeries filter", filteredSurgeries);
     setFormData((prevState) => ({
       ...prevState,
-      allAllergies: allergies,
-      allDisabilities: disabilities,
-      allVaccines: vaccines,
-      allSurgeries: surgeries,
+      allAllergies: filteredAllergies,
+      allDisabilities: filteredDisabilites,
+      allVaccines: filteredVaccines,
+      allSurgeries: filteredSurgeries,
     }));
   }, [allergies, disabilities, vaccines, surgeries]);
 
