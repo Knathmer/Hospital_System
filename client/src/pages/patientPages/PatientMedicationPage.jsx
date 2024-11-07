@@ -60,7 +60,7 @@ export default function PrescriptionPage() {
     }
   };
 
-  const handleAssignPharmacyClick = (prescriptionID) => {
+  const handlePharmacyClick = (prescriptionID) => {
     setAssigningPharmacyPrescriptionID(prescriptionID);
     setErrorMessage("");
     fetchPatientPharmacies();
@@ -194,7 +194,10 @@ export default function PrescriptionPage() {
                         : "",
                     }}
                     onAssignPharmacy={() =>
-                      handleAssignPharmacyClick(med.prescriptionID)
+                      handlePharmacyClick(med.prescriptionID)
+                    }
+                    onChangePharmacy={() =>
+                      handlePharmacyClick(med.prescriptionID)
                     }
                   />
 
@@ -202,7 +205,7 @@ export default function PrescriptionPage() {
                   {assigningPharmacyPrescriptionID === med.prescriptionID && (
                     <div className="bg-gray-100 p-4 rounded-md mt-2">
                       <h3 className="text-lg font-semibold mb-2">
-                        Assign a Pharmacy
+                        Select a Pharmacy
                       </h3>
                       {patientPharmacies.length > 0 ? (
                         <form onSubmit={handleAssignPharmacySubmit}>
@@ -240,7 +243,7 @@ export default function PrescriptionPage() {
                               type="submit"
                               className="px-4 py-2 bg-pink-600 text-white rounded"
                             >
-                              Assign Pharmacy
+                              Save Pharmacy
                             </button>
                           </div>
                         </form>
