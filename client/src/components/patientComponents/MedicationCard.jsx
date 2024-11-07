@@ -9,6 +9,7 @@ export default function MedicationCard({
   prescriptionDetails = {},
   refillDetails = {},
   pharmacyDetails = {},
+  onAssignPharmacy,
   //   onRequestRefill,
   //   onRemove,
 }) {
@@ -62,7 +63,15 @@ export default function MedicationCard({
               <p>{pharmacyDetails.pharmacyPhoneNum}</p>
             </>
           ) : (
-            <p></p>
+            <div>
+              <p>No pharmacy assigned</p>
+              <button
+                className="text-pink-600 hover:underline mt-1"
+                onClick={onAssignPharmacy}
+              >
+                Assign Pharmacy
+              </button>
+            </div>
           )}
         </div>
       </div>

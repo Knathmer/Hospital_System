@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Printer, Info, Trash2 } from "lucide-react";
 import MedicationCard from "../../components/patientComponents/MedicationCard.jsx";
 import NoMedicationFound from "../../components/patientComponents/NoMedicationFound.jsx";
 import NavbarPatient from "../../components/users/patient/sections/header/NavbarPatient.jsx";
@@ -11,36 +10,90 @@ export default function PrescriptionPage() {
   const [medications, setMedications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [assigningPharmacyPrescriptionID, setAssigningPharmacyPrescriptionID] =
+    useState(null);
+  const [patientPharmacies, setPatientPharmacies] = useState([]);
+  const [selectedPharmacyID, setSelectedPharmacyID] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const fetchMedications = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // If no token is found, it means that the user is not authenticated.
+      if (!token) {
+        setError("User is not authenticated");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/medications",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setMedications(response.data.patientMedicationInformation);
+    } catch (error) {
+      console.error("Error fetching medications: ", error);
+      if (error.response && error.response.status === 401) {
+        setError("Session expired. Please log in again");
+      } else {
+        setError("Error fetching medications");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPatientPharmacies = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/medications/manage-pharmacies",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setPatientPharmacies(response.data.patientPharmacyInformation);
+    } catch (error) {
+      console.error("Error fetching patient pharmacies: ", error);
+      setErrorMessage("Error fetching your pharmacies.");
+    }
+  };
+
+  const handleAssignPharmacyClick = (prescriptionID) => {
+    setAssigningPharmacyPrescriptionID(prescriptionID);
+    setErrorMessage("");
+    fetchPatientPharmacies();
+  };
+
+  const handleAssignPharmacySubmit = async (event) => {
+    event.preventDefault();
+
+    if (!selectedPharmacyID) {
+      setErrorMessage("Please select a pharmacy.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        `http://localhost:3000/auth/patient/medications/${assigningPharmacyPrescriptionID}/pharmacy`,
+        { pharmacyID: selectedPharmacyID },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      await fetchMedications();
+
+      setAssigningPharmacyPrescriptionID(null);
+      setSelectedPharmacyID(null);
+    } catch (error) {
+      console.error("Error assigning pharmacy: ", error);
+      setErrorMessage("Error assigning pharmacy. Please try again.");
+    }
+  };
 
   useEffect(() => {
-    const fetchMedications = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        //If no token is found it means that the user is not authenticated.
-        if (!token) {
-          setError("User is not authenticated");
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get(
-          "http://localhost:3000/auth/patient/medications",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        setMedications(response.data.patientMedicationInformation);
-      } catch (error) {
-        console.error("Error fetching medications: ", error);
-        if (error.response && error.response.status === 401) {
-          setError("Session expired. Please log in again");
-        } else {
-          setError("Error fetching medications");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchMedications();
   }, []);
 
@@ -90,6 +143,11 @@ export default function PrescriptionPage() {
                 Go to Manage My Pharmacies.
               </Link>
             </p>
+            {errorMessage && (
+              <div className="bg-red-100 text-red-700 p-2 mb-4 rounded">
+                {errorMessage}
+              </div>
+            )}
             {medications && medications.length > 0 && (
               <Link
                 to="refill-medications"
@@ -100,41 +158,106 @@ export default function PrescriptionPage() {
             )}
             {medications && medications.length > 0 ? (
               medications.map((med, index) => (
-                <MedicationCard
-                  key={index}
-                  refillCard={false}
-                  name={med.medicationName}
-                  instructions={med.instruction}
-                  prescriptionDetails={{
-                    prescribed: new Date(med.start).toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "2-digit",
-                        day: "2-digit",
-                        year: "numeric",
-                      }
-                    ),
-                    approvedBy: `${med.firstName} ${med.lastName}`,
-                  }}
-                  refillDetails={{
-                    quantity: med.quantity,
-                    daySupply: med.daySupply,
-                  }}
-                  pharmacyDetails={{
-                    pharmacyName: med.pharmacyName || "NULL",
-                    pharmacyAddress: med.address || "",
-                    pharmacyCity: med.city || "",
-                    pharmacyState: med.state || "",
-                    pharmacyZip: med.zipCode || "",
-                    pharmacyPhoneNum: med.phoneNumber
-                      ? med.phoneNumber.slice(0, 3) +
-                        "-" +
-                        med.phoneNumber.slice(3, 6) +
-                        "-" +
-                        med.phoneNumber.slice(6)
-                      : "",
-                  }}
-                />
+                <div key={index}>
+                  <MedicationCard
+                    key={index}
+                    refillCard={false}
+                    name={med.medicationName}
+                    instructions={med.instruction}
+                    prescriptionDetails={{
+                      prescribed: new Date(med.start).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "2-digit",
+                          day: "2-digit",
+                          year: "numeric",
+                        }
+                      ),
+                      approvedBy: `${med.firstName} ${med.lastName}`,
+                    }}
+                    refillDetails={{
+                      quantity: med.quantity,
+                      daySupply: med.daySupply,
+                    }}
+                    pharmacyDetails={{
+                      pharmacyName: med.pharmacyName || "NULL",
+                      pharmacyAddress: med.address || "",
+                      pharmacyCity: med.city || "",
+                      pharmacyState: med.state || "",
+                      pharmacyZip: med.zipCode || "",
+                      pharmacyPhoneNum: med.phoneNumber
+                        ? med.phoneNumber.slice(0, 3) +
+                          "-" +
+                          med.phoneNumber.slice(3, 6) +
+                          "-" +
+                          med.phoneNumber.slice(6)
+                        : "",
+                    }}
+                    onAssignPharmacy={() =>
+                      handleAssignPharmacyClick(med.prescriptionID)
+                    }
+                  />
+
+                  {/* Conditionally render pharmacy assignment form */}
+                  {assigningPharmacyPrescriptionID === med.prescriptionID && (
+                    <div className="bg-gray-100 p-4 rounded-md mt-2">
+                      <h3 className="text-lg font-semibold mb-2">
+                        Assign a Pharmacy
+                      </h3>
+                      {patientPharmacies.length > 0 ? (
+                        <form onSubmit={handleAssignPharmacySubmit}>
+                          <select
+                            className="w-full p-2 border rounded mb-2"
+                            value={selectedPharmacyID || ""}
+                            onChange={(e) =>
+                              setSelectedPharmacyID(e.target.value)
+                            }
+                          >
+                            <option value="">Select a pharmacy</option>
+                            {patientPharmacies.map((pharmacy) => (
+                              <option
+                                key={pharmacy.pharmacyID}
+                                value={pharmacy.pharmacyID}
+                              >
+                                {pharmacy.pharmacyName}, {pharmacy.city},{" "}
+                                {pharmacy.state}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="flex space-x-2">
+                            <button
+                              type="button"
+                              className="px-4 py-2 bg-gray-200 rounded"
+                              onClick={() => {
+                                setAssigningPharmacyPrescriptionID(null);
+                                setSelectedPharmacyID(null);
+                                setErrorMessage("");
+                              }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              className="px-4 py-2 bg-pink-600 text-white rounded"
+                            >
+                              Assign Pharmacy
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <p>
+                          You have no pharmacies. Please add one first.
+                          <Link
+                            to="manage-pharmacies"
+                            className="text-pink-600 hover:underline ml-1"
+                          >
+                            Manage Pharmacies
+                          </Link>
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               ))
             ) : (
               <NoMedicationFound />
