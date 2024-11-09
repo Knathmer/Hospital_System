@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Heart, Users, Calendar, Phone } from "lucide-react";
 import IconLogo from "../header/IconLogo";
@@ -11,17 +11,33 @@ import GynecologyService from "./services/GynecologyService";
 import ObstetricsService from "./services/ObstetricsService";
 import WellnessService from "./services/WellnessService";
 import Input from "../../ui/Input";
+import { AuthContext } from "../../../context/AuthContext";
+
+
 
 export default function WomensHealthLandingPage() {
+  const { isLoggedIn, logout } = useContext(AuthContext);
+
   return (
     <div className="flex flex-col min-h-screen min-screen">
       <header className="px-4 lg:px-6 h-16 flex items-center">
         <IconLogo />
         <Navbar />
-        <div className="px-6">
-          <NavButton className="text-sm" to="/login">
-            Log in
-          </NavButton>
+        <div className="px-6 flex items-center gap-4">
+          {isLoggedIn ? (
+            <>
+              <NavButton className="text-sm" to="/profile">
+                Profile
+              </NavButton>
+                <NavButton className="text-sm" onClick={logout}>
+                Log out
+                </NavButton>
+            </>
+          ) : (
+            <NavButton className="text-sm" to="/login">
+              Log in
+            </NavButton>
+          )}
         </div>
       </header>
       <main className="flex-1">
