@@ -1,0 +1,22 @@
+/* styles/tabs.css */
+.tabs-list {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+}
+
+.tabs-trigger {
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 16px;
+}
+
+.tabs-trigger.active {
+  border-bottom: 2px solid #000;
+  font-weight: bold;
+}
+
+.tabs-content {
+  padding: 20px 0;
+}
