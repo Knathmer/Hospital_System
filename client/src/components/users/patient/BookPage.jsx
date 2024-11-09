@@ -2,83 +2,119 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 function BookPage() {
-    // State variables for form data
     const [specialty, setSpecialty] = useState("");
     const [specialties, setSpecialties] = useState([]);
     const [doctors, setDoctors] = useState([]);
-    const [doctor, setDoctor] = useState("");
+    const [selectedDoctor, setSelectedDoctor] = useState(null); // For row selection
+    const [gender, setGender] = useState("");
+    const [location, setLocation] = useState("");
+    const [locations, setLocations] = useState([]);
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
     const [reason, setReason] = useState("");
     const [message, setMessage] = useState("");
-    const [bookedTimes, setBookedTimes] = useState([]);
     const [availableTimes, setAvailableTimes] = useState([]);
+    const [bookedTimes, setBookedTimes] = useState([]); // Times already booked
 
-    const BUSINESS_HOURS_START = 9; 
-    const BUSINESS_HOURS_END = 17; 
-    const TIME_INTERVAL = 30;
+    const BUSINESS_HOURS_START = 9; // 9 AM
+    const BUSINESS_HOURS_END = 17; // 5 PM
+    const TIME_INTERVAL = 30; // 30 minutes
 
     useEffect(() => {
+        // Fetch specialties
         axios.get("http://localhost:3000/appointment/specialties")
             .then(response => setSpecialties(response.data))
             .catch(error => console.error("Error fetching specialties:", error));
+
+        // Fetch office locations
+        axios.get("http://localhost:3000/appointment/locations")
+            .then(response => setLocations(response.data))
+            .catch(error => console.error("Error fetching locations:", error));
     }, []);
 
     useEffect(() => {
-        if (specialty) {
-            axios.get("http://localhost:3000/appointment/doctors", { params: { specialty } })
-                .then(response => setDoctors(response.data))
-                .catch(error => console.error("Error fetching doctors:", error));
-        } else {
-            setDoctors([]);
-            setDoctor("");
-        }
-    }, [specialty]);
+        // Fetch doctors based on filters
+        axios.get("http://localhost:3000/appointment/doctors", {
+            params: { specialty, gender, location }
+        })
+        .then(response => setDoctors(response.data))
+        .catch(error => console.error("Error fetching doctors:", error));
+    }, [specialty, gender, location]);
 
     useEffect(() => {
-        if (doctor && date) {
-            axios.get("http://localhost:3000/appointment/appointments", { params: { doctorID: doctor, date } })
-                .then(response => setBookedTimes(response.data.bookedTimes))
-                .catch(error => setBookedTimes([]));
-        } else {
-            setBookedTimes([]);
-        }
-    }, [doctor, date]);
-
-    useEffect(() => {
+        // Generate available times for the selected day
         const generateAvailableTimes = () => {
             const times = [];
             for (let hour = BUSINESS_HOURS_START; hour < BUSINESS_HOURS_END; hour++) {
                 for (let min = 0; min < 60; min += TIME_INTERVAL) {
-                    const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+                    const timeStr = new Date(0, 0, 0, hour, min).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
                     times.push(timeStr);
                 }
             }
-            setAvailableTimes(times.filter(t => !bookedTimes.includes(t)));
-            if (!availableTimes.includes(time)) setTime("");
+            setAvailableTimes(times);
         };
-        generateAvailableTimes();
-    }, [bookedTimes, time]);
 
+        if (date && selectedDoctor) {
+            // Fetch booked times for the selected doctor and date
+            axios.get("http://localhost:3000/appointment/appointments", {
+                params: { doctorID: selectedDoctor.doctorID, date }
+            })
+            .then(response => {
+                const booked = response.data.bookedTimes.map(time => {
+                    return new Date(`1970-01-01T${time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                });
+                setBookedTimes(booked);
+            })
+            .catch(error => {
+                console.error("Error fetching booked times:", error);
+                setBookedTimes([]);
+            });
+
+            generateAvailableTimes();
+        }
+    }, [date, selectedDoctor]);
+
+    const isWeekend = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDay();
+        return day === 0 || day === 6; // Sunday (0) and Saturday (6)
+    };
+
+    const convertTo24HourFormat = (timeStr) => {
+        const [time, modifier] = timeStr.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+    
+        if (modifier === 'PM' && hours !== 12) {
+            hours += 12;
+        }
+        if (modifier === 'AM' && hours === 12) {
+            hours = 0;
+        }
+    
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!selectedDoctor) {
+            setMessage("Please select a doctor.");
+            return;
+        }
+    
         try {
             const token = localStorage.getItem("token");
+            const formattedTime = convertTo24HourFormat(time); // Convert to 24-hour format
             await axios.post("http://localhost:3000/appointment/book", {
-                appointmentDateTime: `${date}T${time}:00`,
+                appointmentDateTime: `${date}T${formattedTime}:00`, // Append seconds for MySQL DATETIME
                 reason,
-                doctorID: doctor
+                doctorID: selectedDoctor.doctorID
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage("Appointment booked successfully!");
-            setSpecialty("");
-            setDoctor("");
-            setDate("");
-            setTime("");
-            setReason("");
         } catch (error) {
             setMessage("Error booking appointment.");
+            console.error("Error booking appointment:", error);
         }
     };
 
@@ -108,19 +144,53 @@ function BookPage() {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium">Doctor:</label>
+                                <label className="block text-sm font-medium">Gender:</label>
                                 <select
-                                    value={doctor}
-                                    onChange={(e) => setDoctor(e.target.value)}
+                                    value={gender}
+                                    onChange={(e) => setGender(e.target.value)}
                                     className="w-full p-2 border rounded-md"
                                 >
-                                    <option value="">Select a doctor</option>
-                                    {doctors.map(doc => (
-                                        <option key={doc.doctorID} value={doc.doctorID}>
-                                            Dr. {doc.firstName} {doc.lastName}
+                                    <option value="">Any</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                    <option value="Prefer not to say">Prefer not to say</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium">Location:</label>
+                                <select
+                                    value={location}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                    className="w-full p-2 border rounded-md"
+                                >
+                                    <option value="">Any</option>
+                                    {locations.map(loc => (
+                                        <option key={loc.officeID} value={loc.officeName}>
+                                            {loc.officeName} - {loc.address}
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+                            <div className="space-y-2">
+                                <h3 className="text-md font-semibold">Available Doctors</h3>
+                                <div className="space-y-2">
+                                    {doctors.length === 0 && <p>No doctors available with the selected filters.</p>}
+                                    {doctors.map(doc => (
+                                        <div
+                                            key={doc.doctorID}
+                                            className={`p-4 border rounded-md cursor-pointer ${selectedDoctor?.doctorID === doc.doctorID ? "bg-blue-100 border-blue-500" : "hover:bg-gray-100"}`}
+                                            onClick={() => setSelectedDoctor(doc)}
+                                        >
+                                            <p className="text-lg font-medium">Dr. {doc.firstName} {doc.lastName}</p>
+                                            <p className="text-sm text-gray-500">Specialty: {doc.specialty}</p>
+                                            <p className="text-sm text-gray-500">Gender: {doc.gender}</p>
+                                            <p className="text-sm text-gray-500">Location: {doc.officeLocation}</p>
+                                            <p className="text-sm text-gray-500">Phone: {doc.workPhoneNumber}</p>
+                                            <p className="text-sm text-gray-500">Email: {doc.workEmail}</p>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
@@ -133,8 +203,12 @@ function BookPage() {
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
+                                    min={new Date().toISOString().split("T")[0]} // Disable past dates
                                     className="w-full p-2 border rounded-md"
                                 />
+                                {isWeekend(date) && (
+                                    <p className="text-red-500 text-sm mt-1">Weekends are not available for appointments.</p>
+                                )}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium">Time:</label>
@@ -145,7 +219,14 @@ function BookPage() {
                                 >
                                     <option value="">Select a time</option>
                                     {availableTimes.map(t => (
-                                        <option key={t} value={t}>{t}</option>
+                                        <option
+                                            key={t}
+                                            value={t}
+                                            disabled={bookedTimes.includes(t)} // Disable unavailable times
+                                            className={bookedTimes.includes(t) ? "text-gray-400" : ""}
+                                        >
+                                            {t} {bookedTimes.includes(t) ? "(Unavailable)" : ""}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
@@ -161,6 +242,7 @@ function BookPage() {
                             <button
                                 onClick={handleSubmit}
                                 className="w-full py-2 bg-blue-600 text-white rounded-md"
+                                disabled={!time || isWeekend(date)} // Disable if no time selected or weekend
                             >
                                 Book Appointment
                             </button>
