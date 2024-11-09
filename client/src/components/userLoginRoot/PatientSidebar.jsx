@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart, Calendar, FileText, PillBottle, CreditCard, ShieldPlus} from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
+
 
 // Sidebar Components
 import LogoSidebar from './sidebarItems/UserLogoSidebar.jsx';
@@ -17,6 +19,7 @@ export default function PatientSidebar() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
 
+
   const sidebarItems = {
     'Patient Services': [
       { id: 'dashboard', label: 'Dashboard', icon: Heart },
@@ -29,6 +32,15 @@ export default function PatientSidebar() {
       { id: 'insurance', label: 'Insurance', icon: ShieldPlus },
     ],
   };
+
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [location]);
 
   return (
     <div className="flex min-h-screen bg-gray-100 relative transition-all duration-300">
