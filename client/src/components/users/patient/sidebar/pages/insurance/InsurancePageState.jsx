@@ -3,7 +3,7 @@ import axios from "axios";
 import EditInsuranceForm from "./EditInsuranceForm";
 import InsuranceForm from "./InsuranceForm";
 
-export default InsurancePage = () => {
+export default function InsurancePage() {
   const [insuranceInfo, setInsuranceInfo] = useState(null); // State to store the insurance data
   const [loading, setLoading] = useState(true); // State to manage loading state
   const [error, setError] = useState(null); // State to manage errors
@@ -56,6 +56,6 @@ export default InsurancePage = () => {
   } else {
     return <InsuranceForm />; // Otherwise, show the form to add insurance
   }
-};
+}
 
 //export default InsurancePage;

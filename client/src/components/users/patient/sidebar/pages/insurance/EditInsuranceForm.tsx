@@ -541,7 +541,7 @@ export default function EditInsuranceForm() {
           </form>
         </div>
       </main>
-      <footer className="bg-white border-t py-6 px-4 md:px-6">
+      {/* <footer className="bg-white border-t py-6 px-4 md:px-6">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between">
           <p className="text-xs text-gray-500">
             © 2024 WomenWell. All rights reserved.
@@ -558,7 +558,7 @@ export default function EditInsuranceForm() {
             </Link>
           </nav>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }
