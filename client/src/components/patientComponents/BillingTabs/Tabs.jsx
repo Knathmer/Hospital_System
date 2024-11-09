@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { TabsContext } from "./TabsContext";
 
 //This is the main container component for the entire tabbed interface.
 //It wraps all the other tab-related components and manages the overall

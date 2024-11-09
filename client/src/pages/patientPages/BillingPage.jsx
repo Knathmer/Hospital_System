@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Tabs,
+  TabsContent,
   TabsList,
   TabsTrigger,
-  TabsContent,
 } from "../../components/patientComponents/BillingTabs/BillingTabsExports";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/patientComponents/BillingCards/BillingCardExports";
 import {
   CreditCard,
   FileText,
@@ -17,8 +22,6 @@ import {
 } from "lucide-react";
 
 export default function BillingPage() {
-  const [activeTab, setActiveTab] = useState("overview");
-
   // Static data for the overview
   const balanceData = {
     currentBalance: 500.0,
@@ -52,7 +55,7 @@ export default function BillingPage() {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Billing</h1>
 
-      <Tabs defaultValue={"overview"}>
+      <Tabs defaultValue="overview">
         <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="overview" className="flex items-center">
             <PieChart className="w-4 h-4 mr-2" />
@@ -71,6 +74,7 @@ export default function BillingPage() {
         <TabsContent value="overview" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-6">
+              {/* Balance Summary Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>Balance Summary</CardTitle>
@@ -107,6 +111,7 @@ export default function BillingPage() {
                 </CardContent>
               </Card>
 
+              {/* Recent Payments Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Payments</CardTitle>
@@ -133,6 +138,7 @@ export default function BillingPage() {
             </div>
 
             <div className="space-y-6">
+              {/* Patient Information Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>Patient Information</CardTitle>
@@ -164,6 +170,7 @@ export default function BillingPage() {
                 </CardContent>
               </Card>
 
+              {/* Office Information Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>Office Information</CardTitle>
