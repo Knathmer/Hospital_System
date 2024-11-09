@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import IconLogo from "../../landingPage/header/IconLogo";
-import Navbar from "../../landingPage/header/Navbar";
-import NavButton from "../../ui/buttons/NavButton";
 
 function BookPage() {
     // State variables for form data
