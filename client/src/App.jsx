@@ -10,6 +10,7 @@ import AboutPage from "./components/landingPage/AboutPage.jsx";
 import AppointmentsPage from "./components/landingPage/AppointmentsPage.jsx";
 import DoctorsPage from "./components/landingPage/DoctorsPage.jsx";
 import LoginPage from "./components/landingPage/authpages/LoginPage.jsx";
+import BookingPage from "./components/landingPage/BookingPage.jsx";
 import RegistrationPage from "./components/landingPage/authpages/RegistrationPage.jsx";
 
 // Role-specific route imports
@@ -32,6 +33,7 @@ function App() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/appointments" element={<AppointmentsPage />} />
       <Route path="/doctors" element={<DoctorsPage />} />
+      <Route path="/book" element={<BookingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegistrationPage />} />
       <Route path="/medical-history" element={<MedicalHistoryForm />} />
