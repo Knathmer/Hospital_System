@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import IconLogo from "./header/IconLogo";
-import Navbar from "./header/Navbar";
-import NavButton from "../ui/buttons/NavButton";
+import IconLogo from "../../landingPage/header/IconLogo";
+import Navbar from "../../landingPage/header/Navbar";
+import NavButton from "../../ui/buttons/NavButton";
 
 function BookPage() {
     // State variables for form data
@@ -116,15 +116,6 @@ function BookPage() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <header className="px-4 lg:px-6 h-16 flex items-center">
-                <IconLogo />
-                <Navbar />
-                <div className="px-6">
-                    <NavButton className="text-sm" to="/login">
-                        Log in
-                    </NavButton>
-                </div>
-            </header>
         <section className="min-w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-pink-50">
             <div className="container mx-auto px-4">
                 <div className="flex flex-col items-center space-y-4 text-center">
