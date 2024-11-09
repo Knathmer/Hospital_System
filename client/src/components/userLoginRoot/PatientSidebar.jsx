@@ -21,6 +21,7 @@ import PatientDashboard from "../users/patient/PatientDashboard.tsx";
 import InsurancePage from "../users/patient/sidebar/pages/insurance/InsurancePageState.jsx";
 
 import BookPage from "../users/patient/BookPage.jsx";
+import MedicalHistoryPage from "../users/patient/sidebar/pages/medical-history/MedicalHistoryPageState.jsx";
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -125,8 +126,7 @@ export default function PatientSidebar() {
         )}
         {activeTab === "medical-records" && (
           <div>
-            <p className="text-gray-700">Place medical records file here.</p>
-            {/* Add medical records content here */}
+            <MedicalHistoryPage />
           </div>
         )}
       </main>
