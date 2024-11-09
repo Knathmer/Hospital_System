@@ -20,6 +20,8 @@ import PatientDashboard from "../users/patient/PatientDashboard.tsx";
 
 import InsurancePage from "../users/patient/sidebar/pages/insurance/InsurancePageState.jsx";
 
+import BookPage from "../users/patient/BookPage.jsx";
+
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -112,8 +114,7 @@ export default function PatientSidebar() {
         )}
         {activeTab === "appointments" && (
           <div>
-            <p className="text-gray-700">Place appointment file here.</p>
-            {/* Add appointments content here */}
+            <BookPage />
           </div>
         )}
         {activeTab === "insurance" && (
