@@ -54,7 +54,7 @@ export default function PrescriptionPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
-      <NavbarPatient linkTo={"/patient/dashboard"} />
+      <NavbarPatient linkTo={"/patient/dashboard?tab=dashboard"} />
       <main className="flex-1 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-6">

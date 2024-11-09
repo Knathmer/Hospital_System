@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Heart, Calendar, FileText, PillBottle, CreditCard, ShieldPlus} from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 
 // Sidebar Components
@@ -18,7 +18,8 @@ export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
-
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const sidebarItems = {
     'Patient Services': [
@@ -33,7 +34,6 @@ export default function PatientSidebar() {
     ],
   };
 
-  const location = useLocation();
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tabParam = params.get("tab");
@@ -41,6 +41,11 @@ export default function PatientSidebar() {
       setActiveTab(tabParam);
     }
   }, [location]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    navigate(`/patient/dashboard?tab=${tabId}`);
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100 relative transition-all duration-300">
@@ -66,7 +71,7 @@ export default function PatientSidebar() {
                 {sidebarItems[category].map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => handleTabChange(item.id)}
                     className={`flex items-center w-full px-4 py-2 mt-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
                       activeTab === item.id ? 'text-pink-600 bg-pink-100' : 'text-gray-600 hover:bg-gray-200'
                     }`}
