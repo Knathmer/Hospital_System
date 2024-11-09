@@ -10,6 +10,7 @@ import SidebarToggleButton from '../ui/buttons/SidebarToggleButton.jsx';
 
 // Files Linked
 import PatientDashboard from '../users/patient/PatientDashboard.tsx';
+import BookPage from '../users/patient/BookPage.jsx';
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -92,8 +93,7 @@ export default function PatientSidebar() {
         )}
         {activeTab === 'appointments' && (
           <div>
-            <p className="text-gray-700">Place appointment file here.</p>
-            {/* Add appointments content here */}
+            <BookPage />
           </div>
         )}
       </main>
