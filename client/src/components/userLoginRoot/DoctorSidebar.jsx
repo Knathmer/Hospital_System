@@ -10,6 +10,7 @@ import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar';
 import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
 
 // Files Linked
+import DoctorDashboard from '../users/doctor/DoctorDashboard';
 
 export default function DocDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -82,7 +83,7 @@ export default function DocDashboard() {
        {/* Link pages here to according sidebar items */}
         {activeTab === 'dashboard' && (
             <div>
-            <p className="text-gray-700">Place dashboard file here</p>
+            <p className="text-gray-700">{<DoctorDashboard/>}</p>
             </div>
         )}
 

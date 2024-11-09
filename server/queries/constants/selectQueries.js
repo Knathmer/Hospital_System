@@ -72,4 +72,46 @@ export const SELECT_DOCTOR_NAMES =
  export const SELECT_ADMIN_NAMES =
   "SELECT firstName, lastName from admin WHERE adminID = ?";
 
+// Patient Dashboard (DB) Queries 
+export const SELECT_UPCOMING_APPOINTMENTS_DB = `
+  SELECT 
+      a.appointmentDateTime, a.status, d.firstName AS doctorFirstName, d.lastName AS doctorLastName
+  FROM 
+      appointment AS a
+  JOIN 
+      doctor AS d ON a.doctorID = d.doctorID
+  WHERE 
+      a.patientID = ? 
+  AND 
+      a.appointmentDateTime > NOW()
+  ORDER BY 
+      a.appointmentDateTime ASC;
+`;
+
+export const SELECT_RECENT_MED_REQ_DB = `
+  SELECT 
+      p.medicationName, 
+      r.status
+  FROM 
+      prescription AS p
+  JOIN 
+      refill AS r ON p.prescriptionID = r.prescriptionID
+  WHERE 
+      p.patientID = ?
+  ORDER BY 
+      r.createdAt DESC
+  LIMIT 5;
+`;
+
+export const SELECT_NOTIFICATIONS_DB = `
+  SELECT 
+      e.subject
+  FROM 
+      email_queue AS e
+  WHERE 
+      e.patientID = ?
+  ORDER BY 
+      e.createdAt DESC
+  LIMIT 5;
+`;
 
