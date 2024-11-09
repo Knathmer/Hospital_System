@@ -25,7 +25,7 @@ const UpcomingAppointmentsContainer = () => {
           <span className="text-sm text-gray-500">June 3, 2024 at 2:00 PM</span>
         </li>
       </ul>
-      <NavButton to = "/book" className="mt-4 bg-pink-500 text-white hover:bg-pink-600">
+      <NavButton to = "/patient/dashboard?tab=appointments" className="mt-4 bg-pink-500 text-white hover:bg-pink-600">
         Schedule Appointment
       </NavButton>
     </GenericContainer>
