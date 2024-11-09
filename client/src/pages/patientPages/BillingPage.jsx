@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import {
   Tabs,
-  TabsContent,
   TabsList,
   TabsTrigger,
-} from "../../components/patientComponents/PatientComponentExports";
+  TabsContent,
+} from "../../components/patientComponents/BillingTabs/BillingTabsExports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   CreditCard,
