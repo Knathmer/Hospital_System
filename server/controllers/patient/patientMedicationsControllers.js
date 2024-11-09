@@ -160,3 +160,41 @@ export const getPendingRequests = async (req, res) => {
       .json({ message: "Server error fetching pending refill information" });
   }
 };
+
+export const updateMedicationPharmacyID = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+    const { pharmacyID } = req.body;
+    const prescriptionID = req.params.prescriptionID;
+
+    const prescription = await query(
+      "SELECT * FROM prescription WHERE prescriptionID = ? AND patientID = ?",
+      [prescriptionID, patientID]
+    );
+
+    if (!prescription) {
+      return res.status(401).json({ message: "Prescription not found" });
+    }
+
+    const pharmacyAssociation = await query(
+      "SELECT * FROM patient_pharmacy WHERE patientID = ? AND pharmacyID = ?",
+      [patientID, pharmacyID]
+    );
+
+    if (!pharmacyAssociation) {
+      return res.status(401).json({
+        message: "Selecte pharmacy is not associated with your account.",
+      });
+    }
+
+    await query(
+      "UPDATE prescription SET pharmacyID = ? WHERE prescriptionID = ?",
+      [pharmacyID, prescriptionID]
+    );
+
+    res.status(200).json({ message: "Pharmacy assigned successfully" });
+  } catch (error) {
+    console.error("Error updating prescription's pharmacy: ", error);
+    res.status(500).json({ message: "Server error updating pharmacy" });
+  }
+};
