@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Tabs,
   TabsContent,
@@ -24,6 +25,34 @@ import {
 } from "lucide-react";
 
 export default function BillingPage() {
+  const [currentAndPastDueBalance, setCurrentAndPastDueBalance] = useState([]);
+
+  const fetchCurrentAndPastDueBalances = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/billing/current-balance",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setCurrentAndPastDueBalance(response.data.currentAndPastDueBalance);
+    } catch (error) {
+      console.error("Error fetching current and past due balances:", error);
+      // Optionally, you can set an error state to display an error message to the user
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentAndPastDueBalances();
+  }, []);
+
+  //Get the current and past due balance from the api request which is stored in the state variable.
+  const currentBalance =
+    currentAndPastDueBalance && currentAndPastDueBalance[0]?.currentBalance;
+  const pastDueBalance =
+    currentAndPastDueBalance && currentAndPastDueBalance[0]?.pastDueBalance;
+
   const balanceData = {
     currentBalance: 500.0,
     pastDueBalance: 150.0,
@@ -93,13 +122,13 @@ export default function BillingPage() {
                     <div>
                       <p className="text-sm text-gray-500">Current Balance</p>
                       <p className="text-2xl font-semibold">
-                        ${balanceData.currentBalance.toFixed(2)}
+                        ${currentBalance}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Past Due Balance</p>
                       <p className="text-2xl font-semibold text-red-600">
-                        ${balanceData.pastDueBalance.toFixed(2)}
+                        ${pastDueBalance}
                       </p>
                     </div>
                     <div>
