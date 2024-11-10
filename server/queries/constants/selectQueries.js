@@ -75,3 +75,8 @@ export const GET_CURRENT_PAST_BALANCE = `SELECT SUM(CASE WHEN paidStatus != 'Pai
                                         SUM(CASE WHEN dueDate < CURDATE() AND paidStatus = 'Overdue' THEN amount - paidAmount ELSE 0 END) AS pastDueBalance
                                         FROM bill 
                                         WHERE patientID = ?;`;
+
+export const GET_LAST_PAYMENT_INFORMATION = `SELECT p.amount AS lastPaymentAmount, p.paymentDate AS lastPaymentDate 
+                                            FROM bill b LEFT JOIN payment p ON p.billID = b.billID 
+                                            WHERE b.patientID = ? 
+                                            ORDER BY p.paymentDate DESC LIMIT 1;`;

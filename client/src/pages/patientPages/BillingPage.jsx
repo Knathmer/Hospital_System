@@ -20,14 +20,16 @@ import {
   Calendar,
   User,
   Building,
+  House,
   Phone,
   Mail,
 } from "lucide-react";
 
 export default function BillingPage() {
   const [currentAndPastDueBalance, setCurrentAndPastDueBalance] = useState([]);
+  const [lastPaymentInformation, setLastPaymentInformation] = useState([]);
 
-  const fetchCurrentAndPastDueBalances = async () => {
+  const fetchBalanceSummary = async () => {
     try {
       const token = localStorage.getItem("token");
 
@@ -35,8 +37,13 @@ export default function BillingPage() {
         "http://localhost:3000/auth/patient/billing/current-balance",
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      const lastPaymentResponse = await axios.get(
+        "http://localhost:3000/auth/patient/billing/last-payment-summary",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       setCurrentAndPastDueBalance(response.data.currentAndPastDueBalance);
+      setLastPaymentInformation(lastPaymentResponse.data.lastPayment);
     } catch (error) {
       console.error("Error fetching current and past due balances:", error);
       // Optionally, you can set an error state to display an error message to the user
@@ -44,14 +51,32 @@ export default function BillingPage() {
   };
 
   useEffect(() => {
-    fetchCurrentAndPastDueBalances();
+    fetchBalanceSummary();
   }, []);
 
   //Get the current and past due balance from the api request which is stored in the state variable.
   const currentBalance =
     currentAndPastDueBalance && currentAndPastDueBalance[0]?.currentBalance;
-  const pastDueBalance =
-    currentAndPastDueBalance && currentAndPastDueBalance[0]?.pastDueBalance;
+  const pastDueBalance = parseFloat(
+    currentAndPastDueBalance && currentAndPastDueBalance[0]?.pastDueBalance
+  );
+
+  const lastPaymentAmount =
+    lastPaymentInformation?.[0]?.lastPaymentAmount ?? "N/A";
+
+  const lastPaymentDate =
+    Array.isArray(lastPaymentInformation) &&
+    lastPaymentInformation[0] &&
+    lastPaymentInformation[0].lastPaymentDate
+      ? new Date(lastPaymentInformation[0].lastPaymentDate).toLocaleDateString(
+          "en-US",
+          {
+            month: "2-digit",
+            day: "2-digit",
+            year: "numeric",
+          }
+        )
+      : "No payment made";
 
   const balanceData = {
     currentBalance: 500.0,
@@ -127,8 +152,14 @@ export default function BillingPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Past Due Balance</p>
-                      <p className="text-2xl font-semibold text-red-600">
-                        ${pastDueBalance}
+                      <p
+                        className={
+                          pastDueBalance !== 0.0
+                            ? `text-2xl font-semibold text-red-600`
+                            : `text-2xl font-semibold text-black`
+                        }
+                      >
+                        ${pastDueBalance.toFixed(2)}
                       </p>
                     </div>
                     <div>
@@ -136,13 +167,15 @@ export default function BillingPage() {
                         Last Payment Amount
                       </p>
                       <p className="text-2xl font-semibold">
-                        ${balanceData.lastPaymentAmount.toFixed(2)}
+                        {lastPaymentAmount === "N/A"
+                          ? lastPaymentAmount
+                          : `$${lastPaymentAmount}`}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Last Payment Date</p>
                       <p className="text-2xl font-semibold">
-                        {balanceData.lastPaymentDate}
+                        {lastPaymentDate}
                       </p>
                     </div>
                   </div>
