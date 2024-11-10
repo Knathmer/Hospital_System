@@ -102,7 +102,7 @@ const TableCell = ({ children, className = "", ...props }) => (
 );
 
 
-const DoctorDashboard = () => {
+const DoctorBookingPage = () => {
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -369,4 +369,4 @@ const DoctorDashboard = () => {
   );
 };
 
-export default DoctorDashboard;
+export default DoctorBookingPage;

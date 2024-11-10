@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
 import { Heart, Calendar, FileText, CalendarClock } from "lucide-react"
+import { useNavigate, useLocation } from "react-router-dom";
 // import { Link } from 'react-router-dom';
 
 // Sidebar Components
@@ -10,11 +11,14 @@ import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar';
 import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
 
 // Files Linked
+import DoctorBookingPage from '../users/doctor/DoctorBookingPage.jsx';
 
-export default function DocDashboard() {
-  const [activeTab, setActiveTab] = useState('dashboard')
+export default function DoctorSidebar() {
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const sidebarItems = {
   
@@ -26,6 +30,19 @@ export default function DocDashboard() {
     //   { id: 'patient-records', label: 'Medication', icon: PillBottle },
     ],
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [location]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    navigate(`/doctor/dashboard?tab=${tabId}`);
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -51,7 +68,7 @@ export default function DocDashboard() {
                 {sidebarItems[category].map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => handleTabChange(item.id)}
                     className={`flex items-center w-full px-4 py-2 mt-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
                       activeTab === item.id ? 'text-pink-600 bg-pink-100' : 'text-gray-600 hover:bg-gray-200'
                     }`}
@@ -83,17 +100,28 @@ export default function DocDashboard() {
         {activeTab === 'dashboard' && (
             <div>
             <p className="text-gray-700">Place dashboard file here</p>
+            {/* Add dashboard content here */}
             </div>
         )}
 
         {activeTab === 'appointments' && (
-            <div>
-            <p className="text-gray-700">Place appointment file here.</p>
-            {/* Add appointments content here */}
-            </div>
+          <div>
+            < DoctorBookingPage />
+          </div>
         )}
-
-    </main>
+        {activeTab === 'schedule' && (
+          <div>
+            <p className="text-gray-700">Place schedule file here</p>
+            {/* Add schedule content here */}
+          </div>
+        )}
+        {activeTab === 'patients-list' && (
+          <div>
+            <p className="text-gray-700">Place patients list file here</p>
+            {/* Add patients-list content here */}
+          </div>
+        )}
+      </main>
     </div>
-  )
-} 
+  );
+}
