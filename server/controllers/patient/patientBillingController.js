@@ -10,7 +10,7 @@ export const getCurrentPastBalance = async (req, res) => {
     //Extract the patientID from the token payload.
     const patientID = req.user.patientID;
 
-    const currentAndPastDueBalance = await query(GET_CURRENT_PAST_BALANCE, [
+    const [currentAndPastDueBalance] = await query(GET_CURRENT_PAST_BALANCE, [
       patientID,
     ]);
 
@@ -28,7 +28,9 @@ export const getLastPaymentInformation = async (req, res) => {
   try {
     const patientID = req.user.patientID;
 
-    const lastPayment = await query(GET_LAST_PAYMENT_INFORMATION, [patientID]);
+    const [lastPayment] = await query(GET_LAST_PAYMENT_INFORMATION, [
+      patientID,
+    ]);
 
     res.status(200).json({ lastPayment });
   } catch (error) {

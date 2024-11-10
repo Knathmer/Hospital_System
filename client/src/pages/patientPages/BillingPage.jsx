@@ -31,6 +31,7 @@ export default function BillingPage() {
   const [lastPaymentInformation, setLastPaymentInformation] = useState([]);
   const [patientInformation, setPatientInformation] = useState({});
   const [officeInformation, setOfficeInformation] = useState({});
+  const [hasMadePayments, setHasMadePayments] = useState(false);
 
   const fetchBalanceSummary = async () => {
     try {
@@ -87,57 +88,11 @@ export default function BillingPage() {
     fetchOfficeInformation();
   }, []);
 
-  //Get the current and past due balance from the api request which is stored in the state variable.
-  const currentBalance =
-    currentAndPastDueBalance && currentAndPastDueBalance[0]?.currentBalance;
-  const pastDueBalance = parseFloat(
-    currentAndPastDueBalance && currentAndPastDueBalance[0]?.pastDueBalance
-  );
-
-  const lastPaymentAmount =
-    lastPaymentInformation?.[0]?.lastPaymentAmount ?? "N/A";
-
-  const lastPaymentDate =
-    Array.isArray(lastPaymentInformation) &&
-    lastPaymentInformation[0] &&
-    lastPaymentInformation[0].lastPaymentDate
-      ? new Date(lastPaymentInformation[0].lastPaymentDate).toLocaleDateString(
-          "en-US",
-          {
-            month: "2-digit",
-            day: "2-digit",
-            year: "numeric",
-          }
-        )
-      : "No payment made";
-
-  const balanceData = {
-    currentBalance: 500.0,
-    pastDueBalance: 150.0,
-    lastPaymentAmount: 200.0,
-    lastPaymentDate: "2023-06-15",
-  };
-
   const recentPayments = [
     { id: 1, date: "2023-06-15", amount: 200.0 },
     { id: 2, date: "2023-05-20", amount: 150.0 },
     { id: 3, date: "2023-04-18", amount: 300.0 },
   ];
-
-  const patientInfo = {
-    name: "Jane Doe",
-    dob: "1985-03-22",
-    address: "123 Main St, Anytown, USA 12345",
-    phone: "(555) 123-4567",
-    email: "jane.doe@example.com",
-  };
-
-  const officeInfo = {
-    name: "Health & Wellness Clinic",
-    address: "456 Medical Ave, Healthville, USA 67890",
-    phone: "(555) 987-6543",
-    email: "info@healthwellness.com",
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -185,7 +140,7 @@ export default function BillingPage() {
                             Current Balance
                           </p>
                           <p className="text-2xl font-semibold">
-                            ${currentBalance}
+                            ${currentAndPastDueBalance.currentBalance}
                           </p>
                         </div>
                         <div>
@@ -194,12 +149,12 @@ export default function BillingPage() {
                           </p>
                           <p
                             className={
-                              pastDueBalance !== 0.0
-                                ? `text-2xl font-semibold text-red-600`
-                                : `text-2xl font-semibold text-black`
+                              currentAndPastDueBalance.pastDueBalance !== 0.0
+                                ? `text-2xl font-semibold text-black`
+                                : `text-2xl font-semibold text-red-600`
                             }
                           >
-                            ${pastDueBalance.toFixed(2)}
+                            ${currentAndPastDueBalance.pastDueBalance}
                           </p>
                         </div>
                         <div>
@@ -207,9 +162,9 @@ export default function BillingPage() {
                             Last Payment Amount
                           </p>
                           <p className="text-2xl font-semibold">
-                            {lastPaymentAmount === "N/A"
-                              ? lastPaymentAmount
-                              : `$${lastPaymentAmount}`}
+                            {lastPaymentInformation.lastPaymentAmount === "N/A"
+                              ? lastPaymentInformation.lastPaymentAmount
+                              : `$${lastPaymentInformation.lastPaymentAmount}`}
                           </p>
                         </div>
                         <div>
@@ -217,7 +172,13 @@ export default function BillingPage() {
                             Last Payment Date
                           </p>
                           <p className="text-2xl font-semibold">
-                            {lastPaymentDate}
+                            {new Date(
+                              lastPaymentInformation.lastPaymentDate
+                            ).toLocaleDateString("en-US", {
+                              month: "2-digit",
+                              day: "2-digit",
+                              year: "numeric",
+                            })}
                           </p>
                         </div>
                       </div>
