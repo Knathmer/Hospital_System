@@ -60,10 +60,7 @@ function BookPage() {
                 params: { doctorID: selectedDoctor.doctorID, date }
             })
             .then(response => {
-                const booked = response.data.bookedTimes.map(time => {
-                    return new Date(`1970-01-01T${time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-                });
-                setBookedTimes(booked);
+                setBookedTimes(response.data.bookedTimes); // Simplified mapping
             })
             .catch(error => {
                 console.error("Error fetching booked times:", error);
@@ -71,7 +68,12 @@ function BookPage() {
             });
 
             generateAvailableTimes();
+        }   
+        else {
+            setBookedTimes([]);
+            setAvailableTimes([]);
         }
+
     }, [date, selectedDoctor]);
 
     const isWeekend = (dateString) => {
@@ -100,6 +102,11 @@ function BookPage() {
             setMessage("Please select a doctor.");
             return;
         }
+
+        if (isWeekend(date)) {
+            setMessage("Weekends are not available for appointments.");
+            return;
+        }
     
         try {
             const token = localStorage.getItem("token");
@@ -112,6 +119,17 @@ function BookPage() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage("Appointment booked successfully!");
+
+            setSpecialty("");
+            setGender("");
+            setLocation("");
+            setDate("");
+            setTime("");
+            setReason("");
+            setSelectedDoctor(null);
+            setBookedTimes([]);
+            setAvailableTimes([]);
+            
         } catch (error) {
             setMessage("Error booking appointment.");
             console.error("Error booking appointment:", error);
@@ -223,7 +241,7 @@ function BookPage() {
                                             key={t}
                                             value={t}
                                             disabled={bookedTimes.includes(t)} // Disable unavailable times
-                                            className={bookedTimes.includes(t) ? "text-gray-400" : ""}
+                                            className={bookedTimes.includes(t) ? "text-gray-400 opacity-50" : ""}
                                         >
                                             {t} {bookedTimes.includes(t) ? "(Unavailable)" : ""}
                                         </option>
@@ -246,7 +264,7 @@ function BookPage() {
                             >
                                 Book Appointment
                             </button>
-                            {message && <p className="mt-4 text-green-500">{message}</p>}
+                            {message && <p className={`mt-4 ${message.includes("successfully") ? "text-green-500" : "text-red-500"}`}>{message}</p>}
                         </div>
                     </div>
                 </div>

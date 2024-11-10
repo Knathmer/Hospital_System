@@ -129,14 +129,14 @@ export async function getAppointmentsByDoctorAndDate(req, res) {
             `SELECT appointmentDateTime FROM appointment 
              WHERE doctorID = ? 
              AND appointmentDateTime BETWEEN ? AND ? 
-             AND status = 'Scheduled'`,
+             AND status IN ('Requested', 'Scheduled')`, // Include 'Requested' status
             [doctorID, startOfDay, endOfDay]
         );
 
-        // Extract times in HH:MM format
+        // Extract times in consistent format
         const bookedTimes = appointments.map(app => {
             const dateObj = new Date(app.appointmentDateTime);
-            return dateObj.toTimeString().substring(0, 5); // "HH:MM"
+            return dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
         });
 
         res.json({ bookedTimes });
