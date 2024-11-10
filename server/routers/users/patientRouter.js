@@ -9,6 +9,7 @@ import {
   updateInsurance,
 } from "../../controllers/patient/patientInsuranceController.js";
 import medicationRouter from "../subRouters/medicationRouter.js";
+import billingRouter from "../subRouters/billingRouter.js";
 import {
   getAllPharmacies,
   postNewPharmacy,
@@ -27,6 +28,8 @@ router.put("/update-insurance", updateInsurance);
 
 //Since medications will have many sub routes, create a sub router for the path "/auth/patient/medications/*"
 router.use("/medications", medicationRouter);
+
+router.use("/billing", billingRouter);
 
 router.get("/pharmacies", getAllPharmacies);
 router.delete(`/pharmacies/:pharmacyID`, deletePharmacyFromPatient);
