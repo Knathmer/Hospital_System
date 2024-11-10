@@ -101,7 +101,9 @@ const QuickActions = () => {
         <DefaultButton variant="outline" onClick={handleMedHistoryClick}>
           Update Health Information
         </DefaultButton>
-        <NavButton variant="outline">View Billing Statements</NavButton>
+        <NavButton variant="outline" to="/patient/billing">
+          View Billing Statements
+        </NavButton>
       </div>
     </section>
   );
