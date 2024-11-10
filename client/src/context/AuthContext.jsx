@@ -1,31 +1,42 @@
-// src/context/AuthContext.jsx
 import React, { createContext, useState, useEffect } from 'react';
+import jwtDecode from 'jwt-decode'; // Assuming jwt-decode library is installed
+import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check authentication status on component mount
     const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    if (token) {
+      setIsLoggedIn(true);
+      const decoded = jwtDecode(token);
+      setUserRole(decoded.role); // Extract and set user role
+    }
+    setIsLoading(false);
   }, []);
 
   const login = (token) => {
-    // Save token and update state
     localStorage.setItem('token', token);
     setIsLoggedIn(true);
+    const decoded = jwtDecode(token);
+    setUserRole(decoded.role); // Extract and set user role on login
+    navigate('/');
   };
 
   const logout = () => {
-    // Remove token and update state
     localStorage.removeItem('token');
     setIsLoggedIn(false);
+    setUserRole(null); // Clear role on logout
+    navigate('/');
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, userRole, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

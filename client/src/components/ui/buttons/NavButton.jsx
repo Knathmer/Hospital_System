@@ -6,7 +6,7 @@ const NavButton = ({
   variant = "default",
   className = "",
   to = "",
-  onClick = undefined, // Make onClick optional
+  onClick, // Remove default = undefined
 }) => {
   const nav = useNavigate();
 

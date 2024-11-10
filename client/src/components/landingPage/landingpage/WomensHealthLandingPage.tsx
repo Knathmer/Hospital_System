@@ -5,6 +5,7 @@ import IconLogo from "../header/IconLogo";
 import Navbar from "../header/Navbar";
 import NavButton from "../../ui/buttons/NavButton";
 import MainSection from "./sections/MainSection";
+import { useNavigate } from "react-router-dom";
 
 import Footer from "../../ui/Footer";
 import GynecologyService from "./services/GynecologyService";
@@ -16,25 +17,47 @@ import { AuthContext } from "../../../context/AuthContext";
 
 
 export default function WomensHealthLandingPage() {
-  const { isLoggedIn, logout } = useContext(AuthContext);
+  const { isLoggedIn, logout, userRole } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  const navigateProfile = () => {
+    switch (userRole) {
+      case "admin":
+        navigate("/admin/dashboard");
+        break;
+      case "doctor":
+        navigate("/doctor/dashboard");
+        break;
+      case "patient":
+        navigate("/patient/dashboard");
+        break;
+      default:
+        navigate("/");
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen min-screen">
-      <header className="px-4 lg:px-6 h-16 flex items-center">
+      <header className="px-4 lg:px-6 h-16 flex items-center justify-between">
         <IconLogo />
         <Navbar />
-        <div className="px-6 flex items-center gap-4">
+        <div className="flex items-center gap-4 ml-auto px-6">
           {isLoggedIn ? (
             <>
-              <NavButton className="text-sm" to="/profile">
+              <NavButton className="text-sm" onClick={navigateProfile}>
                 Profile
               </NavButton>
-                <NavButton className="text-sm" onClick={logout}>
+              <NavButton className="text-sm" onClick={handleLogout}>
                 Log out
-                </NavButton>
+              </NavButton>
             </>
           ) : (
-            <NavButton className="text-sm" to="/login">
+            <NavButton className="text-sm" to="/login" onClick={() => {}}>
               Log in
             </NavButton>
           )}
@@ -66,8 +89,8 @@ export default function WomensHealthLandingPage() {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row lg:justify-end">
-              <NavButton>Schedule a Consultation</NavButton>
-              <NavButton variant="outline">View Our Services</NavButton>
+              <NavButton onClick={() => {}}>Schedule a Consultation</NavButton>
+              <NavButton variant="outline" onClick={() => {}}>View Our Services</NavButton>
             </div>
           </div>
         </section>
@@ -89,7 +112,7 @@ export default function WomensHealthLandingPage() {
                   placeholder="Enter your email"
                   type="email"
                 />
-                <NavButton>Subscribe</NavButton>
+                <NavButton onClick={() => {}}>Subscribe</NavButton>
               </form>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 By subscribing, you agree to our Terms & Conditions and Privacy
