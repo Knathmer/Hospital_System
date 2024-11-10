@@ -2,6 +2,8 @@ import { query } from "../../database.js";
 import {
   GET_CURRENT_PAST_BALANCE,
   GET_LAST_PAYMENT_INFORMATION,
+  GET_PATIENT_INFORMATION,
+  GET_OFFICE_INFORMATION,
 } from "../../queries/constants/selectQueries.js";
 export const getCurrentPastBalance = async (req, res) => {
   try {
@@ -34,5 +36,35 @@ export const getLastPaymentInformation = async (req, res) => {
     res
       .status(500)
       .json({ message: "Server error fetching last payment information" });
+  }
+};
+
+export const getPatientInformation = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+
+    const [patientInfo] = await query(GET_PATIENT_INFORMATION, [patientID]);
+
+    res.status(200).json({ patientInfo });
+  } catch (error) {
+    console.error("Error fetching user's information from the server", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching user's information." });
+  }
+};
+
+export const getOfficeInformation = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+
+    const [officeInfo] = await query(GET_OFFICE_INFORMATION, [patientID]);
+
+    res.status(200).json({ officeInfo });
+  } catch (error) {
+    console.error("Error fetching office information from the server", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching office information." });
   }
 };

@@ -80,3 +80,14 @@ export const GET_LAST_PAYMENT_INFORMATION = `SELECT p.amount AS lastPaymentAmoun
                                             FROM bill b LEFT JOIN payment p ON p.billID = b.billID 
                                             WHERE b.patientID = ? 
                                             ORDER BY p.paymentDate DESC LIMIT 1;`;
+
+export const GET_PATIENT_INFORMATION = `SELECT p.firstName, p.lastName, p.dateOfBirth, p.phoneNumber, p.email, 
+                                        a.addrStreet, a.addrcity, a.addrState, a.addrZip FROM patient AS p 
+                                        JOIN address AS a ON p.addressID = a.addressID WHERE p.patientID = ?;`;
+
+export const GET_OFFICE_INFORMATION = `SELECT o.officeName, o.officePhoneNumber, o.officeEmail, a.addrStreet, 
+                                      a.addrcity, a.addrState, a.addrZip
+                                      FROM office AS o
+                                      JOIN address AS a ON o.addressID = a.addressID
+                                      JOIN bill AS b ON o.officeID = b.officeID
+                                      WHERE b.patientID = ?;`;

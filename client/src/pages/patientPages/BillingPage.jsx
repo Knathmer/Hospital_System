@@ -28,6 +28,8 @@ import {
 export default function BillingPage() {
   const [currentAndPastDueBalance, setCurrentAndPastDueBalance] = useState([]);
   const [lastPaymentInformation, setLastPaymentInformation] = useState([]);
+  const [patientInformation, setPatientInformation] = useState({});
+  const [officeInformation, setOfficeInformation] = useState({});
 
   const fetchBalanceSummary = async () => {
     try {
@@ -49,9 +51,39 @@ export default function BillingPage() {
       // Optionally, you can set an error state to display an error message to the user
     }
   };
+  const fetchPatientInformation = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/billing/patient-information",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setPatientInformation(response.data.patientInfo);
+    } catch (error) {
+      console.error("Error fetching patient information:", error);
+    }
+  };
+  const fetchOfficeInformation = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/billing/office-information",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setOfficeInformation(response.data.officeInfo);
+    } catch (error) {
+      console.error("Error fetching office information:", error);
+    }
+  };
 
   useEffect(() => {
     fetchBalanceSummary();
+    fetchPatientInformation();
+    fetchOfficeInformation();
   }, []);
 
   //Get the current and past due balance from the api request which is stored in the state variable.
@@ -217,23 +249,50 @@ export default function BillingPage() {
                     <li className="flex items-start">
                       <User className="w-4 h-4 mr-2 mt-1 text-gray-400" />
                       <div>
-                        <p className="font-semibold">{patientInfo.name}</p>
+                        <p className="font-semibold">
+                          {patientInformation.firstName +
+                            " " +
+                            patientInformation.lastName}
+                        </p>
                         <p className="text-sm text-gray-500">
-                          DOB: {patientInfo.dob}
+                          DOB:{" "}
+                          {new Date(
+                            patientInformation.dateOfBirth
+                          ).toLocaleDateString("en-US", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            year: "numeric",
+                          })}
                         </p>
                       </div>
                     </li>
                     <li className="flex items-start">
-                      <Building className="w-4 h-4 mr-2 mt-1 text-gray-400" />
-                      <p className="text-sm">{patientInfo.address}</p>
+                      <House className="w-4 h-4 mr-2 mt-1 text-gray-400" />
+                      <p className="text-sm">
+                        {patientInformation.addrStreet +
+                          ", " +
+                          patientInformation.addrcity +
+                          " " +
+                          patientInformation.addrState +
+                          ", " +
+                          patientInformation.addrZip}
+                      </p>
                     </li>
                     <li className="flex items-center">
                       <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                      <p className="text-sm">{patientInfo.phone}</p>
+                      <p className="text-sm">
+                        {patientInformation.phoneNumber
+                          ? patientInformation.phoneNumber.slice(0, 3) +
+                            "-" +
+                            patientInformation.phoneNumber.slice(3, 6) +
+                            "-" +
+                            patientInformation.phoneNumber.slice(6)
+                          : "N/A"}
+                      </p>
                     </li>
                     <li className="flex items-center">
                       <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                      <p className="text-sm">{patientInfo.email}</p>
+                      <p className="text-sm">{patientInformation.email}</p>
                     </li>
                   </ul>
                 </CardContent>
@@ -248,17 +307,35 @@ export default function BillingPage() {
                     <li className="flex items-start">
                       <Building className="w-4 h-4 mr-2 mt-1 text-gray-400" />
                       <div>
-                        <p className="font-semibold">{officeInfo.name}</p>
-                        <p className="text-sm">{officeInfo.address}</p>
+                        <p className="font-semibold">
+                          {officeInformation.officeName}
+                        </p>
+                        <p className="text-sm">
+                          {officeInformation.addrStreet +
+                            ", " +
+                            officeInformation.addrcity +
+                            " " +
+                            officeInformation.addrState +
+                            ", " +
+                            officeInformation.addrZip}
+                        </p>
                       </div>
                     </li>
                     <li className="flex items-center">
                       <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                      <p className="text-sm">{officeInfo.phone}</p>
+                      <p className="text-sm">
+                        {officeInformation.officePhoneNumber
+                          ? officeInformation.officePhoneNumber.slice(0, 3) +
+                            "-" +
+                            officeInformation.officePhoneNumber.slice(3, 6) +
+                            "-" +
+                            officeInformation.officePhoneNumber.slice(6)
+                          : "N/A"}
+                      </p>
                     </li>
                     <li className="flex items-center">
                       <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                      <p className="text-sm">{officeInfo.email}</p>
+                      <p className="text-sm">{officeInformation.officeEmail}</p>
                     </li>
                   </ul>
                 </CardContent>
