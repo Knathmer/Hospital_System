@@ -71,10 +71,11 @@ export const SELECT_DOCTOR_NAMES =
 export const SELECT_ADMIN_NAMES =
   "SELECT firstName, lastName from admin WHERE adminID = ?";
 
-export const GET_CURRENT_PAST_BALANCE = `SELECT SUM(CASE WHEN paidStatus != 'Paid' THEN amount - paidAmount ELSE 0 END) AS currentBalance, 
-                                        SUM(CASE WHEN dueDate < CURDATE() AND paidStatus = 'Overdue' THEN amount - paidAmount ELSE 0 END) AS pastDueBalance
+export const GET_CURRENT_PAST_BALANCE = `SELECT IFNULL(SUM(CASE WHEN paidStatus != 'Paid' THEN amount - paidAmount ELSE 0 END), 0) AS currentBalance, 
+                                        IFNULL(SUM(CASE WHEN dueDate < CURDATE() AND paidStatus = 'Overdue' THEN amount - paidAmount ELSE 0 END), 0) AS pastDueBalance
                                         FROM bill 
-                                        WHERE patientID = ?;`;
+                                        WHERE patientID = ?;
+`;
 
 export const GET_LAST_PAYMENT_INFORMATION = `SELECT p.amount AS lastPaymentAmount, p.paymentDate AS lastPaymentDate 
                                             FROM bill b LEFT JOIN payment p ON p.billID = b.billID 
