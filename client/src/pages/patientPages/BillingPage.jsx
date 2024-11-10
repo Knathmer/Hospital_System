@@ -19,10 +19,11 @@ import {
   Calendar,
   User,
   Building,
+  Phone,
+  Mail,
 } from "lucide-react";
 
 export default function BillingPage() {
-  // Static data for the overview
   const balanceData = {
     currentBalance: 500.0,
     pastDueBalance: 150.0,
@@ -55,17 +56,26 @@ export default function BillingPage() {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Billing</h1>
 
-      <Tabs defaultValue="overview">
+      <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="grid w-full grid-cols-3 mb-6">
-          <TabsTrigger value="overview" className="flex items-center">
+          <TabsTrigger
+            value="overview"
+            className="flex items-center justify-center border-b-2 border-transparent hover:border-gray-300"
+          >
             <PieChart className="w-4 h-4 mr-2" />
             Overview
           </TabsTrigger>
-          <TabsTrigger value="details" className="flex items-center">
+          <TabsTrigger
+            value="details"
+            className="flex items-center justify-center border-b-2 border-transparent hover:border-gray-300"
+          >
             <FileText className="w-4 h-4 mr-2" />
             Details
           </TabsTrigger>
-          <TabsTrigger value="payments" className="flex items-center">
+          <TabsTrigger
+            value="payments"
+            className="flex items-center justify-center border-b-2 border-transparent hover:border-gray-300"
+          >
             <CreditCard className="w-4 h-4 mr-2" />
             Payments
           </TabsTrigger>
@@ -74,7 +84,6 @@ export default function BillingPage() {
         <TabsContent value="overview" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-6">
-              {/* Balance Summary Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>Balance Summary</CardTitle>
@@ -111,7 +120,6 @@ export default function BillingPage() {
                 </CardContent>
               </Card>
 
-              {/* Recent Payments Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Payments</CardTitle>
@@ -138,7 +146,6 @@ export default function BillingPage() {
             </div>
 
             <div className="space-y-6">
-              {/* Patient Information Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>Patient Information</CardTitle>
@@ -159,18 +166,17 @@ export default function BillingPage() {
                       <p className="text-sm">{patientInfo.address}</p>
                     </li>
                     <li className="flex items-center">
-                      <DollarSign className="w-4 h-4 mr-2 text-gray-400" />
+                      <Phone className="w-4 h-4 mr-2 text-gray-400" />
                       <p className="text-sm">{patientInfo.phone}</p>
                     </li>
                     <li className="flex items-center">
-                      <CreditCard className="w-4 h-4 mr-2 text-gray-400" />
+                      <Mail className="w-4 h-4 mr-2 text-gray-400" />
                       <p className="text-sm">{patientInfo.email}</p>
                     </li>
                   </ul>
                 </CardContent>
               </Card>
 
-              {/* Office Information Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>Office Information</CardTitle>
@@ -185,11 +191,11 @@ export default function BillingPage() {
                       </div>
                     </li>
                     <li className="flex items-center">
-                      <DollarSign className="w-4 h-4 mr-2 text-gray-400" />
+                      <Phone className="w-4 h-4 mr-2 text-gray-400" />
                       <p className="text-sm">{officeInfo.phone}</p>
                     </li>
                     <li className="flex items-center">
-                      <CreditCard className="w-4 h-4 mr-2 text-gray-400" />
+                      <Mail className="w-4 h-4 mr-2 text-gray-400" />
                       <p className="text-sm">{officeInfo.email}</p>
                     </li>
                   </ul>
@@ -200,11 +206,25 @@ export default function BillingPage() {
         </TabsContent>
 
         <TabsContent value="details">
-          <p>Details content will go here.</p>
+          <Card>
+            <CardHeader>
+              <CardTitle>Billing Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Detailed billing information will be displayed here.</p>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="payments">
-          <p>Payments content will go here.</p>
+          <Card>
+            <CardHeader>
+              <CardTitle>Payment History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>A comprehensive payment history will be shown here.</p>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
