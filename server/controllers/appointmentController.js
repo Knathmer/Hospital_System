@@ -28,10 +28,13 @@ export async function getDoctorsBySpecialty(req, res) {
                 doctor.lastName, 
                 doctor.gender, 
                 doctor.workPhoneNumber, 
-                doctor.workEmail, 
-                office.officeName AS officeLocation
+                doctor.workEmail,
+                doctor.specialty, 
+                office.officeName AS officeLocation,
+                CONCAT(addrStreet, ', ', addrcity, ', ', addrstate, ' ', addrzip) AS officeAddress
             FROM doctor
             LEFT JOIN office ON doctor.officeID = office.officeID
+            JOIN address ON office.addressID = address.addressID
             WHERE 1=1
         `;
         const params = [];

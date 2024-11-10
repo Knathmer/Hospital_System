@@ -42,6 +42,10 @@ function BookPage() {
     }, [specialty, gender, location]);
 
     useEffect(() => {
+        console.log("Doctors data updated:", doctors);
+    }, [doctors]);
+
+    useEffect(() => {
         // Generate available times for the selected day
         const generateAvailableTimes = () => {
             const times = [];
@@ -76,6 +80,17 @@ function BookPage() {
 
     }, [date, selectedDoctor]);
 
+    const formatPhoneNumber = (phoneNumber) => {
+        const cleaned = ('' + phoneNumber).replace(/\D/g, '');
+        if (cleaned.length === 10) {
+            const part1 = cleaned.slice(0, 3);
+            const part2 = cleaned.slice(3, 6);
+            const part3 = cleaned.slice(6);
+            return `(${part1}) ${part2}-${part3}`;
+        }
+        return phoneNumber;
+    };
+    
     const isWeekend = (dateString) => {
         const date = new Date(dateString);
         const day = date.getDay();
@@ -193,7 +208,7 @@ function BookPage() {
                             <div className="space-y-2">
                                 <h3 className="text-md font-semibold">Available Doctors</h3>
                                 <div className="space-y-2">
-                                    {doctors.length === 0 && <p>No doctors available with the selected filters.</p>}
+                                    {doctors.length === 0 && <p>No Doctors Available For The Selected Fields</p>}
                                     {doctors.map(doc => (
                                         <div
                                             key={doc.doctorID}
@@ -203,8 +218,8 @@ function BookPage() {
                                             <p className="text-lg font-medium">Dr. {doc.firstName} {doc.lastName}</p>
                                             <p className="text-sm text-gray-500">Specialty: {doc.specialty}</p>
                                             <p className="text-sm text-gray-500">Gender: {doc.gender}</p>
-                                            <p className="text-sm text-gray-500">Location: {doc.officeLocation}</p>
-                                            <p className="text-sm text-gray-500">Phone: {doc.workPhoneNumber}</p>
+                                            <p className="text-sm text-gray-500">Location: {doc.officeLocation} - {doc.officeAddress}</p>
+                                            <p className="text-sm text-gray-500">Phone: {formatPhoneNumber(doc.workPhoneNumber)}</p>
                                             <p className="text-sm text-gray-500">Email: {doc.workEmail}</p>
                                         </div>
                                     ))}
