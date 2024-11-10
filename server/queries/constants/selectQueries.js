@@ -59,17 +59,19 @@ export const GET_REFILL_HISTORY = `SELECT r.refillID, pr.medicationName, r.statu
                                    WHERE r.patientID = ?
                                    ORDER BY r.requestDate DESC;`;
 
-
 export const GET_PENDING_REQUESTS = `SELECT r.refillID, pr.medicationName, r.status, r.requestDate FROM refill AS r JOIN prescription AS pr ON r.prescriptionID = pr.prescriptionID WHERE r.patientID = ? AND r.status = 'Pending' ORDER BY r.requestDate DESC;`;
 
 // User Role's Names
 export const SELECT_PATIENT_NAMES =
   "SELECT firstName, lastName FROM patient WHERE patientID = ?";
 
-export const SELECT_DOCTOR_NAMES = 
- "SELECT firstName, lastName FROM doctor WHERE doctorID = ?";
+export const SELECT_DOCTOR_NAMES =
+  "SELECT firstName, lastName FROM doctor WHERE doctorID = ?";
 
- export const SELECT_ADMIN_NAMES =
+export const SELECT_ADMIN_NAMES =
   "SELECT firstName, lastName from admin WHERE adminID = ?";
 
-
+export const GET_CURRENT_PAST_BALANCE = `SELECT SUM(CASE WHEN paidStatus != 'Paid' THEN amount - paidAmount ELSE 0 END) AS currentBalance, 
+                                        SUM(CASE WHEN dueDate < CURDATE() AND paidStatus = 'Overdue' THEN amount - paidAmount ELSE 0 END) AS pastDueBalance
+                                        FROM bill 
+                                        WHERE patientID = ?;`;
