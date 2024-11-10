@@ -12,6 +12,7 @@ import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
 
 // Files Linked
 import DoctorBookingPage from '../users/doctor/DoctorBookingPage.jsx';
+import DoctorDashboard from '../users/doctor/DoctorDashboard.jsx';
 
 export default function DoctorSidebar() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -45,7 +46,7 @@ export default function DoctorSidebar() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 relative transition-all duration-300">
       {/* Sidebar */}
       <aside
         className={`transform transition-transform duration-300 fixed h-screen z-50 ${
@@ -91,34 +92,26 @@ export default function DoctorSidebar() {
 
 
       {/* Main Content */}
-    <main className="flex-1 p-8">
+      <main
+        className={`p-8 flex-1 transition-all duration-300 min-h-screen ${
+          isSidebarVisible ? 'ml-64' : 'ml-0'
+        }`}
+      >
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
-            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}
+          {activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}
         </h1>
         
        {/* Link pages here to according sidebar items */}
-        {activeTab === 'dashboard' && (
-            <div>
-            <p className="text-gray-700">Place dashboard file here</p>
-            {/* Add dashboard content here */}
-            </div>
-        )}
-
-        {activeTab === 'appointments' && (
-          <div>
-            < DoctorBookingPage />
-          </div>
-        )}
+       {activeTab === 'dashboard' && <DoctorDashboard />}
+        {activeTab === 'appointments' && <DoctorBookingPage />}
         {activeTab === 'schedule' && (
           <div>
             <p className="text-gray-700">Place schedule file here</p>
-            {/* Add schedule content here */}
           </div>
         )}
         {activeTab === 'patients-list' && (
           <div>
             <p className="text-gray-700">Place patients list file here</p>
-            {/* Add patients-list content here */}
           </div>
         )}
       </main>
