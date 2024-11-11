@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { format } from 'date-fns';
+
 
 const PatientInfoPage = () => {
   const { patientID } = useParams();
@@ -32,6 +34,16 @@ const PatientInfoPage = () => {
   if (!patientData) {
     return <div>Loading...</div>;
   }
+
+  const formatPhoneNumber = (phoneNumberString) => {
+    const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return `(${match[1]}) ${match[2]}-${match[3]}`;
+    }
+    return phoneNumberString;
+  };
+  
 
   const {
     firstName,
@@ -66,7 +78,7 @@ const PatientInfoPage = () => {
         </div>
         <div>
           <h3 className="font-semibold">Date of Birth:</h3>
-          <p>{dateOfBirth}</p>
+          <p>{format(new Date(dateOfBirth), 'MMM dd, yyyy')}</p>
         </div>
         <div>
           <h3 className="font-semibold">Gender:</h3>
@@ -74,7 +86,7 @@ const PatientInfoPage = () => {
         </div>
         <div>
           <h3 className="font-semibold">Phone Number:</h3>
-          <p>{phoneNumber}</p>
+          <p>{formatPhoneNumber(phoneNumber)}</p>
         </div>
         <div>
           <h3 className="font-semibold">Email:</h3>
@@ -122,7 +134,7 @@ const PatientInfoPage = () => {
             <div key={contact.emergencyContactID} className="border p-4 mb-4">
               <p><strong>Name:</strong> {contact.firstName} {contact.lastName}</p>
               <p><strong>Relationship:</strong> {contact.relationship}</p>
-              <p><strong>Phone Number:</strong> {contact.emergencyPhoneNumber}</p>
+              <p><strong>Phone Number:</strong> {formatPhoneNumber(contact.emergencyPhoneNumber)}</p>
               <p><strong>Email:</strong> {contact.emergencyEmail || 'N/A'}</p>
             </div>
           ))}
@@ -138,7 +150,7 @@ const PatientInfoPage = () => {
               <p><strong>Provider:</strong> {ins.providerName}</p>
               <p><strong>Policy Number:</strong> {ins.policy_number}</p>
               <p><strong>Coverage Details:</strong> {ins.coverageDetails}</p>
-              <p><strong>Expiration Date:</strong> {ins.coverage_expiration_date}</p>
+              <p><strong>Expiration Date:</strong> {format(new Date(ins.coverage_expiration_date), 'MMM dd, yyyy')}</p>
             </div>
           ))}
         </div>
@@ -166,7 +178,7 @@ const PatientInfoPage = () => {
           {surgeries.map((surgery) => (
             <div key={surgery.surgeryID} className="border p-4 mb-4">
               <p><strong>Type:</strong> {surgery.surgeryType}</p>
-              <p><strong>Date:</strong> {surgery.surgeryDateTime}</p>
+              <p><strong>Date:</strong> {format(new Date(surgery.surgeryDateTime), 'MMM dd, yyyy')}</p>
             </div>
           ))}
         </div>
@@ -178,7 +190,7 @@ const PatientInfoPage = () => {
           <h3 className="text-xl font-bold">Vitals</h3>
           {vitals.map((vital) => (
             <div key={vital.vitalsId} className="border p-4 mb-4">
-              <p><strong>Date:</strong> {vital.recordDate}</p>
+              <p><strong>Date:</strong> {format(new Date(vital.recordDate), 'MMM dd, yyyy')}</p>
               <p><strong>Height:</strong> {vital.height} cm</p>
               <p><strong>Weight:</strong> {vital.weight} kg</p>
               <p><strong>BMI:</strong> {vital.bmi}</p>
@@ -199,7 +211,7 @@ const PatientInfoPage = () => {
           {vaccines.map((vaccine) => (
             <div key={vaccine.vaccineID} className="border p-4 mb-4">
               <p><strong>Name:</strong> {vaccine.vaccineName}</p>
-              <p><strong>Date Administered:</strong> {vaccine.dateAdministered}</p>
+              <p><strong>Date Administered:</strong> {format(new Date(vaccine.dateAdministered), 'MMM dd, yyyy')}</p>
             </div>
           ))}
         </div>
@@ -212,8 +224,8 @@ const PatientInfoPage = () => {
           {treatmentPlans.map((plan) => (
             <div key={plan.treatmentPlanID} className="border p-4 mb-4">
               <p><strong>Doctor:</strong> {plan.doctorFirstName} {plan.doctorLastName}</p>
-              <p><strong>Start Date:</strong> {plan.startDate}</p>
-              <p><strong>End Date:</strong> {plan.endDate || 'Ongoing'}</p>
+              <p><strong>Start Date:</strong> {format(new Date(plan.startDate), 'MMM dd, yyyy')}</p>
+              <p><strong>End Date:</strong> {format(new Date(plan.endDate), 'MMM dd, yyyy') || 'Ongoing'}</p>
               <p><strong>Notes:</strong> {plan.notes}</p>
             </div>
           ))}
@@ -239,11 +251,11 @@ const PatientInfoPage = () => {
           <h3 className="text-xl font-bold">Completed Appointments</h3>
           {appointments.map((appointment) => (
             <div key={appointment.appointmentID} className="border p-4 mb-4">
-              <p><strong>Date:</strong> {appointment.appointmentDateTime}</p>
+              <p><strong>Date:</strong> {format(new Date(appointment.appointmentDateTime), 'MMM dd, yyyy')}</p>
               <p><strong>Reason:</strong> {appointment.reason}</p>
               <p><strong>Visit Notes:</strong> {appointment.visitNotes || 'No notes available'}</p>
               <p><strong>Bill Amount:</strong> {appointment.billAmount ? `$${appointment.billAmount}` : 'N/A'}</p>
-              <p><strong>Bill Due Date:</strong> {appointment.billDueDate || 'N/A'}</p>
+              <p><strong>Bill Due Date:</strong> {format(new Date(appointment.billDueDate), 'MMM dd, yyyy') || 'N/A'}</p>
               <p><strong>Paid Amount:</strong> {appointment.billPaidAmount ? `$${appointment.billPaidAmount}` : 'N/A'}</p>
               <p><strong>Bill Status:</strong> {appointment.billPaidStatus || 'N/A'}</p>
             </div>
@@ -258,7 +270,7 @@ const PatientInfoPage = () => {
           <div className="border p-4 mb-4">
             <p><strong>Name:</strong> {primaryPhysician.firstName} {primaryPhysician.lastName}</p>
             <p><strong>Specialty:</strong> {primaryPhysician.specialty}</p>
-            <p><strong>Phone Number:</strong> {primaryPhysician.workPhoneNumber}</p>
+            <p><strong>Phone Number:</strong> {formatPhoneNumber(primaryPhysician.workPhoneNumber)}</p>
             <p><strong>Email:</strong> {primaryPhysician.workEmail}</p>
           </div>
         </div>
