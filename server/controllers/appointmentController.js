@@ -17,26 +17,54 @@ export async function getSpecialties(req, res) {
 }
 
 
-// Function to get doctors by specialty
 export async function getDoctorsBySpecialty(req, res) {
-    const { specialty } = req.query; // Retrieve specialty from query params
-
-    if (!specialty) {
-        return res.status(400).json({ error: "Specialty is required" });
-    }
+    const { specialty, gender, location } = req.query;
 
     try {
-        const doctors = await query(
-            "SELECT doctorID, firstName, lastName FROM doctor WHERE specialty = ?",
-            [specialty]
-        );
+        let queryStr = `
+            SELECT 
+                doctor.doctorID, 
+                doctor.firstName, 
+                doctor.lastName, 
+                doctor.gender, 
+                doctor.workPhoneNumber, 
+                doctor.workEmail,
+                doctor.specialty, 
+                office.officeName AS officeLocation,
+                CONCAT(addrStreet, ', ', addrcity, ', ', addrstate, ' ', addrzip) AS officeAddress
+            FROM doctor
+            LEFT JOIN office ON doctor.officeID = office.officeID
+            JOIN address ON office.addressID = address.addressID
+            WHERE 1=1
+        `;
+        const params = [];
 
+        if (specialty) {
+            queryStr += " AND doctor.specialty = ?";
+            params.push(specialty);
+        }
+
+        if (gender) {
+            queryStr += " AND doctor.gender = ?";
+            params.push(gender);
+        }
+
+        if (location) {
+            queryStr += " AND office.officeName = ?";
+            params.push(location);
+        }
+
+        queryStr += " ORDER BY doctor.specialty, doctor.gender, office.officeName";
+
+        const doctors = await query(queryStr, params);
         res.json(doctors);
     } catch (error) {
         console.error("Error retrieving doctors:", error);
         res.status(500).json({ error: "Error retrieving doctors" });
     }
-};
+}
+
+
 
 // Function to book an appointment
 export async function bookAppointment(req, res) {
@@ -104,14 +132,14 @@ export async function getAppointmentsByDoctorAndDate(req, res) {
             `SELECT appointmentDateTime FROM appointment 
              WHERE doctorID = ? 
              AND appointmentDateTime BETWEEN ? AND ? 
-             AND status = 'Scheduled'`,
+             AND status IN ('Requested', 'Scheduled')`, // Include 'Requested' status
             [doctorID, startOfDay, endOfDay]
         );
 
-        // Extract times in HH:MM format
+        // Extract times in consistent format
         const bookedTimes = appointments.map(app => {
             const dateObj = new Date(app.appointmentDateTime);
-            return dateObj.toTimeString().substring(0, 5); // "HH:MM"
+            return dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
         });
 
         res.json({ bookedTimes });
@@ -176,5 +204,20 @@ export async function updateAppointment(req, res) {
     } catch (error) {
         console.error('Error updating appointment:', error);
         res.status(500).json({ error: 'Error updating appointment' });
+    }
+}
+
+// Function to get unique office locations
+export async function getLocations(req, res) {
+    try {
+        const locations = await query(`
+            SELECT officeID, officeName, CONCAT(addrStreet, ', ', addrcity, ', ', addrstate, ' ', addrzip) AS address
+            FROM office
+            JOIN address ON office.addressID = address.addressID
+        `);
+        res.json(locations);
+    } catch (error) {
+        console.error("Error retrieving locations:", error);
+        res.status(500).json({ error: "Error retrieving locations" });
     }
 }

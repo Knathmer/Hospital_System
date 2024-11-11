@@ -39,7 +39,7 @@ const LoginPage = () => {
         } else if (userRole === "doctor") {
           navigate("/doctor/dashboard");
         } else if (userRole === "patient") {
-          navigate("/patient/dashboard");
+          navigate("/patient/dashboard?tab=dashboard");
         }
       } else {
         setError("Login failed. Please try again.");

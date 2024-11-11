@@ -207,7 +207,7 @@ export default function EditInsuranceForm() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <Link
-            to="/patient/dashboard"
+            to="/patient/dashboard?tab=dashboard"
             className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
