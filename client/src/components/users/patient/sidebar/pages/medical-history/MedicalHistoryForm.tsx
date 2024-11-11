@@ -111,36 +111,37 @@ export default function MedicalHistoryForm() {
     <div className="flex flex-col min-h-screen bg-pink-50">
       <NavbarPatient linkTo={"/patient/dashboard?tab=dashboard"} />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <Link
-            to="/patient/dashboard?tab=dashboard"
-            className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Link>
-          <h1 className="text-3xl font-bold mb-6">Medical History Form</h1>
-          <form onSubmit={handleSubmit} className="space-y-6 py-4">
-            <FamilyHistory />
+        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="p-6 sm:p-10">
+            <Link
+              to="/patient/dashboard?tab=dashboard"
+              className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Link>
+            <h1 className="text-3xl font-bold mb-6">Medical History Form</h1>
+            <form onSubmit={handleSubmit} className="space-y-6 py-4">
+              <FamilyHistory />
 
-            <Allergies allergies={allergies} setAllergies={setAllergies} />
+              <Allergies allergies={allergies} setAllergies={setAllergies} />
 
-            <Medications />
+              <Medications />
 
-            <Vaccines vaccines={vaccines} setVaccines={setVaccines} />
+              <Vaccines vaccines={vaccines} setVaccines={setVaccines} />
 
-            <Disabilities
-              disabilities={disabilities}
-              setDisablilities={setDisablilities}
-            />
+              <Disabilities
+                disabilities={disabilities}
+                setDisablilities={setDisablilities}
+              />
 
-            <Surgeries surgeries={surgeries} setSurgeries={setSurgeries} />
+              <Surgeries surgeries={surgeries} setSurgeries={setSurgeries} />
 
-            <FormSubmitButton />
-          </form>
+              <FormSubmitButton />
+            </form>
+          </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

@@ -429,37 +429,37 @@ export default function EditMedicalHistoryForm() {
 
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
-      
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <Link
-            to="/patient/dashboard?tab=dashboard"
-            className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Link>
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold">Medical History Form</h1>
-            <DefaultButton
-              onClick={toggleEditMode}
-              className="bg-pink-500 text-white hover:bg-pink-600"
+        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="p-6 sm:p-10">
+            <Link
+              to="/patient/dashboard?tab=dashboard"
+              className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
             >
-              {isEditing ? (
-                <>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Cancel
-                </>
-              ) : (
-                <>
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Edit
-                </>
-              )}
-            </DefaultButton>
-          </div>
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* <div className="space-y-4">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Link>
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-bold">Medical History Form</h1>
+              <DefaultButton
+                onClick={toggleEditMode}
+                className="bg-pink-500 text-white hover:bg-pink-600"
+              >
+                {isEditing ? (
+                  <>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Cancel
+                  </>
+                ) : (
+                  <>
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Edit
+                  </>
+                )}
+              </DefaultButton>
+            </div>
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Medical History</h2>
               <div>
                 <Label>Do you have any allergies?</Label>
@@ -480,288 +480,292 @@ export default function EditMedicalHistoryForm() {
               </div>
             </div> */}
 
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Family Medical History</h2>
-              <div className="space-y-2">
-                <Label>
-                  Has anyone in your family been diagnosed with the following?
-                </Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {[
-                    "Heart Disease",
-                    "Diabetes",
-                    "Cancer",
-                    "High Blood Pressure",
-                    "Stroke",
-                    "Mental Illness",
-                  ].map((condition) => (
-                    <div
-                      key={condition}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        id={condition.toLowerCase().replace(/\s/g, "-")}
-                        disabled={!isEditing}
-                      />
-                      <Label
-                        htmlFor={condition.toLowerCase().replace(/\s/g, "-")}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">
+                  Family Medical History
+                </h2>
+                <div className="space-y-2">
+                  <Label>
+                    Has anyone in your family been diagnosed with the following?
+                  </Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {[
+                      "Heart Disease",
+                      "Diabetes",
+                      "Cancer",
+                      "High Blood Pressure",
+                      "Stroke",
+                      "Mental Illness",
+                    ].map((condition) => (
+                      <div
+                        key={condition}
+                        className="flex items-center space-x-2"
                       >
-                        {condition}
-                      </Label>
-                    </div>
-                  ))}
+                        <Checkbox
+                          id={condition.toLowerCase().replace(/\s/g, "-")}
+                          disabled={!isEditing}
+                        />
+                        <Label
+                          htmlFor={condition.toLowerCase().replace(/\s/g, "-")}
+                        >
+                          {condition}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Allergies</h2>
-              {allergies.map((allergy, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Input
-                    placeholder="Allergy name"
-                    value={allergy.name}
-                    onChange={(e) => {
-                      const newAllergies = [...allergies];
-                      newAllergies[index].name = e.target.value;
-                      setAllergies(newAllergies);
-                    }}
-                    disabled={
-                      (allergy.name ===
-                        initialFormData.allAllergies[index]?.name &&
-                        initialFormData.allAllergies[index]?.name) ||
-                      !isEditing
-                    }
-                  />
-                  <Input
-                    placeholder="Reaction"
-                    value={allergy.reaction}
-                    onChange={(e) => {
-                      const newAllergies = [...allergies];
-                      newAllergies[index].reaction = e.target.value;
-                      setAllergies(newAllergies);
-                    }}
-                    disabled={
-                      (allergy.reaction ===
-                        initialFormData.allAllergies[index]?.reaction &&
-                        initialFormData.allAllergies[index]?.reaction) ||
-                      !isEditing
-                    }
-                  />
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Allergies</h2>
+                {allergies.map((allergy, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Input
+                      placeholder="Allergy name"
+                      value={allergy.name}
+                      onChange={(e) => {
+                        const newAllergies = [...allergies];
+                        newAllergies[index].name = e.target.value;
+                        setAllergies(newAllergies);
+                      }}
+                      disabled={
+                        (allergy.name ===
+                          initialFormData.allAllergies[index]?.name &&
+                          initialFormData.allAllergies[index]?.name) ||
+                        !isEditing
+                      }
+                    />
+                    <Input
+                      placeholder="Reaction"
+                      value={allergy.reaction}
+                      onChange={(e) => {
+                        const newAllergies = [...allergies];
+                        newAllergies[index].reaction = e.target.value;
+                        setAllergies(newAllergies);
+                      }}
+                      disabled={
+                        (allergy.reaction ===
+                          initialFormData.allAllergies[index]?.reaction &&
+                          initialFormData.allAllergies[index]?.reaction) ||
+                        !isEditing
+                      }
+                    />
 
-                  <Select
-                    id="severity"
-                    name="severity"
-                    value={allergy.severity}
-                    onChange={(e) => {
-                      const newAllergies = [...allergies];
-                      newAllergies[index].severity = e.target.value;
-                      setAllergies(newAllergies);
-                    }}
-                    disabled={
-                      (allergy.severity ===
-                        initialFormData.allAllergies[index]?.severity &&
-                        initialFormData.allAllergies[index]?.severity) ||
-                      !isEditing
-                    }
+                    <Select
+                      id="severity"
+                      name="severity"
+                      value={allergy.severity}
+                      onChange={(e) => {
+                        const newAllergies = [...allergies];
+                        newAllergies[index].severity = e.target.value;
+                        setAllergies(newAllergies);
+                      }}
+                      disabled={
+                        (allergy.severity ===
+                          initialFormData.allAllergies[index]?.severity &&
+                          initialFormData.allAllergies[index]?.severity) ||
+                        !isEditing
+                      }
+                    >
+                      <SelectItem value=""> Select Severity</SelectItem>
+                      <SelectItem value="Mild"> Mild</SelectItem>
+                      <SelectItem value="Moderate"> Moderate</SelectItem>
+                      <SelectItem value="Severe"> Severe</SelectItem>
+                    </Select>
+
+                    {isEditing && (
+                      <DefaultButton
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeAllergy(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </DefaultButton>
+                    )}
+                  </div>
+                ))}
+                {isEditing && (
+                  <DefaultButton
+                    type="button"
+                    variant="outline"
+                    onClick={addAllergy}
                   >
-                    <SelectItem value=""> Select Severity</SelectItem>
-                    <SelectItem value="Mild"> Mild</SelectItem>
-                    <SelectItem value="Moderate"> Moderate</SelectItem>
-                    <SelectItem value="Severe"> Severe</SelectItem>
-                  </Select>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Allergy
+                  </DefaultButton>
+                )}
+              </div>
 
-                  {isEditing && (
-                    <DefaultButton
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeAllergy(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </DefaultButton>
-                  )}
-                </div>
-              ))}
-              {isEditing && (
-                <DefaultButton
-                  type="button"
-                  variant="outline"
-                  onClick={addAllergy}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Allergy
-                </DefaultButton>
-              )}
-            </div>
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Current Medications</h2>
+                {medications.map((medication, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Input
+                      placeholder="Medication name"
+                      value={medication.name}
+                      onChange={(e) => {
+                        const newMedications = [...medications];
+                        newMedications[index].name = e.target.value;
+                        setMedications(newMedications);
+                      }}
+                      disabled={
+                        (medication.name ===
+                          initialFormData.allMedications[index]?.name &&
+                          initialFormData.allMedications[index]?.name) ||
+                        !isEditing
+                      }
+                    />
 
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Current Medications</h2>
-              {medications.map((medication, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Input
-                    placeholder="Medication name"
-                    value={medication.name}
-                    onChange={(e) => {
-                      const newMedications = [...medications];
-                      newMedications[index].name = e.target.value;
-                      setMedications(newMedications);
-                    }}
-                    disabled={
-                      (medication.name ===
-                        initialFormData.allMedications[index]?.name &&
-                        initialFormData.allMedications[index]?.name) ||
-                      !isEditing
-                    }
-                  />
-
-                  {isEditing && (
-                    <DefaultButton
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeMedication(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </DefaultButton>
-                  )}
-                </div>
-              ))}
-              {isEditing && (
-                <DefaultButton
-                  type="button"
-                  variant="outline"
-                  onClick={addMedication}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Medication
-                </DefaultButton>
-              )}
-              {/* <div>
+                    {isEditing && (
+                      <DefaultButton
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeMedication(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </DefaultButton>
+                    )}
+                  </div>
+                ))}
+                {isEditing && (
+                  <DefaultButton
+                    type="button"
+                    variant="outline"
+                    onClick={addMedication}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Medication
+                  </DefaultButton>
+                )}
+                {/* <div>
                 <Label htmlFor="medications">
                   Please list any medications you are currently taking:
                 </Label>
                 <Textarea id="medications" placeholder="Enter your current medications here" disabled={!isEditing} />
               </div> */}
-            </div>
+              </div>
 
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Vaccination History</h2>
-              {vaccines.map((vaccine, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Input
-                    placeholder="Vaccine name"
-                    value={vaccine.name}
-                    onChange={(e) => {
-                      const newVaccines = [...vaccines];
-                      newVaccines[index].name = e.target.value;
-                      setVaccines(newVaccines);
-                    }}
-                    disabled={
-                      (vaccine.name ===
-                        initialFormData.allVaccines[index]?.name &&
-                        initialFormData.allVaccines[index]?.name) ||
-                      !isEditing
-                    }
-                  />
-                  <Input
-                    type="date"
-                    value={vaccine.date}
-                    onChange={(e) => {
-                      const newVaccines = [...vaccines];
-                      newVaccines[index].date = e.target.value;
-                      setVaccines(newVaccines);
-                    }}
-                    disabled={
-                      (vaccine.date ===
-                        initialFormData.allVaccines[index]?.date &&
-                        initialFormData.allVaccines[index]?.date) ||
-                      !isEditing
-                    }
-                  />
-                  <Input
-                    placeholder="Doctor name"
-                    value={vaccine.doctor}
-                    onChange={(e) => {
-                      const newVaccines = [...vaccines];
-                      newVaccines[index].doctor = e.target.value;
-                      setVaccines(newVaccines);
-                    }}
-                    disabled={
-                      (vaccine.doctor ===
-                        initialFormData.allVaccines[index]?.doctor &&
-                        initialFormData.allVaccines[index]?.doctor) ||
-                      !isEditing
-                    }
-                  />
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Vaccination History</h2>
+                {vaccines.map((vaccine, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Input
+                      placeholder="Vaccine name"
+                      value={vaccine.name}
+                      onChange={(e) => {
+                        const newVaccines = [...vaccines];
+                        newVaccines[index].name = e.target.value;
+                        setVaccines(newVaccines);
+                      }}
+                      disabled={
+                        (vaccine.name ===
+                          initialFormData.allVaccines[index]?.name &&
+                          initialFormData.allVaccines[index]?.name) ||
+                        !isEditing
+                      }
+                    />
+                    <Input
+                      type="date"
+                      value={vaccine.date}
+                      onChange={(e) => {
+                        const newVaccines = [...vaccines];
+                        newVaccines[index].date = e.target.value;
+                        setVaccines(newVaccines);
+                      }}
+                      disabled={
+                        (vaccine.date ===
+                          initialFormData.allVaccines[index]?.date &&
+                          initialFormData.allVaccines[index]?.date) ||
+                        !isEditing
+                      }
+                    />
+                    <Input
+                      placeholder="Doctor name"
+                      value={vaccine.doctor}
+                      onChange={(e) => {
+                        const newVaccines = [...vaccines];
+                        newVaccines[index].doctor = e.target.value;
+                        setVaccines(newVaccines);
+                      }}
+                      disabled={
+                        (vaccine.doctor ===
+                          initialFormData.allVaccines[index]?.doctor &&
+                          initialFormData.allVaccines[index]?.doctor) ||
+                        !isEditing
+                      }
+                    />
 
-                  {isEditing && (
-                    <DefaultButton
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeVaccine(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </DefaultButton>
-                  )}
-                </div>
-              ))}
-              {isEditing && (
-                <DefaultButton
-                  type="button"
-                  variant="outline"
-                  onClick={addVaccine}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Vaccine
-                </DefaultButton>
-              )}
-            </div>
+                    {isEditing && (
+                      <DefaultButton
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeVaccine(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </DefaultButton>
+                    )}
+                  </div>
+                ))}
+                {isEditing && (
+                  <DefaultButton
+                    type="button"
+                    variant="outline"
+                    onClick={addVaccine}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Vaccine
+                  </DefaultButton>
+                )}
+              </div>
 
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Disability Information</h2>
-              {disabilities.map((disability, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Input
-                    placeholder="Disability name"
-                    value={disability.name}
-                    onChange={(e) => {
-                      const newDisabilities = [...disabilities];
-                      newDisabilities[index].name = e.target.value;
-                      setDisabilities(newDisabilities);
-                    }}
-                    disabled={
-                      (disability.name ===
-                        initialFormData.allDisabilities[index]?.name &&
-                        initialFormData.allDisabilities[index]?.name) ||
-                      !isEditing
-                    }
-                  />
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">
+                  Disability Information
+                </h2>
+                {disabilities.map((disability, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Input
+                      placeholder="Disability name"
+                      value={disability.name}
+                      onChange={(e) => {
+                        const newDisabilities = [...disabilities];
+                        newDisabilities[index].name = e.target.value;
+                        setDisabilities(newDisabilities);
+                      }}
+                      disabled={
+                        (disability.name ===
+                          initialFormData.allDisabilities[index]?.name &&
+                          initialFormData.allDisabilities[index]?.name) ||
+                        !isEditing
+                      }
+                    />
 
-                  {isEditing && (
-                    <DefaultButton
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeDisability(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </DefaultButton>
-                  )}
-                </div>
-              ))}
-              {isEditing && (
-                <DefaultButton
-                  type="button"
-                  variant="outline"
-                  onClick={addDisability}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Disability
-                </DefaultButton>
-              )}
-              {/* <div>
+                    {isEditing && (
+                      <DefaultButton
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeDisability(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </DefaultButton>
+                    )}
+                  </div>
+                ))}
+                {isEditing && (
+                  <DefaultButton
+                    type="button"
+                    variant="outline"
+                    onClick={addDisability}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Disability
+                  </DefaultButton>
+                )}
+                {/* <div>
                 <Label>Do you have any disabilities?</Label>
                 <RadioGroup defaultValue="no" disabled={!isEditing}>
                   <div className="flex items-center space-x-2">
@@ -774,110 +778,93 @@ export default function EditMedicalHistoryForm() {
                   </div>
                 </RadioGroup>
               </div> */}
-              {/* <div>
+                {/* <div>
                 <Label htmlFor="disabilities">
                   If yes, please describe your disabilities:
                 </Label>
                 <Textarea id="disabilities" placeholder="Enter your disability information here" disabled={!isEditing} />
               </div> */}
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Previous Surgeries</h2>
-              {surgeries.map((surgery, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Input
-                    placeholder="Surgery name"
-                    value={surgery.name}
-                    onChange={(e) => {
-                      const newSurgeries = [...surgeries];
-                      newSurgeries[index].name = e.target.value;
-                      setSurgeries(newSurgeries);
-                    }}
-                    disabled={
-                      (surgery.name ===
-                        initialFormData.allSurgeries[index]?.name &&
-                        initialFormData.allSurgeries[index]?.name) ||
-                      !isEditing
-                    }
-                  />
-                  <Input
-                    type="date"
-                    value={surgery.date}
-                    onChange={(e) => {
-                      const newSurgeries = [...surgeries];
-                      newSurgeries[index].date = e.target.value;
-                      setSurgeries(newSurgeries);
-                    }}
-                    disabled={
-                      (surgery.date ===
-                        initialFormData.allSurgeries[index]?.date &&
-                        initialFormData.allSurgeries[index]?.date) ||
-                      !isEditing
-                    }
-                  />
-                  {isEditing && (
-                    <DefaultButton
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeSurgery(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </DefaultButton>
-                  )}
-                </div>
-              ))}
-              {isEditing && (
-                <DefaultButton
-                  type="button"
-                  variant="outline"
-                  onClick={addSurgery}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Surgery
-                </DefaultButton>
-              )}
-            </div>
-
-            {isEditing && (
-              <div className="flex justify-end space-x-4">
-                <DefaultButton
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  variant="outline"
-                >
-                  Cancel
-                </DefaultButton>
-                <DefaultButton
-                  type="submit"
-                  className="bg-pink-500 text-white hover:bg-pink-600"
-                >
-                  Update Medical History
-                </DefaultButton>
               </div>
-            )}
-          </form>
+
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Previous Surgeries</h2>
+                {surgeries.map((surgery, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Input
+                      placeholder="Surgery name"
+                      value={surgery.name}
+                      onChange={(e) => {
+                        const newSurgeries = [...surgeries];
+                        newSurgeries[index].name = e.target.value;
+                        setSurgeries(newSurgeries);
+                      }}
+                      disabled={
+                        (surgery.name ===
+                          initialFormData.allSurgeries[index]?.name &&
+                          initialFormData.allSurgeries[index]?.name) ||
+                        !isEditing
+                      }
+                    />
+                    <Input
+                      type="date"
+                      value={surgery.date}
+                      onChange={(e) => {
+                        const newSurgeries = [...surgeries];
+                        newSurgeries[index].date = e.target.value;
+                        setSurgeries(newSurgeries);
+                      }}
+                      disabled={
+                        (surgery.date ===
+                          initialFormData.allSurgeries[index]?.date &&
+                          initialFormData.allSurgeries[index]?.date) ||
+                        !isEditing
+                      }
+                    />
+                    {isEditing && (
+                      <DefaultButton
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeSurgery(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </DefaultButton>
+                    )}
+                  </div>
+                ))}
+                {isEditing && (
+                  <DefaultButton
+                    type="button"
+                    variant="outline"
+                    onClick={addSurgery}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Surgery
+                  </DefaultButton>
+                )}
+              </div>
+
+              {isEditing && (
+                <div className="flex justify-end space-x-4">
+                  <DefaultButton
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    variant="outline"
+                  >
+                    Cancel
+                  </DefaultButton>
+                  <DefaultButton
+                    type="submit"
+                    className="bg-pink-500 text-white hover:bg-pink-600"
+                  >
+                    Update Medical History
+                  </DefaultButton>
+                </div>
+              )}
+            </form>
+          </div>
         </div>
       </main>
-      <footer className="bg-white border-t py-6 px-4 md:px-6">
-        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between">
-          <p className="text-xs text-gray-500">
-            © 2024 WomenWell. All rights reserved.
-          </p>
-          <nav className="flex gap-4 sm:gap-6 mt-4 sm:mt-0">
-            <Link className="text-xs hover:underline underline-offset-4" to="#">
-              Privacy Policy
-            </Link>
-            <Link className="text-xs hover:underline underline-offset-4" to="#">
-              Terms of Use
-            </Link>
-            <Link className="text-xs hover:underline underline-offset-4" to="#">
-              Contact Support
-            </Link>
-          </nav>
-        </div>
-      </footer>
     </div>
   );
 }

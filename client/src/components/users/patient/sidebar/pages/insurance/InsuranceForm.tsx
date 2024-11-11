@@ -77,56 +77,59 @@ export default function InsuranceForm() {
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <Link
-            to="/patient/dashboard?tab=dashboard"
-            className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Link>
-          <h1 className="text-3xl font-bold mb-6">Insurance Information</h1>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Primary Insurance</h2>
-              <div className="grid grid-cols-1  gap-4 ">
-                <div>
-                  <Label htmlFor="insuranceProvider">Insurance Provider</Label>
-                  <Input
-                    type="text"
-                    id="providerName"
-                    name="providerName"
-                    value={formData.providerName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="policyNumber">Policy Number</Label>
-                  <Input
-                    type="text"
-                    id="policyNum"
-                    name="policyNum"
-                    value={formData.policyNum}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                {/* <div>
+        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="p-6 sm:p-10">
+            <Link
+              to="/patient/dashboard?tab=dashboard"
+              className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Link>
+            <h1 className="text-3xl font-bold mb-6">Insurance Information</h1>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Primary Insurance</h2>
+                <div className="grid grid-cols-1  gap-4 ">
+                  <div>
+                    <Label htmlFor="insuranceProvider">
+                      Insurance Provider
+                    </Label>
+                    <Input
+                      type="text"
+                      id="providerName"
+                      name="providerName"
+                      value={formData.providerName}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="policyNumber">Policy Number</Label>
+                    <Input
+                      type="text"
+                      id="policyNum"
+                      name="policyNum"
+                      value={formData.policyNum}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  {/* <div>
                   <Label htmlFor="groupNumber">Group Number</Label>
                   <Input id="groupNumber" />
                 </div> */}
-                {/* <div>
+                  {/* <div>
                   <Label htmlFor="policyHolderName">Policy Holder Name</Label>
                   <Input id="policyHolderName" required />
                 </div> */}
-                {/* <div>
+                  {/* <div>
                   <Label htmlFor="policyHolderDOB">
                     Policy Holder Date of Birth
                   </Label>
                   <Input id="policyHolderDOB" type="date" required />
                 </div> */}
-                {/* <div>
+                  {/* <div>
                   <Label htmlFor="relationshipToPatient">
                     Relationship to Patient
                   </Label>
@@ -141,35 +144,35 @@ export default function InsuranceForm() {
                     <SelectItem value="other">Other</SelectItem>
                   </Select>
                 </div> */}
-                <div>
-                  <Label htmlFor="coverageDetails">Coverage Details</Label>
-                  <Input
-                    type="text"
-                    id="covDetails"
-                    name="covDetails"
-                    placeholder="e.g., PPO, HMO, etc."
-                    value={formData.covDetails}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="coverageExpirationDate">
-                    Coverage Expiration Date
-                  </Label>
-                  <Input
-                    id="covExpDate"
-                    name="covExpDate"
-                    type="date"
-                    value={formData.covExpDate}
-                    onChange={handleChange}
-                    required
-                  />
+                  <div>
+                    <Label htmlFor="coverageDetails">Coverage Details</Label>
+                    <Input
+                      type="text"
+                      id="covDetails"
+                      name="covDetails"
+                      placeholder="e.g., PPO, HMO, etc."
+                      value={formData.covDetails}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="coverageExpirationDate">
+                      Coverage Expiration Date
+                    </Label>
+                    <Input
+                      id="covExpDate"
+                      name="covExpDate"
+                      type="date"
+                      value={formData.covExpDate}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* <div className="space-y-4">
+              {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Secondary Insurance</h2>
               <div>
                 <Label>Do you have secondary insurance?</Label>
@@ -221,7 +224,7 @@ export default function InsuranceForm() {
               </div>
             </div> */}
 
-            {/* <div className="space-y-4">
+              {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Additional Information</h2>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
@@ -239,7 +242,7 @@ export default function InsuranceForm() {
               </div>
             </div> */}
 
-            {/* <div className="space-y-4">
+              {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Emergency Contact</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -259,10 +262,11 @@ export default function InsuranceForm() {
               </div>
             </div> */}
 
-            <div className="flex justify-end space-x-4">
-              <FormSubmitButton />
-            </div>
-          </form>
+              <div className="flex justify-end space-x-4">
+                <FormSubmitButton />
+              </div>
+            </form>
+          </div>
         </div>
       </main>
       {/* <footer className="bg-white border-t py-6 px-4 md:px-6">

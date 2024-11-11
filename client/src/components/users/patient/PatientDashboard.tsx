@@ -16,7 +16,6 @@ export default function PatientDashboard() {
         <MainSectionPatient user={"Sarah"} />
         <QuickActions />
       </main>
-      <Footer />
     </div>
   );
 }
