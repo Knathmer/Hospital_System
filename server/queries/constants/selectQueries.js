@@ -88,18 +88,5 @@ export const SELECT_UPCOMING_APPOINTMENTS_DB = `
       a.appointmentDateTime ASC;
 `;
 
-export const SELECT_RECENT_MED_REQ_DB = 
-`SELECT status, requestDate, FROM refill WHERE patientID = ?`;
-
-export const SELECT_NOTIFICATIONS_DB = `
-  SELECT 
-      e.subject
-  FROM 
-      email_queue AS e
-  WHERE 
-      e.patientID = ?
-  ORDER BY 
-      e.createdAt DESC
-  LIMIT 5;
-`;
+export const SELECT_RECENT_MED_REQ_DB = `SELECT status, requestDate FROM refill WHERE patientID = ?`;
 
