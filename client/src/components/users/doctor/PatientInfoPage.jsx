@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
 
 const PatientInfoPage = () => {
   const { patientID } = useParams();
+  const navigate = useNavigate();
   const [patientData, setPatientData] = useState(null);
 
   useEffect(() => {
@@ -68,11 +69,22 @@ const PatientInfoPage = () => {
   } = patientData;
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Patient Information</h2>
-      <div className="grid grid-cols-2 gap-4">
-        {/* Basic Patient Information */}
-        <div>
+    <div className="flex flex-col min-h-screen bg-pink-50">
+      <header className="bg-pink-500 text-white py-4 px-6">
+        <button
+          className="text-white font-bold bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded shadow"
+          onClick={() => navigate(-1)}
+        >
+          Go Back
+        </button>
+        <h1 className="text-3xl font-extrabold text-center">Patient Details</h1>
+      </header>
+      <main className="flex-1 p-6">
+        <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+          <section className="mb-6">
+            <h2 className="text-2xl font-bold text-pink-600 mb-4">Basic Information</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
           <h3 className="font-semibold">Name:</h3>
           <p>{`${firstName} ${lastName}`}</p>
         </div>
@@ -275,6 +287,9 @@ const PatientInfoPage = () => {
           </div>
         </div>
       )}
+      </section>
+        </div>
+      </main>
     </div>
   );
 };
