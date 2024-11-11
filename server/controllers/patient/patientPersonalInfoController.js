@@ -7,14 +7,15 @@ export async function hasPersonalInfo(req, res) {
     const GET_ADDRESS_ID_FROM_PATIENT = `SELECT addressID
                                             FROM patient
                                             WHERE patientID = ?;`;
-    const addressID = await query(GET_ADDRESS_ID_FROM_PATIENT, [patientID]);
+    let addressID = await query(GET_ADDRESS_ID_FROM_PATIENT, [patientID]);
+    addressID = addressID[0].addressID;
 
     const GET_PERSONAL_INFO_QUERY = `SELECT firstName, lastName, dateOfBirth, gender, email, phoneNumber
                                             FROM patient
                                             WHERE patientID = ?;`;
     const GET_PATIENT_ADDRESS_QUERY = `SELECT addrStreet, addrZip, addrCity, addrState
                                         FROM address
-                                        WHERE addressID= ?;`;
+                                        WHERE addressID = ?;`;
     const GET_EMERGENCY_CONTACT_QUERY = `SELECT firstName, lastName, relationship, emergencyPhoneNumber, emergencyEmail
                                                 FROM emergency_contact
                                                 WHERE patientID = ?;`;
@@ -27,6 +28,7 @@ export async function hasPersonalInfo(req, res) {
     const patientAddressResult = await query(GET_PATIENT_ADDRESS_QUERY, [
       addressID,
     ]);
+    console.log("addrID: ", addressID);
     console.log("Patient Address result:", patientAddressResult);
 
     const emergencyContactResult = await query(GET_EMERGENCY_CONTACT_QUERY, [
