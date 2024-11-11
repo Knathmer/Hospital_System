@@ -5,6 +5,7 @@ import {
   GET_PATIENT_INFORMATION,
   GET_OFFICE_INFORMATION,
   GET_RECENT_PAYMENTS,
+  GET_DETAILS_YTD,
 } from "../../queries/constants/selectQueries.js";
 
 export const getCurrentPastBalance = async (req, res) => {
@@ -101,4 +102,65 @@ export const getRecentPayments = async (req, res) => {
       .status(500)
       .json({ message: "Server error fetching payment information." });
   }
+};
+//-------------End of Overview Controller Functions----------------------------------\\
+
+//-------------Start of Details Controller Functions----------------------------------\\
+export const getDetailsYTD = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+    const startDate = new Date(new Date().getFullYear(), 0, 1); //Gets the January 1st of the current Year
+    const endDate = new Date(); //Gets current date.
+
+    // Format dates to 'YYYY-MM-DD' if necessary
+    const formattedStartDate = startDate.toISOString().split("T")[0];
+    const formattedEndDate = endDate.toISOString().split("T")[0];
+
+    const detailsYTD = await query(GET_DETAILS_YTD, [
+      patientID,
+      formattedStartDate,
+      formattedEndDate,
+    ]);
+
+    if (detailsYTD.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No records found for this specified date range." });
+    }
+
+    res.status(200).json({ detailsYTD });
+
+    //Make query call here.
+  } catch (error) {
+    console.error(
+      "Error fetching patients ytd information from the server",
+      error
+    );
+    res
+      .status(500)
+      .json({ message: "Server error fetching patients ytd information." });
+  }
+};
+
+export const getDetailsLastYear = async () => {
+  try {
+    const patientID = req.user.patientID;
+    const year = new Date().getFullYear() - 1;
+    const startDate = new Date(year, 0, 1); //January 1st of last year
+    const endDate = new Date(year, 11, 31); //December 31s of Last Year
+  } catch (error) {
+    console.error(
+      "Error fetching patients ytd information from the server",
+      error
+    );
+    res
+      .status(500)
+      .json({ message: "Server error fetching patients ytd information." });
+  }
+};
+
+export const getDetailsDateRange = async () => {
+  try {
+    const patientID = req.user.patientID;
+  } catch (error) {}
 };
