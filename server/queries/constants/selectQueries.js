@@ -92,3 +92,10 @@ export const GET_OFFICE_INFORMATION = `SELECT o.officeName, o.officePhoneNumber,
                                       JOIN address AS a ON o.addressID = a.addressID
                                       JOIN bill AS b ON o.officeID = b.officeID
                                       WHERE b.patientID = ?;`;
+
+export const GET_RECENT_PAYMENTS = `SELECT p.paymentID, p.paymentDate, p.amount
+                                    FROM payment AS p
+                                    JOIN bill AS b ON p.billID = b.billID
+                                    WHERE b.patientID = ?
+                                    ORDER BY p.paymentDate DESC
+                                    LIMIT 5;`;

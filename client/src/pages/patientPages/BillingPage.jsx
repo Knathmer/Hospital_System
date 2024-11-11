@@ -27,11 +27,22 @@ import {
 } from "lucide-react";
 
 export default function BillingPage() {
-  const [currentAndPastDueBalance, setCurrentAndPastDueBalance] = useState([]);
-  const [lastPaymentInformation, setLastPaymentInformation] = useState([]);
+  const [currentAndPastDueBalance, setCurrentAndPastDueBalance] = useState({
+    currentBalance: 0,
+    pastDueBalance: 0,
+  });
+  const [lastPaymentInformation, setLastPaymentInformation] = useState({
+    lastPaymentAmount: "N/A",
+    lastPaymentDate: "No payment made",
+  });
+  const [officeInformation, setOfficeInformation] = useState(null);
   const [patientInformation, setPatientInformation] = useState({});
-  const [officeInformation, setOfficeInformation] = useState({});
+  const [previousPayments, setPreviousPayments] = useState([]);
+  const [billingStatements, setBillingStatements] = useState([]);
   const [hasMadePayments, setHasMadePayments] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("yearToDate");
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const fetchBalanceSummary = async () => {
     try {
@@ -46,13 +57,29 @@ export default function BillingPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setCurrentAndPastDueBalance(response.data.currentAndPastDueBalance);
-      setLastPaymentInformation(lastPaymentResponse.data.lastPayment);
+      const balanceData = response.data.currentAndPastDueBalance || {
+        currentBalance: 0,
+        pastDueBalance: 0,
+      };
+      const lastPaymentData = lastPaymentResponse.data.lastPayment || {
+        lastPaymentAmount: "N/A",
+        lastPaymentDate: "No payment made",
+      };
+
+      setCurrentAndPastDueBalance(balanceData);
+      setLastPaymentInformation(lastPaymentData);
+
+      // Check balanceData directly
+      if (balanceData.currentBalance > 0 || balanceData.pastDueBalance > 0) {
+        await fetchOfficeInformation();
+      } else {
+        setOfficeInformation(null);
+      }
     } catch (error) {
       console.error("Error fetching current and past due balances:", error);
-      // Optionally, you can set an error state to display an error message to the user
     }
   };
+
   const fetchPatientInformation = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -76,17 +103,84 @@ export default function BillingPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setOfficeInformation(response.data.officeInfo);
+      const officeInfo = response.data.officeInfo || null;
+      setOfficeInformation(officeInfo);
     } catch (error) {
       console.error("Error fetching office information:", error);
     }
   };
+  const fetchRecentPayments = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/billing/recent-payments",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.recentPayments.length === 0) {
+        setPreviousPayments([]);
+        setHasMadePayments(false);
+      } else {
+        setPreviousPayments(response.data.recentPayments);
+        setHasMadePayments(true);
+      }
+    } catch (error) {
+      console.error("Error fetching payment history:", error);
+    }
+  };
+
+  const fetchBillingStatements = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      let url;
+
+      switch (selectedFilter) {
+        case "yearToDate":
+          url = "http://localhost:3000/auth/patient/billing/details/ytd";
+          break;
+        case "lastYear":
+          url = "http://localhost:3000/auth/patient/billing/details/last-year";
+          break;
+        case "dateRange":
+          url =
+            '"http://localhost:3000/auth/patient/billing/details/date-range"';
+          break;
+        default:
+          url = "http://localhost:3000/auth/patient/billing/details/ytd";
+      }
+
+      const response = axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setBillingStatements(response.data.statements);
+    } catch (error) {}
+  };
+
+  const handleDateRangeSubmit = () => {
+    if (startDate && endDate) {
+      fetchBillingStatements();
+    } else {
+      alert("Please select both start and end dates.");
+    }
+  };
+
+  //useEffect for the 'Overview' tab
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchBalanceSummary();
+      await fetchPatientInformation();
+      await fetchRecentPayments();
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
-    fetchBalanceSummary();
-    fetchPatientInformation();
-    fetchOfficeInformation();
-  }, []);
+    if (selectedFilter === "dateRange" && (!startDate || !endDate)) return;
+
+    fetchBillingStatements();
+  }, [selectedFilter, startDate, endDate]);
 
   const recentPayments = [
     { id: 1, date: "2023-06-15", amount: 200.0 },
@@ -149,9 +243,9 @@ export default function BillingPage() {
                           </p>
                           <p
                             className={
-                              currentAndPastDueBalance.pastDueBalance !== 0.0
-                                ? `text-2xl font-semibold text-black`
-                                : `text-2xl font-semibold text-red-600`
+                              currentAndPastDueBalance.pastDueBalance > 0
+                                ? `text-2xl font-semibold text-red-600`
+                                : `text-2xl font-semibold text-black`
                             }
                           >
                             ${currentAndPastDueBalance.pastDueBalance}
@@ -172,13 +266,16 @@ export default function BillingPage() {
                             Last Payment Date
                           </p>
                           <p className="text-2xl font-semibold">
-                            {new Date(
-                              lastPaymentInformation.lastPaymentDate
-                            ).toLocaleDateString("en-US", {
-                              month: "2-digit",
-                              day: "2-digit",
-                              year: "numeric",
-                            })}
+                            {lastPaymentInformation.lastPaymentDate !==
+                            "No payment made"
+                              ? new Date(
+                                  lastPaymentInformation.lastPaymentDate
+                                ).toLocaleDateString("en-US", {
+                                  month: "2-digit",
+                                  day: "2-digit",
+                                  year: "numeric",
+                                })
+                              : lastPaymentInformation.lastPaymentDate}
                           </p>
                         </div>
                       </div>
@@ -191,17 +288,25 @@ export default function BillingPage() {
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-4">
-                        {recentPayments.map((payment) => (
+                        {previousPayments.map((payment) => (
                           <li
-                            key={payment.id}
+                            key={payment.paymentID}
                             className="flex justify-between items-center"
                           >
                             <div className="flex items-center">
                               <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                              <span>{payment.date}</span>
+                              <span>
+                                {new Date(
+                                  payment.paymentDate
+                                ).toLocaleDateString("en-US", {
+                                  month: "2-digit",
+                                  day: "2-digit",
+                                  year: "numeric",
+                                })}
+                              </span>
                             </div>
                             <span className="font-semibold">
-                              ${payment.amount.toFixed(2)}
+                              ${payment.amount}
                             </span>
                           </li>
                         ))}
@@ -269,61 +374,114 @@ export default function BillingPage() {
                     </CardContent>
                   </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Office Information</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        <li className="flex items-start">
-                          <Building className="w-4 h-4 mr-2 mt-1 text-gray-400" />
-                          <div>
-                            <p className="font-semibold">
-                              {officeInformation.officeName}
-                            </p>
+                  {officeInformation && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Office Information</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-2">
+                          <li className="flex items-start">
+                            <Building className="w-4 h-4 mr-2 mt-1 text-gray-400" />
+                            <div>
+                              <p className="font-semibold">
+                                {officeInformation.officeName}
+                              </p>
+                              <p className="text-sm">
+                                {officeInformation.addrStreet},{" "}
+                                {officeInformation.addrcity}{" "}
+                                {officeInformation.addrState},{" "}
+                                {officeInformation.addrZip}
+                              </p>
+                            </div>
+                          </li>
+                          <li className="flex items-center">
+                            <Phone className="w-4 h-4 mr-2 text-gray-400" />
                             <p className="text-sm">
-                              {officeInformation.addrStreet +
-                                ", " +
-                                officeInformation.addrcity +
-                                " " +
-                                officeInformation.addrState +
-                                ", " +
-                                officeInformation.addrZip}
+                              {officeInformation.officePhoneNumber
+                                ? `${officeInformation.officePhoneNumber.slice(
+                                    0,
+                                    3
+                                  )}-${officeInformation.officePhoneNumber.slice(
+                                    3,
+                                    6
+                                  )}-${officeInformation.officePhoneNumber.slice(
+                                    6
+                                  )}`
+                                : "N/A"}
                             </p>
-                          </div>
-                        </li>
-                        <li className="flex items-center">
-                          <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                          <p className="text-sm">
-                            {officeInformation.officePhoneNumber
-                              ? officeInformation.officePhoneNumber.slice(
-                                  0,
-                                  3
-                                ) +
-                                "-" +
-                                officeInformation.officePhoneNumber.slice(
-                                  3,
-                                  6
-                                ) +
-                                "-" +
-                                officeInformation.officePhoneNumber.slice(6)
-                              : "N/A"}
-                          </p>
-                        </li>
-                        <li className="flex items-center">
-                          <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                          <p className="text-sm">
-                            {officeInformation.officeEmail}
-                          </p>
-                        </li>
-                      </ul>
-                    </CardContent>
-                  </Card>
+                          </li>
+                          <li className="flex items-center">
+                            <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                            <p className="text-sm">
+                              {officeInformation.officeEmail}
+                            </p>
+                          </li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               </div>
             </TabsContent>
 
             <TabsContent value="details">
+              <div className="space-y-4">
+                <div className="flex space-x-4">
+                  <button
+                    className={`px-4 py-2 rounded ${
+                      selectedFilter === "yearToDate"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                    }`}
+                    onClick={() => setSelectedFilter("yearToDate")}
+                  >
+                    Year to Date
+                  </button>
+                  <button
+                    className={`px-4 py-2 rounded ${
+                      selectedFilter === "lastYear"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                    }`}
+                    onClick={() => setSelectedFilter("lastYear")}
+                  >
+                    Last Year
+                  </button>
+                  <button
+                    className={`px-4 py-2 rounded ${
+                      selectedFilter === "dateRange"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                    }`}
+                    onClick={() => setSelectedFilter("dateRange")}
+                  >
+                    Date Range
+                  </button>
+                </div>
+                {selectedFilter === "dateRange" && (
+                  <div className="flex space-x-4 mt-4">
+                    <input
+                      type="date"
+                      className="border rounded px-2 py-1"
+                      value={startDate || ""}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                    <input
+                      type="date"
+                      className="border rounded px-2 py-1"
+                      value={endDate || ""}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                    <button
+                      className="px-4 py-2 bg-green-500 text-white rounded"
+                      onClick={handleDateRangeSubmit}
+                    >
+                      Apply
+                    </button>
+                  </div>
+                )}
+              </div>
               <Card>
                 <CardHeader>
                   <CardTitle>Billing Details</CardTitle>
