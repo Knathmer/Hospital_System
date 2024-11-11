@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'; // Updated import
 import { format } from 'date-fns';
-
+import { Link } from 'react-router-dom';
 
 const DoctorBookingPage = () => {
   const [appointments, setAppointments] = useState([]);
@@ -155,7 +155,12 @@ const DoctorBookingPage = () => {
                       {format(new Date(appointment.appointmentDateTime), 'HH:mm')}
                     </td>
                     <td className="p-2">
-                      {`${appointment.patientFirstName} ${appointment.patientLastName}`}
+                      <Link
+                        to={`/doctor/patient/${appointment.patientID}`}
+                        className="text-pink-500 hover:underline"
+                      >
+                        {`${appointment.patientFirstName} ${appointment.patientLastName}`}
+                      </Link>
                     </td>
                     <td className="p-2">{appointment.reason}</td>
                     <td className="p-2">
