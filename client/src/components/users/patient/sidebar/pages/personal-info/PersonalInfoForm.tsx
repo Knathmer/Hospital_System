@@ -68,7 +68,8 @@ export default function PersonalInfoForm() {
     state: "",
     zipCode: "",
     country: "",
-    emergencyContactName: "",
+    emergencyContactFirstName: "",
+    emergencyContactLastName: "",
     emergencyContactRelationship: "",
     emergencyContactPhone: "",
     emergencyContactEmail: "",
@@ -114,7 +115,8 @@ export default function PersonalInfoForm() {
         pEContact = pEContact[0];
         setFormData((prevData) => ({
           ...prevData,
-          emergencyContactName: `${pEContact.firstName} ${pEContact.lastName}`,
+          emergencyContactFirstName: pEContact.firstName,
+          emergencyContactLastName: pEContact.lastName,
           emergencyContactRelationship: pEContact.relationship,
           emergencyContactPhone: pEContact.emergencyPhoneNumber,
           emergencyContactEmail: pEContact.emergencyEmail,
@@ -376,14 +378,29 @@ export default function PersonalInfoForm() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <Label
-                      htmlFor="emergencyContactName"
+                      htmlFor="emergencyContactFirstName"
                       className="text-sm font-medium text-gray-700"
                     >
-                      Name
+                      First Name
                     </Label>
                     <Input
-                      id="emergencyContactName"
-                      value={formData.emergencyContactName}
+                      id="emergencyContactFirstName"
+                      value={formData.emergencyContactFirstName}
+                      className="mt-1"
+                      required
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="emergencyContactLastName"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Last Name
+                    </Label>
+                    <Input
+                      id="emergencyContactLastName"
+                      value={formData.emergencyContactLastName}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -415,6 +432,22 @@ export default function PersonalInfoForm() {
                       id="emergencyContactPhone"
                       value={formData.emergencyContactPhone}
                       type="tel"
+                      className="mt-1"
+                      required
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="emergencyContactEmail"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Email
+                    </Label>
+                    <Input
+                      id="emergencyContactEmail"
+                      type="email"
+                      value={formData.emergencyContactEmail}
                       className="mt-1"
                       required
                       disabled={!isEditing}
