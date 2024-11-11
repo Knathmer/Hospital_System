@@ -6,6 +6,7 @@ import {
   PillBottle,
   CreditCard,
   ShieldPlus,
+  User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -22,6 +23,7 @@ import InsurancePage from "../users/patient/sidebar/pages/insurance/InsurancePag
 
 import BookPage from "../users/patient/BookPage.jsx";
 import MedicalHistoryPage from "../users/patient/sidebar/pages/medical-history/MedicalHistoryPageState.jsx";
+import PersonalInfoForm from "../users/patient/sidebar/pages/personal-info/PersonalInfoForm.tsx";
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -34,6 +36,7 @@ export default function PatientSidebar() {
       { id: "appointments", label: "Appointments", icon: Calendar },
       { id: "medical-records", label: "Medical Records", icon: FileText },
       { id: "medication", label: "Medication", icon: PillBottle },
+      { id: "personal-info", label: "Personal Info", icon: User },
     ],
     "Billing & Payments": [
       { id: "billing", label: "Billing", icon: CreditCard },
@@ -47,7 +50,7 @@ export default function PatientSidebar() {
       <aside
         className={`transform transition-transform duration-300 fixed h-screen z-50 ${
           isSidebarVisible ? "translate-x-0 w-64" : "-translate-x-64 w-0"
-        } bg-white border-r flex flex-col justify-between`}
+        } bg-white border-r flex flex-col justify-between overflow-y-auto`}
       >
         <div>
           <div className="p-4 border-b">
@@ -102,10 +105,10 @@ export default function PatientSidebar() {
           isSidebarVisible ? "ml-64" : "ml-0"
         }`}
       >
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        {/* <h1 className="text-3xl font-bold text-gray-900 mb-6">
           {activeTab.charAt(0).toUpperCase() +
             activeTab.slice(1).replace("-", " ")}
-        </h1>
+        </h1> */}
 
         {/* Link pages here according to sidebar items */}
         {activeTab === "dashboard" && (
@@ -127,6 +130,11 @@ export default function PatientSidebar() {
         {activeTab === "medical-records" && (
           <div>
             <MedicalHistoryPage />
+          </div>
+        )}
+        {activeTab === "personal-info" && (
+          <div>
+            <PersonalInfoForm />
           </div>
         )}
       </main>
