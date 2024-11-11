@@ -14,16 +14,14 @@ import DefaultButton from "../../../../../ui/buttons/DefaultButton";
 
 import axios from "axios";
 
-// Mock function to fetch insurance data
 const fetchInsuranceData = async () => {
-  //Simulating API call
   try {
     const token = localStorage.getItem("token");
 
     if (!token) {
       throw new Error("No token found");
     }
-    // Fetch insurance information from the server (replace with your API endpoint)
+    // Fetch insurance information
     const response = await axios.get(
       "http://localhost:3000/auth/patient/insurance-info",
       {
@@ -31,7 +29,7 @@ const fetchInsuranceData = async () => {
           Authorization: `Bearer ${token}`,
         },
       }
-    ); // Adjust the endpoint as needed
+    );
     console.log("insur select result:", response.data);
     return response.data.data;
   } catch (error) {
@@ -178,34 +176,6 @@ export default function EditInsuranceForm() {
 
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
-      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-sm">
-        <Link className="flex items-center justify-center" to="#">
-          <Heart className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">
-            WomenWell
-          </span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
-          >
-            Dashboard
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
-          >
-            Appointments
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
-          >
-            Profile
-          </Link>
-        </nav>
-      </header>
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <Link
@@ -541,7 +511,7 @@ export default function EditInsuranceForm() {
           </form>
         </div>
       </main>
-      <footer className="bg-white border-t py-6 px-4 md:px-6">
+      {/* <footer className="bg-white border-t py-6 px-4 md:px-6">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between">
           <p className="text-xs text-gray-500">
             © 2024 WomenWell. All rights reserved.
@@ -558,7 +528,7 @@ export default function EditInsuranceForm() {
             </Link>
           </nav>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }
