@@ -67,7 +67,7 @@ export default function PersonalInfoForm() {
     city: "",
     state: "",
     zipCode: "",
-    country: "",
+    //country: "",
     emergencyContactFirstName: "",
     emergencyContactLastName: "",
     emergencyContactRelationship: "",
@@ -136,11 +136,54 @@ export default function PersonalInfoForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const [error, setError] = useState("");
+
+  const updatePersonalInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      const response = await axios.put(
+        "http://localhost:3000/auth/patient/update-personal-info",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200 && response.data) {
+        console.log("Update Personal info Successful!");
+      } else {
+        setError("Update Personal Info failed. Please try again.");
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+      console.error("Personal Info error:", error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically send the formData to your backend
+
     console.log("Form submitted:", formData);
-    // You can add your API call here
+    updatePersonalInfo();
+
+    setError("");
+
+    setIsEditing(false);
   };
 
   return (
@@ -173,7 +216,7 @@ export default function PersonalInfoForm() {
                 )}
               </DefaultButton>
             </div>
-            <form className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-8">
               <section className="space-y-6">
                 <h2 className="text-xl font-semibold text-gray-700 flex items-center">
                   <User className="h-5 w-5 mr-2 text-pink-500" />
@@ -189,8 +232,10 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="firstName"
+                      name="firstName"
                       value={formData.firstName}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -204,8 +249,10 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="lastName"
+                      name="lastName"
                       value={formData.lastName}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -219,9 +266,11 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="dateOfBirth"
+                      name="dateOfBirth"
                       value={formData.dateOfBirth}
                       type="date"
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -261,8 +310,10 @@ export default function PersonalInfoForm() {
                     <Input
                       id="email"
                       type="email"
+                      name="email"
                       value={formData.email}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -276,10 +327,12 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="phone"
+                      name="phone"
                       type="tel"
                       value={formData.phone}
                       className="mt-1"
                       required
+                      onChange={handleChange}
                       disabled={!isEditing}
                     />
                   </div>
@@ -301,8 +354,10 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="streetAddress"
+                      name="streetAddress"
                       value={formData.streetAddress}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -316,8 +371,10 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="city"
+                      name="city"
                       value={formData.city}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -331,8 +388,10 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="state"
+                      name="state"
                       value={formData.state}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -346,13 +405,15 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="zipCode"
+                      name="zipCode"
                       value={formData.zipCode}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <Label
                       htmlFor="country"
                       className="text-sm font-medium text-gray-700"
@@ -361,12 +422,14 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="country"
+                      name="country"
                       value={formData.country}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
-                  </div>
+                  </div> */}
                 </div>
               </section>
 
@@ -385,8 +448,10 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="emergencyContactFirstName"
+                      name="emergencyContactFirstName"
                       value={formData.emergencyContactFirstName}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -400,8 +465,10 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="emergencyContactLastName"
+                      name="emergencyContactLastName"
                       value={formData.emergencyContactLastName}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -415,8 +482,10 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="emergencyContactRelationship"
+                      name="emergencyContactRelationship"
                       value={formData.emergencyContactRelationship}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -430,9 +499,11 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="emergencyContactPhone"
+                      name="emergencyContactPhone"
                       value={formData.emergencyContactPhone}
                       type="tel"
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
@@ -447,8 +518,10 @@ export default function PersonalInfoForm() {
                     <Input
                       id="emergencyContactEmail"
                       type="email"
+                      name="emergencyContactEmail"
                       value={formData.emergencyContactEmail}
                       className="mt-1"
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                     />
