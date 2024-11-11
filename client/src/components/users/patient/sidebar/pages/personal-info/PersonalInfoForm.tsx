@@ -22,7 +22,38 @@ import Input from "../../../../../ui/Input";
 import Checkbox from "../../../../../ui/Checkbox";
 import DefaultButton from "../../../../../ui/buttons/DefaultButton";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
+
+import axios from "axios";
 // import Link from "next/link"
+
+const fetchPersonalInfoData = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("No token found");
+    }
+    // Fetch insurance information
+    const response = await axios.get(
+      "http://localhost:3000/auth/patient/personal-info",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("Personal Info Select Result:", response.data.data);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching personal info:", error);
+  }
+};
+
+const formatDateForInput = (dateString) => {
+  if (!dateString) return ""; // Handle empty case
+  const date = new Date(dateString);
+  return date.toISOString().split("T")[0]; // Returns YYYY-MM-DD
+};
 
 export default function PersonalInfoForm() {
   const [formData, setFormData] = useState({
@@ -40,30 +71,59 @@ export default function PersonalInfoForm() {
     emergencyContactName: "",
     emergencyContactRelationship: "",
     emergencyContactPhone: "",
+    emergencyContactEmail: "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
-    // const loadInsuranceData = async () => {
-    //   let data = await fetchInsuranceData();
+    const loadPersonalInfoData = async () => {
+      let data = await fetchPersonalInfoData();
 
-    //   data = data[0];
-    //   console.log(`data: ${data[0]}`);
-    //   if (data) {
-    //     setFormData((prevData) => ({
-    //       ...prevData,
-    //       providerName: data.providerName || "",
-    //       policyNum: data.policy_number || "",
-    //       covDetails: data.coverageDetails || "",
-    //       covExpDate: formatDateForInput(data.coverage_expiration_date) || "",
-    //     }));
-    //   }
-    // };
-    // if (!isEditing) {
-    //   loadInsuranceData();
-    // }
+      let pInfo = data[0];
+      let pAddr = data[1];
+      let pEContact = data[2];
 
-    !isEditing;
+      console.log("pInfo: ", pInfo[0]);
+      if (pInfo.length > 0) {
+        pInfo = pInfo[0];
+        setFormData((prevData) => ({
+          ...prevData,
+          firstName: pInfo.firstName,
+          lastName: pInfo.lastName,
+          dateOfBirth: formatDateForInput(pInfo.dateOfBirth),
+          gender: pInfo.gender,
+          email: pInfo.email,
+          phone: pInfo.phoneNumber,
+        }));
+      }
+
+      console.log("pAddr: ", pAddr[0]);
+      if (pAddr.length > 0) {
+        pAddr = pAddr[0];
+        setFormData((prevData) => ({
+          ...prevData,
+          streetAddress: pAddr.addrStreet || "",
+          city: pAddr.addrCity || "",
+          state: pAddr.addrState || "",
+          zipCode: pAddr.addrZip || "",
+        }));
+      }
+
+      console.log("pEContact: ", pEContact[0]);
+      if (pEContact.length > 0) {
+        pEContact = pEContact[0];
+        setFormData((prevData) => ({
+          ...prevData,
+          emergencyContactName: `${pEContact.firstName} ${pEContact.lastName}`,
+          emergencyContactRelationship: pEContact.relationship,
+          emergencyContactPhone: pEContact.emergencyPhoneNumber,
+          emergencyContactEmail: pEContact.emergencyEmail,
+        }));
+      }
+    };
+    if (!isEditing) {
+      loadPersonalInfoData();
+    }
   }, [!isEditing]);
 
   const handleChange = (e) => {
@@ -127,6 +187,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="firstName"
+                      value={formData.firstName}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -141,6 +202,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="lastName"
+                      value={formData.lastName}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -155,6 +217,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="dateOfBirth"
+                      value={formData.dateOfBirth}
                       type="date"
                       className="mt-1"
                       required
@@ -171,8 +234,8 @@ export default function PersonalInfoForm() {
                     <select
                       id="gender"
                       name="gender"
-                      // value={formData.gender}
-                      // onChange={handleChange}
+                      value={formData.gender}
+                      onChange={handleChange}
                       required
                       disabled={!isEditing}
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
@@ -196,6 +259,7 @@ export default function PersonalInfoForm() {
                     <Input
                       id="email"
                       type="email"
+                      value={formData.email}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -211,6 +275,7 @@ export default function PersonalInfoForm() {
                     <Input
                       id="phone"
                       type="tel"
+                      value={formData.phone}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -234,6 +299,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="streetAddress"
+                      value={formData.streetAddress}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -248,6 +314,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="city"
+                      value={formData.city}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -262,6 +329,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="state"
+                      value={formData.state}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -276,6 +344,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="zipCode"
+                      value={formData.zipCode}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -290,6 +359,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="country"
+                      value={formData.country}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -313,6 +383,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="emergencyContactName"
+                      value={formData.emergencyContactName}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -327,6 +398,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="emergencyContactRelationship"
+                      value={formData.emergencyContactRelationship}
                       className="mt-1"
                       required
                       disabled={!isEditing}
@@ -341,6 +413,7 @@ export default function PersonalInfoForm() {
                     </Label>
                     <Input
                       id="emergencyContactPhone"
+                      value={formData.emergencyContactPhone}
                       type="tel"
                       className="mt-1"
                       required

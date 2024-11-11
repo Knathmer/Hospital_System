@@ -14,16 +14,14 @@ import DefaultButton from "../../../../../ui/buttons/DefaultButton";
 
 import axios from "axios";
 
-// Mock function to fetch insurance data
 const fetchInsuranceData = async () => {
-  //Simulating API call
   try {
     const token = localStorage.getItem("token");
 
     if (!token) {
       throw new Error("No token found");
     }
-    // Fetch insurance information from the server (replace with your API endpoint)
+    // Fetch insurance information
     const response = await axios.get(
       "http://localhost:3000/auth/patient/insurance-info",
       {
@@ -31,7 +29,7 @@ const fetchInsuranceData = async () => {
           Authorization: `Bearer ${token}`,
         },
       }
-    ); // Adjust the endpoint as needed
+    );
     console.log("insur select result:", response.data);
     return response.data.data;
   } catch (error) {

@@ -19,6 +19,7 @@ import {
   removeMedHistory,
   updateMedHistory,
 } from "../../controllers/patient/patientEditMedicalHistoryController.js";
+import { hasPersonalInfo } from "../../controllers/patient/patientPersonalInfoController.js";
 // import { de } from "date-fns/locale";
 
 const router = express.Router();
@@ -30,6 +31,7 @@ router.get("/insurance-info", hasInsuranceInfo);
 router.put("/update-insurance", updateInsurance);
 router.delete("/remove-medical-history", removeMedHistory);
 router.post("/update-medical-history", updateMedHistory);
+router.get("/personal-info", hasPersonalInfo);
 
 //Since medications will have many sub routes, create a sub router for the path "/auth/patient/medications/*"
 router.use("/medications", medicationRouter);
