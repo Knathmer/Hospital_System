@@ -176,34 +176,6 @@ export default function EditInsuranceForm() {
 
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
-      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-sm">
-        <Link className="flex items-center justify-center" to="#">
-          <Heart className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">
-            WomenWell
-          </span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
-          >
-            Dashboard
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
-          >
-            Appointments
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
-          >
-            Profile
-          </Link>
-        </nav>
-      </header>
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <Link
