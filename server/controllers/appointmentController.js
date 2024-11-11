@@ -183,29 +183,28 @@ export async function getDoctorAppointments(req, res) {
 export async function updateAppointment(req, res) {
     const doctorID = req.user.doctorID;
     if (!doctorID) {
-        return res.status(401).json({ error: "Doctor must be logged in" });
+      return res.status(401).json({ error: "Doctor must be logged in" });
     }
-
-    const { appointmentID, reason, status } = req.body;
-
+  
+    const { appointmentID, status } = req.body;
+  
     try {
-        // Update the appointment if it belongs to the doctor
-        const result = await query(
-            `UPDATE appointment SET reason = ?, status = ?
-             WHERE appointmentID = ? AND doctorID = ?`,
-            [reason, status, appointmentID, doctorID]
-        );
-
-        if (result.affectedRows > 0) {
-            res.json({ message: 'Appointment updated successfully' });
-        } else {
-            res.status(404).json({ error: 'Appointment not found or not authorized' });
-        }
+      const result = await query(
+        `UPDATE appointment SET status = ? WHERE appointmentID = ? AND doctorID = ?`,
+        [status, appointmentID, doctorID]
+      );
+  
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Appointment updated successfully' });
+      } else {
+        res.status(404).json({ error: 'Appointment not found or not authorized' });
+      }
     } catch (error) {
-        console.error('Error updating appointment:', error);
-        res.status(500).json({ error: 'Error updating appointment' });
+      console.error('Error updating appointment:', error);
+      res.status(500).json({ error: 'Error updating appointment' });
     }
-}
+  }
+  
 
 // Function to get unique office locations
 export async function getLocations(req, res) {
