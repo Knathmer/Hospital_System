@@ -175,7 +175,7 @@ export default function EditInsuranceForm() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-pink-50">
+    <div className="flex flex-col min-h-screen bg-pink-50 shadow-2xl rounded-lg">
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="p-6 sm:p-10">

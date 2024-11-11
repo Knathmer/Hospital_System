@@ -108,7 +108,7 @@ export default function MedicalHistoryForm() {
     }
   };
   return (
-    <div className="flex flex-col min-h-screen bg-pink-50">
+    <div className="flex flex-col min-h-screen bg-pink-50 shadow-2xl rounded-lg">
       <NavbarPatient linkTo={"/patient/dashboard?tab=dashboard"} />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
