@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Syringe, Trash2 } from "lucide-react";
 import Input from "../../../../../../ui/Input";
 import DefaultButton from "../../../../../../ui/buttons/DefaultButton";
 
@@ -14,7 +14,10 @@ const Vaccines = ({ vaccines, setVaccines }) => {
   };
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Vaccination History</h2>
+      <h2 className="text-xl font-semibold flex items-center">
+        <Syringe className="h-5 w-5 mr-2 text-pink-500" />
+        Vaccination History
+      </h2>
       {vaccines.map((vaccine, index) => (
         <div key={index} className="flex items-center space-x-2">
           <Input

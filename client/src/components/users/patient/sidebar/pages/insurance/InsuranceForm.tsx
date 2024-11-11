@@ -1,6 +1,6 @@
 // md:grid-cols-2
 import React, { useState, useEffect } from "react";
-import { Heart, ArrowLeft } from "lucide-react";
+import { Heart, ArrowLeft, ShieldPlus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Label from "../../../../../ui/Label";
 import Input from "../../../../../ui/Input";
@@ -88,8 +88,12 @@ export default function InsuranceForm() {
             </Link>
             <h1 className="text-3xl font-bold mb-6">Insurance Information</h1>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Primary Insurance</h2>
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold flex items-center">
+                  {" "}
+                  <ShieldPlus className="h-5 w-5 mr-2 text-pink-500" />
+                  Primary Insurance
+                </h2>
                 <div className="grid grid-cols-1  gap-4 ">
                   <div>
                     <Label htmlFor="insuranceProvider">

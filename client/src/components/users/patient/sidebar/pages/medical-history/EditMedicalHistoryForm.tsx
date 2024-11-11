@@ -1,4 +1,17 @@
-import { Heart, ArrowLeft, Plus, Trash2, Edit2 } from "lucide-react";
+import {
+  Heart,
+  ArrowLeft,
+  Plus,
+  Trash2,
+  Edit2,
+  FileText,
+  Users,
+  Pill,
+  Syringe,
+  Stethoscope,
+  Activity,
+  AlertCircle,
+} from "lucide-react";
 
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
@@ -481,7 +494,8 @@ export default function EditMedicalHistoryForm() {
             </div> */}
 
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">
+                <h2 className="text-xl font-semibold flex items-center">
+                  <Users className="h-5 w-5 mr-2 text-pink-500" />
                   Family Medical History
                 </h2>
                 <div className="space-y-2">
@@ -517,7 +531,10 @@ export default function EditMedicalHistoryForm() {
               </div>
 
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Allergies</h2>
+                <h2 className="text-xl font-semibold flex items-center">
+                  <AlertCircle className="h-5 w-5 mr-2 text-pink-500" />
+                  Allergies
+                </h2>
                 {allergies.map((allergy, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <Input
@@ -598,7 +615,10 @@ export default function EditMedicalHistoryForm() {
               </div>
 
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Current Medications</h2>
+                <h2 className="text-xl font-semibold flex items-center">
+                  <Pill className="h-5 w-5 mr-2 text-pink-500" />
+                  Current Medications
+                </h2>
                 {medications.map((medication, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <Input
@@ -648,7 +668,10 @@ export default function EditMedicalHistoryForm() {
               </div>
 
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Vaccination History</h2>
+                <h2 className="text-xl font-semibold flex items-center">
+                  <Syringe className="h-5 w-5 mr-2 text-pink-500" />
+                  Vaccination History
+                </h2>
                 {vaccines.map((vaccine, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <Input
@@ -722,7 +745,8 @@ export default function EditMedicalHistoryForm() {
               </div>
 
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">
+                <h2 className="text-xl font-semibold flex items-center">
+                  <Activity className="h-5 w-5 mr-2 text-pink-500" />
                   Disability Information
                 </h2>
                 {disabilities.map((disability, index) => (
@@ -787,7 +811,10 @@ export default function EditMedicalHistoryForm() {
               </div>
 
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Previous Surgeries</h2>
+                <h2 className="text-xl font-semibold flex items-center">
+                  <Stethoscope className="h-5 w-5 mr-2 text-pink-500" />
+                  Previous Surgeries
+                </h2>
                 {surgeries.map((surgery, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <Input

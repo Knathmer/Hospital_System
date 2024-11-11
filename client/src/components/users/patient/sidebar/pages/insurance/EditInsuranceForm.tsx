@@ -9,7 +9,7 @@ import SelectItem from "../../../../../ui/select/SelectItem";
 import Checkbox from "../../../../../ui/Checkbox";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
 
-import { Heart, ArrowLeft, Edit2 } from "lucide-react";
+import { Heart, ArrowLeft, Edit2, ShieldPlus } from "lucide-react";
 import DefaultButton from "../../../../../ui/buttons/DefaultButton";
 
 import axios from "axios";
@@ -203,8 +203,12 @@ export default function EditInsuranceForm() {
               </DefaultButton>
             </div>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Primary Insurance</h2>
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold flex items-center">
+                  {" "}
+                  <ShieldPlus className="h-5 w-5 mr-2 text-pink-500" />
+                  Primary Insurance
+                </h2>
                 <div className="grid grid-cols-1  gap-4">
                   <div>
                     <Label htmlFor="insuranceProvider">
