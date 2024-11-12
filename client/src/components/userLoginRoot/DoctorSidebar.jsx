@@ -11,6 +11,7 @@ import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar';
 import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
 
 // Files Linked
+import DoctorDashboard from '../users/doctor/DoctorDashboard';
 import DoctorBookingPage from '../users/doctor/DoctorBookingPage.jsx';
 import DoctorDashboard from '../users/doctor/DoctorDashboard.jsx';
 
