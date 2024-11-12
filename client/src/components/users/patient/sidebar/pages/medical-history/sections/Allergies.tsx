@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { AlertCircle, Plus, Trash2 } from "lucide-react";
 import Input from "../../../../../../ui/Input";
 import DefaultButton from "../../../../../../ui/buttons/DefaultButton";
 import Select from "../../../../../../ui/select/Select";
@@ -16,7 +16,10 @@ const Allergies = ({ allergies, setAllergies }) => {
   };
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Allergies</h2>
+      <h2 className="text-xl font-semibold flex items-center">
+        <AlertCircle className="h-5 w-5 mr-2 text-pink-500" />
+        Allergies
+      </h2>
       {allergies.map((allergy, index) => (
         <div key={index} className="flex items-center space-x-2">
           <Input

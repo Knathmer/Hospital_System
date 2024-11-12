@@ -244,10 +244,10 @@ export async function postVaccines(vaccineList, patientID) {
 export async function postSurgeries(surgeryList, patientID) {
   try {
     const surgeries = surgeryList.map((surgery) => [
-      surgery.name,
-      surgery.date,
-      surgery.doctor,
-      patientID,
+      surgery.name || null,
+      surgery.date || null,
+      patientID || null,
+      surgery.doctor || null,
     ]);
     console.log(`surgeries: ${surgeries}`);
     const insertResult = await bulkQuery(INSERT_SURGERY_QUERY, [surgeries]);

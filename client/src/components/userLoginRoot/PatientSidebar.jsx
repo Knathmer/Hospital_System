@@ -7,6 +7,7 @@ import {
   CreditCard,
   ShieldPlus,
   User,
+  Building,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -25,6 +26,8 @@ import InsurancePage from "../users/patient/sidebar/pages/insurance/InsurancePag
 import BookPage from "../users/patient/BookPage.jsx";
 import MedicalHistoryPage from "../users/patient/sidebar/pages/medical-history/MedicalHistoryPageState.jsx";
 import PersonalInfoForm from "../users/patient/sidebar/pages/personal-info/PersonalInfoForm.tsx";
+import ManagePharmaciesPage from "../../pages/patientPages/ManagePharmaciesPage.jsx";
+import PrescriptionPage from "../../pages/patientPages/PatientMedicationPage.jsx";
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -38,7 +41,7 @@ export default function PatientSidebar() {
       { id: "dashboard", label: "Dashboard", icon: Heart },
       { id: "appointments", label: "Appointments", icon: Calendar },
       { id: "medical-records", label: "Medical Records", icon: FileText },
-      { id: "medication", label: "Medication", icon: PillBottle },
+      { id: "medications", label: "Medications", icon: PillBottle },
       { id: "personal-info", label: "Personal Info", icon: User },
     ],
     "Billing & Payments": [
@@ -146,6 +149,11 @@ export default function PatientSidebar() {
         {activeTab === "medical-records" && (
           <div>
             <MedicalHistoryPage />
+          </div>
+        )}
+        {activeTab === "medications" && (
+          <div>
+            <PrescriptionPage />
           </div>
         )}
         {activeTab === "personal-info" && (

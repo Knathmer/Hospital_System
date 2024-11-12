@@ -2,10 +2,15 @@ import React from "react";
 import Label from "../../../../../../ui/Label";
 import Checkbox from "../../../../../../ui/Checkbox";
 
+import { Users } from "lucide-react";
+
 const FamilyHistory = () => {
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Family Medical History</h2>
+      <h2 className="text-xl font-semibold flex items-center">
+        <Users className="h-5 w-5 mr-2 text-pink-500" />
+        Family Medical History
+      </h2>
       <div className="space-y-2">
         <Label>
           Has anyone in your family been diagnosed with the following?
