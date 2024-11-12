@@ -15,7 +15,7 @@ const MainSection = () => {
           </p>
         </div>
         <div className="space-x-4">
-          <NavButton to="/book">Book Appointment</NavButton>
+          <NavButton to="/patient/dashboard?tab=appointments">Book Appointment</NavButton>
           <NavButton variant="outline">Learn More</NavButton>
         </div>
       </div>

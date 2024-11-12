@@ -64,6 +64,21 @@ const UpcomingAppointmentsDashboard = () => {
 
       {/* Fixed button */}
       <NavButton to="/book" className="mt-4 bg-pink-500 text-white hover:bg-pink-600">
+      <ul className="space-y-2">
+        <li>
+          <span className="font-medium">Annual Check-up</span>
+          <br />
+          <span className="text-sm text-gray-500">
+            May 15, 2024 at 10:00 AM
+          </span>
+        </li>
+        <li>
+          <span className="font-medium">Mammogram</span>
+          <br />
+          <span className="text-sm text-gray-500">June 3, 2024 at 2:00 PM</span>
+        </li>
+      </ul>
+      <NavButton to = "/patient/dashboard?tab=appointments" className="mt-4 bg-pink-500 text-white hover:bg-pink-600">
         Schedule Appointment
       </NavButton>
     </GenericContainer>

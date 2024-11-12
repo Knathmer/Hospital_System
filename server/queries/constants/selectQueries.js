@@ -59,18 +59,18 @@ export const GET_REFILL_HISTORY = `SELECT r.refillID, pr.medicationName, r.statu
                                    WHERE r.patientID = ?
                                    ORDER BY r.requestDate DESC;`;
 
-
 export const GET_PENDING_REQUESTS = `SELECT r.refillID, pr.medicationName, r.status, r.requestDate FROM refill AS r JOIN prescription AS pr ON r.prescriptionID = pr.prescriptionID WHERE r.patientID = ? AND r.status = 'Pending' ORDER BY r.requestDate DESC;`;
 
 // User Role's Names
 export const SELECT_PATIENT_NAMES =
   "SELECT firstName, lastName FROM patient WHERE patientID = ?";
 
-export const SELECT_DOCTOR_NAMES = 
- "SELECT firstName, lastName FROM doctor WHERE doctorID = ?";
+export const SELECT_DOCTOR_NAMES =
+  "SELECT firstName, lastName FROM doctor WHERE doctorID = ?";
 
- export const SELECT_ADMIN_NAMES =
+export const SELECT_ADMIN_NAMES =
   "SELECT firstName, lastName from admin WHERE adminID = ?";
+
 
 // Patient Dashboard (DB) Queries 
 export const SELECT_UPCOMING_APPOINTMENTS_DB = `
@@ -92,3 +92,36 @@ export const SELECT_RECENT_MED_REQ_DB = `SELECT status, requestDate FROM refill 
 
 export const SELECT_BILLING_DB = `SELECT dueDate, paidStatus FROM bill WHERE patientID = ?`;
 
+export const GET_CURRENT_PAST_BALANCE = `SELECT IFNULL(SUM(CASE WHEN paidStatus != 'Paid' THEN amount - paidAmount ELSE 0 END), 0) AS currentBalance, 
+                                        IFNULL(SUM(CASE WHEN dueDate < CURDATE() AND paidStatus = 'Overdue' THEN amount - paidAmount ELSE 0 END), 0) AS pastDueBalance
+                                        FROM bill 
+                                        WHERE patientID = ?;
+`;
+
+export const GET_LAST_PAYMENT_INFORMATION = `SELECT p.amount AS lastPaymentAmount, p.paymentDate AS lastPaymentDate 
+                                            FROM bill b LEFT JOIN payment p ON p.billID = b.billID 
+                                            WHERE b.patientID = ? 
+                                            ORDER BY p.paymentDate DESC LIMIT 1;`;
+
+export const GET_PATIENT_INFORMATION = `SELECT p.firstName, p.lastName, p.dateOfBirth, p.phoneNumber, p.email, 
+                                        a.addrStreet, a.addrcity, a.addrState, a.addrZip FROM patient AS p 
+                                        JOIN address AS a ON p.addressID = a.addressID WHERE p.patientID = ?;`;
+
+export const GET_OFFICE_INFORMATION = `SELECT o.officeName, o.officePhoneNumber, o.officeEmail, a.addrStreet, 
+                                      a.addrcity, a.addrState, a.addrZip
+                                      FROM office AS o
+                                      JOIN address AS a ON o.addressID = a.addressID
+                                      JOIN bill AS b ON o.officeID = b.officeID
+                                      WHERE b.patientID = ?;`;
+
+export const GET_RECENT_PAYMENTS = `SELECT p.paymentID, p.paymentDate, p.amount
+                                    FROM payment AS p
+                                    JOIN bill AS b ON p.billID = b.billID
+                                    WHERE b.patientID = ?
+                                    ORDER BY p.paymentDate DESC
+                                    LIMIT 5;`;
+
+export const GET_DETAILS_YTD = `SELECT b.billID, a.appointmentDateTime AS visitDate, COALESCE(vt.visitTypeName, 'N/A') AS visitType, s.serviceName AS serviceName, COALESCE(d.firstName, 'N/A') AS doctorFirstName, COALESCE(d.lastName, '') AS doctorLastName, p.firstName AS patientFirstName, p.lastName AS patientLastName, COALESCE(i.providerName, 'N/A') AS insuranceName, b.amount AS billedAmount, b.paidAmount, b.insuranceCoveredAmount, (b.amount - b.paidAmount) AS balance, b.paidStatus FROM bill b INNER JOIN appointment a ON b.appointmentID = a.appointmentID INNER JOIN patient p ON a.patientID = p.patientID INNER JOIN service s ON b.serviceID = s.serviceID LEFT JOIN doctor d ON a.doctorID = d.doctorID LEFT JOIN insurance i ON b.insuranceID = i.insuranceID LEFT JOIN visit_type vt ON a.visitTypeID = vt.visitTypeID WHERE b.patientID = ? AND DATE(a.appointmentDateTime) BETWEEN ? AND ? ORDER BY a.appointmentDateTime DESC;`;
+
+
+export const GET_PAYMENTS_STATEMENTS = `SELECT p.paymentDate, p.amount, p.payerType, p.paymentID FROM payment AS p JOIN bill AS b ON p.billID = b.billID WHERE b.patientID = ? AND DATE(p.paymentDate) BETWEEN ? AND ? ORDER BY p.paymentDate DESC;`;
