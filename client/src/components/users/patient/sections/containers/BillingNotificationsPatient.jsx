@@ -45,25 +45,27 @@ const BillingNotificationsPatientDashboard = () => {
         Billing Status
       </h2>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p className="text-red-500">Error: {error}</p>
-      ) : billingDashboard.length > 0 ? (
-        <ul className="space-y-2">
-          {billingDashboard.map((bill, index) => (
-            <li key={index}>
-              <span className="font-medium">Due Date: {new Date(bill.dueDate).toLocaleDateString()}</span>
-              <br />
-              <span className="text-sm text-gray-500">
-                Status: {bill.paidStatus ? "Paid" : "Unpaid"}
-              </span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-gray-500">No billing data available</p>
-      )}
+      <div className="overflow-y-auto" style={{ maxHeight: "150px" }}>
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="text-red-500">Error: {error}</p>
+        ) : billingDashboard.length > 0 ? (
+          <ul className="space-y-2">
+            {billingDashboard.map((bill, index) => (
+              <li key={index}>
+                <span className="font-medium">Due Date: {new Date(bill.dueDate).toLocaleDateString()}</span>
+                <br />
+                <span className="text-sm text-gray-500">
+                  Status: {bill.paidStatus ? "Paid" : "Unpaid"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500">No billing data available</p>
+        )}
+      </div>
 
       <NavButton variant="outline" className="mt-4">
         View All Billing Statements

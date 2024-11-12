@@ -16,11 +16,11 @@ const MedsDashboard = () => {
         const token = localStorage.getItem("token");
         const response = await axios.get("http://localhost:3000/dataFetch/get-meds-dashboard", {
           headers: {
-            Authorization: `Bearer ${token}`, 
+            Authorization: `Bearer ${token}`,
           },
         });
-        console.log("Fetched test results:", response.data); 
-        setTestResults(response.data); 
+        console.log("Fetched test results:", response.data);
+        setTestResults(response.data);
       } catch (error) {
         console.error("Error fetching test results:", error.response || error);
         setError("Failed to fetch medication results");
@@ -28,7 +28,7 @@ const MedsDashboard = () => {
         setLoading(false);
       }
     };
-  
+
     fetchTestResults();
   }, []);
 
@@ -39,28 +39,31 @@ const MedsDashboard = () => {
         Medication Status
       </h2>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p>Error: {error}</p>
-      ) : testResults.length > 0 ? (
-        <ul className="space-y-2">
-          {testResults.map((result, index) => (
-            <li key={index}>
-              <span className="text-sm text-gray-500">
-                Status: {result.status}
-              </span>
-              <br />
-              <span className="text-sm text-gray-500">
-                Request Date: {new Date(result.requestDate).toLocaleDateString()}
-              </span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-gray-500">No recent medication requests</p>
-      )}
+      <div className="overflow-y-auto" style={{ maxHeight: "150px" }}> 
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>Error: {error}</p>
+        ) : testResults.length > 0 ? (
+          <ul className="space-y-2">
+            {testResults.map((result, index) => (
+              <li key={index}>
+                <span className="text-sm text-gray-500">
+                  Status: {result.status}
+                </span>
+                <br />
+                <span className="text-sm text-gray-500">
+                  Request Date: {new Date(result.requestDate).toLocaleDateString()}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500">No recent medication requests</p>
+        )}
+      </div>
 
+      {/* Fixed button */}
       <NavButton variant="outline" className="mt-4">
         View All Results
       </NavButton>
