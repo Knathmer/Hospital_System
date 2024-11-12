@@ -105,4 +105,4 @@ export const GET_DETAILS_YTD = `SELECT b.billID, a.appointmentDateTime AS visitD
 
 export const GET_PAYMENTS_STATEMENTS = `SELECT p.paymentDate, p.amount, p.payerType, p.paymentID FROM payment AS p JOIN bill AS b ON p.billID = b.billID WHERE b.patientID = ? AND DATE(p.paymentDate) BETWEEN ? AND ? ORDER BY p.paymentDate DESC;`;
 
-export const GET_OUTSTANDING_BILLS = `SELECT b.billID, b.dueDate, (b.amount - b.paidAmount) AS outstandingBalance, s.serviceName, o.officeName FROM bill AS b INNER JOIN service s ON b.serviceID = s.serviceID INNER JOIN office o ON b.officeID = o.officeID WHERE b.patientID = ?;`;
+export const GET_OUTSTANDING_BILLS = `SELECT b.billID, b.dueDate, (b.amount - b.paidAmount) AS outstandingBalance, s.serviceName, o.officeName FROM bill AS b INNER JOIN service s ON b.serviceID = s.serviceID INNER JOIN office o ON b.officeID = o.officeID WHERE b.patientID = ? AND b.paidStatus <> 'Paid';`;

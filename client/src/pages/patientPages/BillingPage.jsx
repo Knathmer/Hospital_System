@@ -277,7 +277,48 @@ export default function BillingPage() {
     fetchOutstandingBills();
   }, []);
 
-  const handlePaymentSubmit = async () => {};
+  const handlePaymentSubmit = async () => {
+    try {
+      const amountToPay = parseFloat(paymentAmount);
+      const outstandingBalance = selectedBill.outstandingBalance;
+
+      if (amountToPay <= 0 || amountToPay > outstandingBalance) {
+        alert(
+          `Please enter a valid amount up to $${outstandingBalance.toFixed(2)}`
+        );
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:3000/auth/patient/billing/make-payment",
+        {
+          billID: selectedBill.billID,
+          amount: amountToPay,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        alert("Payment successful!");
+        // Refresh the outstanding bills and other relevant data
+        await fetchOutstandingBills();
+        await fetchBalanceSummary();
+        await fetchRecentPayments();
+        await fetchPaymentsTabStatements();
+        await fetchBillingStatements();
+
+        // Reset state
+        setSelectedBill(null);
+        setPaymentAmount("");
+      } else {
+        alert("Payment failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error making payment:", error);
+      alert("An error occurred while processing your payment.");
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
