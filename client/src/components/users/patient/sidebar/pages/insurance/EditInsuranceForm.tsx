@@ -9,7 +9,7 @@ import SelectItem from "../../../../../ui/select/SelectItem";
 import Checkbox from "../../../../../ui/Checkbox";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
 
-import { Heart, ArrowLeft, Edit2 } from "lucide-react";
+import { Heart, ArrowLeft, Edit2, ShieldPlus } from "lucide-react";
 import DefaultButton from "../../../../../ui/buttons/DefaultButton";
 
 import axios from "axios";
@@ -175,59 +175,66 @@ export default function EditInsuranceForm() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-pink-50">
+    <div className="flex flex-col min-h-screen bg-pink-50 shadow-2xl rounded-lg">
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <Link
-            to="/patient/dashboard?tab=dashboard"
-            className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Link>
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold mb-6">Insurance Information</h1>
-            <DefaultButton onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? (
-                <>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Cancel
-                </>
-              ) : (
-                <>
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Edit
-                </>
-              )}
-            </DefaultButton>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Primary Insurance</h2>
-              <div className="grid grid-cols-1  gap-4">
-                <div>
-                  <Label htmlFor="insuranceProvider">Insurance Provider</Label>
-                  <Input
-                    id="insuranceProvider"
-                    name="providerName"
-                    value={formData.providerName}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="policyNumber">Policy Number</Label>
-                  <Input
-                    id="policyNumber"
-                    name="policyNum"
-                    value={formData.policyNum}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    required
-                  />
-                </div>
-                {/* <div>
+        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="p-6 sm:p-10">
+            <Link
+              to="/patient/dashboard?tab=dashboard"
+              className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Link>
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-bold mb-6">Insurance Information</h1>
+              <DefaultButton onClick={() => setIsEditing(!isEditing)}>
+                {isEditing ? (
+                  <>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Cancel
+                  </>
+                ) : (
+                  <>
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Edit
+                  </>
+                )}
+              </DefaultButton>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold flex items-center">
+                  {" "}
+                  <ShieldPlus className="h-5 w-5 mr-2 text-pink-500" />
+                  Primary Insurance
+                </h2>
+                <div className="grid grid-cols-1  gap-4">
+                  <div>
+                    <Label htmlFor="insuranceProvider">
+                      Insurance Provider
+                    </Label>
+                    <Input
+                      id="insuranceProvider"
+                      name="providerName"
+                      value={formData.providerName}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="policyNumber">Policy Number</Label>
+                    <Input
+                      id="policyNumber"
+                      name="policyNum"
+                      value={formData.policyNum}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      required
+                    />
+                  </div>
+                  {/* <div>
                   <Label htmlFor="groupNumber">Group Number</Label>
                   <Input
                     id="groupNumber"
@@ -242,7 +249,7 @@ export default function EditInsuranceForm() {
                     disabled={!isEditing}
                   />
                 </div> */}
-                {/* <div>
+                  {/* <div>
                   <Label htmlFor="policyHolderName">Policy Holder Name</Label>
                   <Input
                     id="policyHolderName"
@@ -258,7 +265,7 @@ export default function EditInsuranceForm() {
                     required
                   />
                 </div> */}
-                {/* <div>
+                  {/* <div>
                   <Label htmlFor="policyHolderDOB">
                     Policy Holder Date of Birth
                   </Label>
@@ -277,7 +284,7 @@ export default function EditInsuranceForm() {
                     required
                   />
                 </div> */}
-                {/* <div>
+                  {/* <div>
                   <Label htmlFor="relationshipToPatient">
                     Relationship to Patient
                   </Label>
@@ -293,36 +300,36 @@ export default function EditInsuranceForm() {
                     <SelectItem value="other">Other</SelectItem>
                   </Select>
                 </div> */}
-                <div>
-                  <Label htmlFor="coverageDetails">Coverage Details</Label>
-                  <Input
-                    id="coverageDetails"
-                    name="covDetails"
-                    placeholder="e.g., PPO, HMO, etc."
-                    value={formData.covDetails}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="coverageExpirationDate">
-                    Coverage Expiration Date
-                  </Label>
-                  <Input
-                    id="coverageExpirationDate"
-                    name="covExpDate"
-                    type="date"
-                    value={formData.covExpDate}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    required
-                  />
+                  <div>
+                    <Label htmlFor="coverageDetails">Coverage Details</Label>
+                    <Input
+                      id="coverageDetails"
+                      name="covDetails"
+                      placeholder="e.g., PPO, HMO, etc."
+                      value={formData.covDetails}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="coverageExpirationDate">
+                      Coverage Expiration Date
+                    </Label>
+                    <Input
+                      id="coverageExpirationDate"
+                      name="covExpDate"
+                      type="date"
+                      value={formData.covExpDate}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      required
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* <div className="space-y-4">
+              {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Secondary Insurance</h2>
               <div>
                 <Label>Do you have secondary insurance?</Label>
@@ -403,7 +410,7 @@ export default function EditInsuranceForm() {
               )}
             </div> */}
 
-            {/* <div className="space-y-4">
+              {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Additional Information</h2>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
@@ -435,7 +442,7 @@ export default function EditInsuranceForm() {
               </div>
             </div> */}
 
-            {/* <div className="space-y-4">
+              {/* <div className="space-y-4">
               <h2 className="text-xl font-semibold">Emergency Contact</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -492,23 +499,24 @@ export default function EditInsuranceForm() {
               </div>
             </div> */}
 
-            <div className="flex justify-end space-x-4">
-              {isEditing && (
-                <>
-                  <DefaultButton
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsEditing(false)}
-                  >
-                    Cancel
-                  </DefaultButton>
-                  <DefaultButton type="submit">
-                    Update Insurance Information
-                  </DefaultButton>
-                </>
-              )}
-            </div>
-          </form>
+              <div className="flex justify-end space-x-4">
+                {isEditing && (
+                  <>
+                    <DefaultButton
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsEditing(false)}
+                    >
+                      Cancel
+                    </DefaultButton>
+                    <DefaultButton type="submit">
+                      Update Insurance Information
+                    </DefaultButton>
+                  </>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
       </main>
       {/* <footer className="bg-white border-t py-6 px-4 md:px-6">
