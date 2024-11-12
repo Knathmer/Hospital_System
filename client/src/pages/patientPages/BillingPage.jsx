@@ -613,6 +613,14 @@ export default function BillingPage() {
                           statusColor = "bg-gray-100 text-gray-800";
                       }
 
+                      const dueDate = new Date(
+                        statement.dueDate
+                      ).toLocaleDateString("en-US", {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                      });
+
                       return (
                         <div
                           key={statement.billID}
@@ -653,6 +661,7 @@ export default function BillingPage() {
                                   Primary Payer:{" "}
                                   {statement.insuranceName || "None"}
                                 </p>
+                                <p>Due Date: {dueDate}</p>
                               </div>
                             </div>
 
