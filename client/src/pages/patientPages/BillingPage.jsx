@@ -43,6 +43,7 @@ export default function BillingPage() {
   const [paymentsStatements, setPaymentsStatements] = useState([]);
   const [hasMadePayments, setHasMadePayments] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("yearToDate");
+  const [paymentsFilter, setPaymentsFilter] = useState("yearToDate");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [dateRangeApplied, setDateRangeApplied] = useState(false);
@@ -163,7 +164,7 @@ export default function BillingPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("Billing Statements Response:", response.data);
+      // console.log("Billing Statements Response:", response.data);
 
       setBillingStatements(response.data[dataKey] || []);
     } catch (error) {
@@ -204,6 +205,55 @@ export default function BillingPage() {
 
     fetchData();
   }, []);
+
+  //-------------Payments Fetch Functions and Hooks-----------------\\
+
+  const fetchPaymentsTabStatements = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      let url;
+      let dataKey;
+
+      switch (paymentsFilter) {
+        case "yearToDate":
+          url = "http://localhost:3000/auth/patient/billing/payments/ytd";
+          dataKey = "paymentsYTD";
+          break;
+        case "lastYear":
+          url = "http://localhost:3000/auth/patient/billing/payments/last-year";
+          dataKey = "paymentsLastYear";
+          break;
+        case "dateRange":
+          if (!startDate || !endDate) {
+            // Do not fetch if dates are not set
+            return;
+          }
+          url = `http://localhost:3000/auth/patient/billing/payments/date-range?startDate=${startDate}&endDate=${endDate}`;
+          dataKey = "paymentsDateRange";
+          break;
+        default:
+          url = "http://localhost:3000/auth/patient/billing/payments/ytd";
+      }
+
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setPaymentsStatements(response.data[dataKey] || []);
+    } catch (error) {
+      console.error("Error fetching payment statements:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (paymentsFilter === "dateRange" && dateRangeApplied) {
+      if (startDate && endDate) {
+        fetchPaymentsTabStatements();
+      }
+    } else if (paymentsFilter !== "dateRange") {
+      fetchPaymentsTabStatements();
+    }
+  }, [paymentsFilter, dateRangeApplied, startDate, endDate]);
 
   const date = new Date("2024-08-14");
   const month = date.toLocaleString("en-US", { month: "short" });
@@ -665,45 +715,144 @@ export default function BillingPage() {
                 </CardContent>
               </Card>
             </TabsContent>
-
+            {/*----------------------------PAYMENTS VIEW------------------------------------ */}
             <TabsContent value="payments">
+              <div className="space-y-6">
+                <div className="flex flex-wrap gap-4">
+                  <button
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      paymentsFilter === "yearToDate"
+                        ? "bg-pink-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                    onClick={() => setPaymentsFilter("yearToDate")}
+                  >
+                    Year to Date
+                  </button>
+                  <button
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      paymentsFilter === "lastYear"
+                        ? "bg-pink-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                    onClick={() => setPaymentsFilter("lastYear")}
+                  >
+                    Last Year
+                  </button>
+                  <button
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      paymentsFilter === "dateRange"
+                        ? "bg-pink-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                    onClick={() => setPaymentsFilter("dateRange")}
+                  >
+                    Date Range
+                  </button>
+                </div>
+                {paymentsFilter === "dateRange" && (
+                  <div className="flex flex-wrap gap-4 items-end">
+                    <div className="flex-1 min-w-[200px]">
+                      <label
+                        htmlFor="startDate"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Start Date
+                      </label>
+                      <input
+                        id="startDate"
+                        type="date"
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+                        value={startDate || ""}
+                        onChange={(e) => setStartDate(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-[200px]">
+                      <label
+                        htmlFor="endDate"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        End Date
+                      </label>
+                      <input
+                        id="endDate"
+                        type="date"
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+                        value={endDate || ""}
+                        onChange={(e) => setEndDate(e.target.value)}
+                      />
+                    </div>
+                    <button
+                      className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+                      onClick={handleDateRangeSubmit}
+                    >
+                      Apply
+                    </button>
+                  </div>
+                )}
+              </div>
               <Card className="overflow-hidden shadow-lg rounded-lg">
                 <CardHeader className="bg-gray-50 border-b border-gray-200">
                   <CardTitle className="text-lg font-semibold text-gray-800">
                     Payment History
                   </CardTitle>
                 </CardHeader>
+
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex gap-6">
-                      {/* Date Column */}
-                      <div className="text-center w-16">
-                        <div className="text-pink-500 text-lg font-medium">
-                          {month}
-                        </div>
-                        <div className="text-3xl font-bold text-pink-500">
-                          {day}
-                        </div>
-                        <div className="text-pink-500">{year}</div>
-                      </div>
+                  {paymentsStatements.length > 0 ? (
+                    paymentsStatements.map((statement) => {
+                      const date = new Date(statement.paymentDate);
+                      const month = date.toLocaleString("en-US", {
+                        month: "short",
+                      });
+                      const day = date.getDate();
+                      const year = date.getFullYear();
+                      return (
+                        <div
+                          key={statement.paymentID}
+                          className="flex items-start justify-between"
+                        >
+                          <div className="flex gap-6">
+                            {/* Date Column */}
+                            <div className="text-center w-16">
+                              <div className="text-pink-500 text-lg font-medium">
+                                {month}
+                              </div>
+                              <div className="text-3xl font-bold text-pink-500">
+                                {day}
+                              </div>
+                              <div className="text-pink-500">{year}</div>
+                            </div>
 
-                      {/* Details Column */}
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Co-Payment
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          <span className="font-medium">VISA</span> x4700
-                          collected at Houston Methodist Primary Care Group
-                        </p>
-                      </div>
-                    </div>
+                            {/* Details Column */}
+                            <div className="space-y-1">
+                              {statement.payerType === "Patient" ? (
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                  Out-of-Pocket Payment
+                                </h3>
+                              ) : (
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                  Co-Payment
+                                </h3>
+                              )}
+                              <p className="text-sm text-gray-600">
+                                Display which office they made the payment
+                              </p>
+                            </div>
+                          </div>
 
-                    {/* Amount Column */}
-                    <div className="text-xl font-bold text-gray-900">
-                      $15.00
-                    </div>
-                  </div>
+                          {/* Amount Column */}
+                          <div className="text-xl font-bold text-gray-900">
+                            ${statement.amount}
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">
+                      No payments made in current date range
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
