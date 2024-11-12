@@ -142,20 +142,38 @@ export const getDetailsYTD = async (req, res) => {
   }
 };
 
-export const getDetailsLastYear = async () => {
+export const getDetailsLastYear = async (req, res) => {
   try {
     const patientID = req.user.patientID;
     const year = new Date().getFullYear() - 1;
     const startDate = new Date(year, 0, 1); //January 1st of last year
     const endDate = new Date(year, 11, 31); //December 31s of Last Year
+
+    // Format startDate and endDate to 'YYYY-MM-DD'
+    const formattedStartDate = startDate.toISOString().split("T")[0]; // e.g., '2023-01-01'
+    const formattedEndDate = endDate.toISOString().split("T")[0]; // e.g., '2023-12-31'
+
+    const detailsLastYear = query(GET_DETAILS_YTD, [
+      patientID,
+      formattedStartDate,
+      formattedEndDate,
+    ]);
+
+    if (detailsLastYear.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No records found for this specified date range" });
+    }
+
+    res.status(200).json({ detailsLastYear });
   } catch (error) {
     console.error(
-      "Error fetching patients ytd information from the server",
+      "Error fetching patients statement information from the server",
       error
     );
-    res
-      .status(500)
-      .json({ message: "Server error fetching patients ytd information." });
+    res.status(500).json({
+      message: "Server error fetching patients statement information.",
+    });
   }
 };
 

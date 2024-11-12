@@ -6,6 +6,7 @@ import {
   getOfficeInformation,
   getRecentPayments,
   getDetailsYTD,
+  getDetailsLastYear,
 } from "../../controllers/patient/patientBillingController.js";
 const billingRouter = express.Router();
 
@@ -18,7 +19,7 @@ billingRouter.get("/recent-payments", getRecentPayments);
 
 //Details
 billingRouter.get("/details/ytd", getDetailsYTD);
-billingRouter.get("/details/last-year");
+billingRouter.get("/details/last-year", getDetailsLastYear);
 billingRouter.get("/details/date-range");
 
 export default billingRouter;
