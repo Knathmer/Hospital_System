@@ -90,3 +90,5 @@ export const SELECT_UPCOMING_APPOINTMENTS_DB = `
 
 export const SELECT_RECENT_MED_REQ_DB = `SELECT status, requestDate FROM refill WHERE patientID = ?`;
 
+export const SELECT_BILLING_DB = `SELECT dueDate, paidStatus FROM bill WHERE patientID = ?`;
+

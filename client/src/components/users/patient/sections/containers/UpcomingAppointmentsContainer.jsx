@@ -5,7 +5,7 @@ import axios from "axios";
 import GenericContainer from "./GenericContainer.jsx";
 import NavButton from "../../../../ui/buttons/NavButton.jsx";
 
-const UpcomingAppointmentsContainer = () => {
+const UpcomingAppointmentsDashboard = () => {
   const [appointments, setAppointments] = useState([]); 
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null); 
@@ -70,4 +70,4 @@ const UpcomingAppointmentsContainer = () => {
   );
 };
 
-export default UpcomingAppointmentsContainer;
+export default UpcomingAppointmentsDashboard;

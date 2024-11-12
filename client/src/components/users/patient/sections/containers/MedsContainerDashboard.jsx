@@ -5,7 +5,7 @@ import { PillBottle } from "lucide-react";
 import GenericContainer from "./GenericContainer.jsx";
 import NavButton from "../../../../ui/buttons/NavButton.jsx";
 
-const MedsContainer = () => {
+const MedsDashboard = () => {
   const [testResults, setTestResults] = useState([]); // State for test results
   const [loading, setLoading] = useState(true); // State for loading indicator
   const [error, setError] = useState(null); // State for error handling
@@ -68,4 +68,4 @@ const MedsContainer = () => {
   );
 };
 
-export default MedsContainer;
+export default MedsDashboard;
