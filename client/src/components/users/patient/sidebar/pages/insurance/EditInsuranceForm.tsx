@@ -4,13 +4,15 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Label from "../../../../../ui/Label";
 import Input from "../../../../../ui/Input";
-import Select from "../../../../../ui/select/Select";
+//import Select from "../../../../../ui/select/Select";
 import SelectItem from "../../../../../ui/select/SelectItem";
 import Checkbox from "../../../../../ui/Checkbox";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
 
 import { Heart, ArrowLeft, Edit2, ShieldPlus } from "lucide-react";
 import DefaultButton from "../../../../../ui/buttons/DefaultButton";
+
+import Select from "react-select";
 
 import axios from "axios";
 
@@ -70,6 +72,36 @@ export default function EditInsuranceForm() {
     //   phone: "",
     // },
   });
+
+  const insuranceOptions = [
+    {
+      label: "Blue Cross Blue Shield",
+      coverage: ["PPO", "HMO", "POS"],
+      value: "Blue Cross Blue Shield",
+    },
+    { label: "Aetna", coverage: ["PPO", "HMO", "EPO", "POS"], value: "Atena" },
+    { label: "Cigna", coverage: ["PPO", "HMO", "POS", "HDHP"], value: "Cigna" },
+    {
+      label: "UnitedHealthcare",
+      coverage: ["PPO", "HMO", "POS", "HDHP"],
+      value: "UnitedHealthcare",
+    },
+    { label: "Humana", coverage: ["PPO", "HMO", "POS"], value: "Humana" },
+    {
+      label: "Anthem",
+      coverage: ["PPO", "HMO", "EPO", "Medicaid"],
+      value: "Anthem",
+    },
+    {
+      label: "Molina Healthcare",
+      coverage: ["PPO", "HMO", "Medicaid"],
+      value: "Molina Healthcare",
+    },
+  ];
+
+  const [coverageOptions, setCoverageOptions] = useState<{ label: string }[]>(
+    []
+  );
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -174,6 +206,31 @@ export default function EditInsuranceForm() {
     setIsEditing(false);
   };
 
+  useEffect(() => {
+    if (formData.providerName) {
+      // Find the selected provider and extract the coverage options
+      const selectedProvider = insuranceOptions.find(
+        (option) => option.label === formData.providerName
+      );
+
+      // Set the coverage options for the selected provider
+      if (selectedProvider) {
+        setCoverageOptions(
+          selectedProvider.coverage.map((coverage) => ({
+            label: coverage,
+            value: coverage,
+          }))
+        );
+      } else {
+        // If no provider found, reset coverage options to empty
+        setCoverageOptions([]);
+      }
+    } else {
+      // If no provider is selected, reset coverage options to empty
+      setCoverageOptions([]);
+    }
+  }, [formData.providerName]);
+
   return (
     <div className="flex flex-col min-h-screen bg-pink-50 shadow-2xl rounded-lg">
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -214,13 +271,32 @@ export default function EditInsuranceForm() {
                     <Label htmlFor="insuranceProvider">
                       Insurance Provider
                     </Label>
-                    <Input
+                    {/* <Input
                       id="insuranceProvider"
                       name="providerName"
                       value={formData.providerName}
                       onChange={handleChange}
                       disabled={!isEditing}
                       required
+                    /> */}
+                    <Select
+                      placeholder="Provider Name"
+                      options={insuranceOptions}
+                      isDisabled={!isEditing}
+                      value={
+                        // Find the selected option based on formData.covDetails (assuming it's a label)
+                        insuranceOptions.find(
+                          (option) => option.label === formData.providerName
+                        ) || null
+                      }
+                      isClearable
+                      onChange={(option) =>
+                        setFormData({
+                          ...formData,
+                          providerName: option ? option.label : "", // Update provider name
+                          // Reset coverage when provider changes
+                        })
+                      }
                     />
                   </div>
                   <div>
@@ -230,6 +306,7 @@ export default function EditInsuranceForm() {
                       name="policyNum"
                       value={formData.policyNum}
                       onChange={handleChange}
+                      maxLength={12}
                       disabled={!isEditing}
                       required
                     />
@@ -302,7 +379,7 @@ export default function EditInsuranceForm() {
                 </div> */}
                   <div>
                     <Label htmlFor="coverageDetails">Coverage Details</Label>
-                    <Input
+                    {/* <Input
                       id="coverageDetails"
                       name="covDetails"
                       placeholder="e.g., PPO, HMO, etc."
@@ -310,6 +387,26 @@ export default function EditInsuranceForm() {
                       onChange={handleChange}
                       disabled={!isEditing}
                       required
+                    /> */}
+                    <Select
+                      options={coverageOptions}
+                      isClearable
+                      placeholder={"Coverage Plan"}
+                      isDisabled={!isEditing}
+                      value={
+                        // Find the selected option based on formData.covDetails (assuming it's a label)
+                        coverageOptions.find(
+                          (option) => option.label === formData.covDetails
+                        ) || null
+                      }
+                      onChange={(option) =>
+                        option
+                          ? setFormData({
+                              ...formData,
+                              covDetails: option ? option.label : "",
+                            })
+                          : null
+                      }
                     />
                   </div>
                   <div>
