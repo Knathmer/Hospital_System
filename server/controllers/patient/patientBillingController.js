@@ -6,6 +6,7 @@ import {
   GET_OFFICE_INFORMATION,
   GET_RECENT_PAYMENTS,
   GET_DETAILS_YTD,
+  GET_PAYMENTS_STATEMENTS,
 } from "../../queries/constants/selectQueries.js";
 
 export const getCurrentPastBalance = async (req, res) => {
@@ -195,6 +196,105 @@ export const getDetailsDateRange = async (req, res) => {
     }
 
     res.status(200).json({ detailsDateRange });
+  } catch (error) {
+    console.error(
+      "Error fetching patients statement information from the server",
+      error
+    );
+    res.status(500).json({
+      message: "Server error fetching patients statement information.",
+    });
+  }
+};
+
+//-------------End of Details Controller Functions----------------------------------\\
+
+//-------------Start of Payments Controller Functions----------------------------------\\
+export const getPaymentsYTD = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+    const startDate = new Date(new Date().getFullYear(), 0, 1); //Gets the January 1st of the current Year
+    const endDate = new Date(); //Gets current date.
+
+    // Format dates to 'YYYY-MM-DD' if necessary
+    const formattedStartDate = startDate.toISOString().split("T")[0];
+    const formattedEndDate = endDate.toISOString().split("T")[0];
+
+    const paymentsYTD = await query(GET_PAYMENTS_STATEMENTS, [
+      patientID,
+      formattedStartDate,
+      formattedEndDate,
+    ]);
+
+    if (paymentsYTD.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No payments found for this date range" });
+    }
+    res.status(200).json({ paymentsYTD });
+  } catch (error) {
+    console.error(
+      "Error fetching patients statement information from the server",
+      error
+    );
+    res.status(500).json({
+      message: "Server error fetching patients statement information.",
+    });
+  }
+};
+
+export const getPaymentsLastYear = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+    const year = new Date().getFullYear() - 1;
+    const startDate = new Date(year, 0, 1); //January 1st of last year
+    const endDate = new Date(year, 11, 31); //December 31s of Last Year
+
+    // Format dates to 'YYYY-MM-DD' if necessary
+    const formattedStartDate = startDate.toISOString().split("T")[0];
+    const formattedEndDate = endDate.toISOString().split("T")[0];
+
+    const paymentsLastYear = await query(GET_PAYMENTS_STATEMENTS, [
+      patientID,
+      formattedStartDate,
+      formattedEndDate,
+    ]);
+
+    if (paymentsLastYear.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No payments found for this date range" });
+    }
+    res.status(200).json({ paymentsLastYear });
+  } catch (error) {
+    console.error(
+      "Error fetching patients statement information from the server",
+      error
+    );
+    res.status(500).json({
+      message: "Server error fetching patients statement information.",
+    });
+  }
+};
+
+export const getPaymentsDateRange = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+    const { startDate, endDate } = req.query;
+
+    const paymentsDateRange = await query(GET_PAYMENTS_STATEMENTS, [
+      patientID,
+      startDate,
+      endDate,
+    ]);
+
+    if (paymentsDateRange.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No records found for this specified date range" });
+    }
+
+    res.status(200).json({ paymentsDateRange });
   } catch (error) {
     console.error(
       "Error fetching patients statement information from the server",
