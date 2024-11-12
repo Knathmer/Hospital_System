@@ -2,22 +2,17 @@
 import pool from "../../database.js";
 import { SELECT_UPCOMING_APPOINTMENTS_DB, SELECT_RECENT_MED_REQ_DB, SELECT_BILLING_DB } from "../../queries/constants/selectQueries.js";
 
-export async function getAppointmentsDashboard(req,res){
+export async function getAppointmentsDashboard(req, res) {
     const patientID = req.user.patientID;
 
-    try{
+    try {
         const [rows] = await pool.query(SELECT_UPCOMING_APPOINTMENTS_DB, [patientID]);
-        if (rows.length > 0){
-            res.status(200).json(rows);
-        }
-        else{
-            res.status(404).json({error: "No upcoming appointments were found"});
-        }
-    } catch (error){
-        res.status(500).json({error: "Internal server error"});
+        res.status(200).json(rows); // Always return 200, even if rows is empty
+    } catch (error) {
+        console.error("Error fetching appointments:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 }
-
 export async function getMedsResultsDashboard(req, res) {
   const patientID = req.user.patientID;
 
