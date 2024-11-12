@@ -177,8 +177,31 @@ export const getDetailsLastYear = async (req, res) => {
   }
 };
 
-export const getDetailsDateRange = async () => {
+export const getDetailsDateRange = async (req, res) => {
   try {
     const patientID = req.user.patientID;
-  } catch (error) {}
+    const { startDate, endDate } = req.query;
+
+    const detailsDateRange = await query(GET_DETAILS_YTD, [
+      patientID,
+      startDate,
+      endDate,
+    ]);
+
+    if (detailsDateRange.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No records found for this specified date range" });
+    }
+
+    res.status(200).json({ detailsDateRange });
+  } catch (error) {
+    console.error(
+      "Error fetching patients statement information from the server",
+      error
+    );
+    res.status(500).json({
+      message: "Server error fetching patients statement information.",
+    });
+  }
 };
