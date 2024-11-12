@@ -19,6 +19,7 @@ import DoctorRoutes from "./routers/DoctorRoutes.jsx";
 import PatientRoutes from "./routers/PatientRoutes.jsx";
 
 import "./styles.css"; // This imports tailwind css file.
+import "./tabs.css";
 import WomensHealthLandingPage from "./components/landingPage/landingpage/WomensHealthLandingPage.tsx";
 import MedicalHistoryForm from "./components/users/patient/sidebar/pages/medical-history/MedicalHistoryForm.tsx";
 import InsuranceForm from "./components/users/patient/sidebar/pages/insurance/InsuranceForm.tsx";
