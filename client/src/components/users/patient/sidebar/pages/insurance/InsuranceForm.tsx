@@ -4,24 +4,55 @@ import { Heart, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Label from "../../../../../ui/Label";
 import Input from "../../../../../ui/Input";
-import Select from "../../../../../ui/select/Select";
+//import Select from "../../../../../ui/select/Select";
 import SelectItem from "../../../../../ui/select/SelectItem";
 import Checkbox from "../../../../../ui/Checkbox";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
+import Select from "react-select";
 
 import axios from "axios";
 
 // import Link from "next/link"
 
+const insuranceOptions = [
+  {
+    label: "Blue Cross Blue Shield",
+    coverage: ["PPO", "HMO", "POS"],
+    value: "bcbs",
+  },
+  { label: "Aetna", coverage: ["PPO", "HMO", "EPO", "POS"], value: "atena" },
+  { label: "Cigna", coverage: ["PPO", "HMO", "POS", "HDHP"], value: "cigna" },
+  {
+    label: "UnitedHealthcare",
+    coverage: ["PPO", "HMO", "POS", "HDHP"],
+    value: "uHealth",
+  },
+  { label: "Humana", coverage: ["PPO", "HMO", "POS"], value: "humana" },
+  {
+    label: "Anthem",
+    coverage: ["PPO", "HMO", "EPO", "Medicaid"],
+    value: "anthem",
+  },
+  {
+    label: "Molina Healthcare",
+    coverage: ["PPO", "HMO", "Medicaid"],
+    value: "mHealth",
+  },
+];
+
 export default function InsuranceForm() {
   const [formData, setFormData] = useState({
-    providerName: null,
+    providerName: "",
     policyNum: null,
-    covDetails: null,
+    covDetails: "",
     covExpDate: null,
   });
 
   const [error, setError] = useState("");
+
+  const [coverageOptions, setCoverageOptions] = useState<{ label: string }[]>(
+    []
+  );
 
   const handleChange = (e) => {
     //e is the event object
@@ -57,7 +88,7 @@ export default function InsuranceForm() {
 
       if (response.status === 200 && response.data) {
         console.log("Add Insurance Successful!");
-        nav("/edit-insurance");
+        nav("/patient/dashboard?tab=insurance");
       } else {
         setError("Add Insurance failed. Please try again.");
       }
@@ -74,6 +105,32 @@ export default function InsuranceForm() {
       console.error("Medical History error:", error);
     }
   };
+
+  useEffect(() => {
+    if (formData.providerName) {
+      // Find the selected provider and extract the coverage options
+      const selectedProvider = insuranceOptions.find(
+        (option) => option.label === formData.providerName
+      );
+
+      // Set the coverage options for the selected provider
+      if (selectedProvider) {
+        setCoverageOptions(
+          selectedProvider.coverage.map((coverage) => ({
+            label: coverage,
+            value: coverage.toLowerCase,
+          }))
+        );
+      } else {
+        // If no provider found, reset coverage options to empty
+        setCoverageOptions([]);
+      }
+    } else {
+      // If no provider is selected, reset coverage options to empty
+      setCoverageOptions([]);
+    }
+  }, [formData.providerName]);
+
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -92,13 +149,18 @@ export default function InsuranceForm() {
               <div className="grid grid-cols-1  gap-4 ">
                 <div>
                   <Label htmlFor="insuranceProvider">Insurance Provider</Label>
-                  <Input
-                    type="text"
-                    id="providerName"
-                    name="providerName"
-                    value={formData.providerName}
-                    onChange={handleChange}
-                    required
+
+                  <Select
+                    placeholder="Provider Name"
+                    options={insuranceOptions}
+                    isClearable
+                    onChange={(option) =>
+                      setFormData({
+                        ...formData,
+                        providerName: option ? option.label : "", // Update provider name
+                        // Reset coverage when provider changes
+                      })
+                    }
                   />
                 </div>
                 <div>
@@ -109,6 +171,7 @@ export default function InsuranceForm() {
                     name="policyNum"
                     value={formData.policyNum}
                     onChange={handleChange}
+                    maxLength={12}
                     required
                   />
                 </div>
@@ -143,7 +206,7 @@ export default function InsuranceForm() {
                 </div> */}
                 <div>
                   <Label htmlFor="coverageDetails">Coverage Details</Label>
-                  <Input
+                  {/* <Input
                     type="text"
                     id="covDetails"
                     name="covDetails"
@@ -151,6 +214,19 @@ export default function InsuranceForm() {
                     value={formData.covDetails}
                     onChange={handleChange}
                     required
+                  /> */}
+                  <Select
+                    options={coverageOptions}
+                    isClearable
+                    placeholder={"Coverage Plan"}
+                    onChange={(option) =>
+                      option
+                        ? setFormData({
+                            ...formData,
+                            covDetails: option ? option.label : "",
+                          })
+                        : null
+                    }
                   />
                 </div>
                 <div>
