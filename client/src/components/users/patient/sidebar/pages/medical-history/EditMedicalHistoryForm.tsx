@@ -23,27 +23,71 @@ import SelectItem from "../../../../../ui/select/SelectItem";
 import Select from "../../../../../ui/select/Select";
 import axios from "axios";
 
+import {
+  useAllergyState,
+  useMedicationState,
+  useVaccineState,
+  useDisabilityState,
+  useSurgeryState,
+} from "./helpers/EditMedHistoryData";
+
+import {
+  toDictAllergy,
+  toDictMedication,
+  toDictVaccine,
+  toDictDisability,
+  toDictSurgery,
+} from "./helpers/EditMedicalToDict";
+
+import { formatDateForInput } from "../personal-info/PersonalInfoForm";
+
 export default function EditMedicalHistoryForm() {
   const [error, setError] = useState("");
-  const [vaccines, setVaccines] = useState([
-    { name: "", date: "", doctor: "" },
-  ]);
-  const [medications, setMedications] = useState([{ name: "" }]);
-  const [surgeries, setSurgeries] = useState([{ name: "", date: "" }]);
-  const [allergies, setAllergies] = useState([
-    { name: "", reaction: "", severity: "" },
-  ]);
-  const [disabilities, setDisabilities] = useState([{ name: "" }]);
 
-  const [removedMeds, setRemovedMeds] = useState([{ name: "" }]);
-  const [removedVacs, setRemovedVacs] = useState([
-    { name: "", date: "", doctor: "" },
-  ]);
-  const [removedSurs, setRemovedSurs] = useState([{ name: "", date: "" }]);
-  const [removedAllerg, setRemovedAllerg] = useState([
-    { name: "", reaction: "", severity: "" },
-  ]);
-  const [removedDisas, setRemovedDisas] = useState([{ name: "" }]);
+  const {
+    vaccines,
+    setVaccines,
+    addVaccine,
+    removeVaccine,
+    removedVacs,
+    setRemovedVacs,
+  } = useVaccineState();
+
+  const {
+    medications,
+    setMedications,
+    addMedication,
+    removeMedication,
+    removedMeds,
+    setRemovedMeds,
+  } = useMedicationState();
+
+  const {
+    surgeries,
+    setSurgeries,
+    addSurgery,
+    removeSurgery,
+    removedSurs,
+    setRemovedSurs,
+  } = useSurgeryState();
+
+  const {
+    allergies,
+    setAllergies,
+    addAllergy,
+    removeAllergy,
+    removedAllerg,
+    setRemovedAllerg,
+  } = useAllergyState();
+
+  const {
+    disabilities,
+    setDisabilities,
+    addDisability,
+    removeDisability,
+    removedDisas,
+    setRemovedDisas,
+  } = useDisabilityState();
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -67,138 +111,8 @@ export default function EditMedicalHistoryForm() {
     removedSurgeries: removedSurs,
   });
 
-  const addMedication = () => {
-    setMedications([...medications, { name: "" }]);
-  };
-
-  const removeMedication = (index: number) => {
-    setRemovedMeds([...removedMeds, { name: medications[index].name }]);
-    setMedications(medications.filter((_, i) => i !== index));
-  };
-
-  const addVaccine = () => {
-    setVaccines([...vaccines, { name: "", date: "", doctor: "" }]);
-  };
-
-  const removeVaccine = (index: number) => {
-    console.log("removedVacs0: ", removedVacs);
-    // Create the new removed vaccine object
-    const removedVaccine = {
-      name: vaccines[index].name,
-      date: vaccines[index].date,
-      doctor: vaccines[index].doctor,
-    };
-
-    setRemovedVacs((prevRemovedVacs) => [...prevRemovedVacs, removedVaccine]);
-    console.log("removedVacs: ", removedVacs);
-    setVaccines(vaccines.filter((_, i) => i !== index));
-  };
-
-  const addSurgery = () => {
-    setSurgeries([...surgeries, { name: "", date: "" }]);
-  };
-
-  const removeSurgery = (index: number) => {
-    setRemovedSurs([
-      ...removedSurs,
-      { name: surgeries[index].name, date: surgeries[index].date },
-    ]);
-    setSurgeries(surgeries.filter((_, i) => i !== index));
-  };
-
-  const addAllergy = () => {
-    setAllergies([...allergies, { name: "", reaction: "", severity: "" }]);
-  };
-
-  const removeAllergy = (index: number) => {
-    setRemovedAllerg([
-      ...removedAllerg,
-      {
-        name: allergies[index].name,
-        reaction: allergies[index].reaction,
-        severity: allergies[index].severity,
-      },
-    ]);
-    setAllergies(allergies.filter((_, i) => i !== index));
-  };
-
-  const addDisability = () => {
-    setDisabilities([...disabilities, { name: "" }]);
-  };
-
-  const removeDisability = (index: number) => {
-    setRemovedDisas([...removedDisas, { name: disabilities[index].name }]);
-    setDisabilities(disabilities.filter((_, i) => i !== index));
-  };
-
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
-  };
-
-  const toDictAllergy = (list) => {
-    if (!Array.isArray(list) || list.length === 0) {
-      return [{ name: "", reaction: "", severity: "" }];
-    }
-    const listOfObjects = list.map((item) => {
-      return {
-        name: item.allergen || "",
-        reaction: item.reaction || "",
-        severity: item.severity || "",
-      };
-    });
-    return listOfObjects;
-  };
-
-  const toDictVaccine = (list) => {
-    if (!Array.isArray(list) || list.length === 0) {
-      return [{ name: "", date: "", doctor: "" }];
-    }
-    const listOfObjects = list.map((item) => {
-      return {
-        name: item.vaccineName ? item.vaccineName : "",
-        date: item.dateAdministered || "",
-        doctor: "",
-      };
-    });
-    return listOfObjects;
-  };
-
-  const toDictSurgery = (list) => {
-    if (!Array.isArray(list) || list.length === 0) {
-      return [{ name: "", date: "" }];
-    }
-    const listOfObjects = list.map((item) => {
-      return {
-        name: item.surgeryType || "",
-        date: item.surgeryDateTime || "",
-      };
-    });
-    return listOfObjects;
-  };
-
-  const toDictDisability = (list) => {
-    if (!Array.isArray(list) || list.length === 0) {
-      return [{ name: "" }];
-    }
-    const listOfObjects = list.map((item) => {
-      return {
-        name: item.disabilityType || "",
-      };
-    });
-    return listOfObjects;
-  };
-
-  const toDictMedication = (list) => {
-    if (!Array.isArray(list) || list.length === 0) {
-      return [{ name: "" }];
-    }
-    const listOfObjects = list.map((item) => {
-      console.log("item-med:");
-      return {
-        name: item.medicationName,
-      };
-    });
-    return listOfObjects;
   };
 
   // Update formData whenever any related state changes
@@ -834,7 +748,7 @@ export default function EditMedicalHistoryForm() {
                     />
                     <Input
                       type="date"
-                      value={surgery.date}
+                      value={formatDateForInput(surgery.date)}
                       onChange={(e) => {
                         const newSurgeries = [...surgeries];
                         newSurgeries[index].date = e.target.value;

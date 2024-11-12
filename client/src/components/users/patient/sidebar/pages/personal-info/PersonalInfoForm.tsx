@@ -49,7 +49,7 @@ const fetchPersonalInfoData = async () => {
   }
 };
 
-const formatDateForInput = (dateString) => {
+export const formatDateForInput = (dateString) => {
   if (!dateString) return ""; // Handle empty case
   const date = new Date(dateString);
   return date.toISOString().split("T")[0]; // Returns YYYY-MM-DD
@@ -192,7 +192,7 @@ export default function PersonalInfoForm() {
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="p-6 sm:p-10">
             <Link
-              to="#"
+              to="/patient/dashboard?tab=dashboard"
               className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6 transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
