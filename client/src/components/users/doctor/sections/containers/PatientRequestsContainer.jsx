@@ -1,37 +1,36 @@
 import React from "react";
 import GenericContainer from "./GenericContainer.jsx";
-
-import { ClipboardList } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import NavButton from "../../../../ui/buttons/NavButton.jsx";
 
-const TestResultsContainer = () => {
+const PatientRequestsContainer = () => {
   return (
     <GenericContainer>
       <h2 className="text-xl font-semibold mb-4 flex items-center">
-        <ClipboardList className="h-5 w-5 text-pink-500 mr-2" />
-        Recent Test Results
+        <UserPlus className="h-5 w-5 text-blue-500 mr-2" />
+        Patient Requests
       </h2>
       <ul className="space-y-2">
         <li>
-          <span className="font-medium">Blood Work</span>
+          <span className="font-medium">Mary Johnson</span>
           <br />
           <span className="text-sm text-gray-500">
-            Completed on April 10, 2024
+            Request for consultation approval.
           </span>
         </li>
         <li>
-          <span className="font-medium">Pap Smear</span>
+          <span className="font-medium">Michael Brown</span>
           <br />
           <span className="text-sm text-gray-500">
-            Completed on March 22, 2024
+            Request for medical history update review.
           </span>
         </li>
       </ul>
-      <NavButton variant="outline" className="mt-4">
-        View All Results
+      <NavButton to="/doctor/patient-requests" className="mt-4 bg-blue-500 text-white hover:bg-blue-600">
+        View All Requests
       </NavButton>
     </GenericContainer>
   );
 };
 
-export default TestResultsContainer;
+export default PatientRequestsContainer;

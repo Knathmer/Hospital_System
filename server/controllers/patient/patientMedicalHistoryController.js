@@ -103,7 +103,17 @@ export async function hasVaccineInfo(patientID) {
 
     const result = await query(VACCINE_EXISTANCE_QUERY, [patientID]);
     console.log("Patient select result:", result);
-    return result;
+    // Format the date in the result
+    const formattedResult = result.map((vaccine) => {
+      const dateAdministered = new Date(vaccine.dateAdministered);
+      const formattedDate = dateAdministered.toISOString().split("T")[0]; // Gets the 'yyyy-MM-dd' part
+      return {
+        ...vaccine,
+        dateAdministered: formattedDate,
+      };
+    });
+
+    return formattedResult;
 
     // return res.status(200).json({
     //   message: "Get Vaccine Successful!",
@@ -154,8 +164,8 @@ export async function postAllergies(allergiesList, patientID) {
   try {
     const allergies = allergiesList.map((allergy) => [
       allergy.name,
-      allergy.reaction,
-      allergy.severity,
+      allergy.reaction || null,
+      allergy.severity || null,
       patientID,
     ]);
 
@@ -193,7 +203,7 @@ export async function postDisabilities(disabilityList, patientID) {
 export async function postMedications(medicationList, patientID) {
   try {
     const INSERT_MEDICATION_QUERY =
-      "INSERT INTO other_prescriptions (medicationName, patientID) VALUES ?";
+      "INSERT INTO other_prescription (medicationName, patientID) VALUES ?";
 
     const medications = medicationList.map((disability) => [
       disability.name,
@@ -202,7 +212,6 @@ export async function postMedications(medicationList, patientID) {
     console.log(`disabilities: ${medications}`);
     const insertResult = await bulkQuery(INSERT_MEDICATION_QUERY, [
       medications,
-      patientID,
     ]);
     console.log("Patient insert medication result:", insertResult);
 
@@ -217,15 +226,12 @@ export async function postVaccines(vaccineList, patientID) {
   try {
     const vaccines = vaccineList.map((vaccine) => [
       vaccine.name,
-      vaccine.date,
-      vaccine.doctor,
+      vaccine.date || null,
       patientID,
+      vaccine.doctor || null,
     ]);
     console.log(`vaccines: ${vaccines}`);
-    const insertResult = await bulkQuery(INSERT_VACCINE_QUERY, [
-      vaccines,
-      patientID,
-    ]);
+    const insertResult = await bulkQuery(INSERT_VACCINE_QUERY, [vaccines]);
     console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
@@ -238,13 +244,13 @@ export async function postVaccines(vaccineList, patientID) {
 export async function postSurgeries(surgeryList, patientID) {
   try {
     const surgeries = surgeryList.map((surgery) => [
-      surgery.name,
-      surgery.date,
-      surgery.doctor,
-      patientID,
+      surgery.name || null,
+      surgery.date || null,
+      patientID || null,
+      surgery.doctor || null,
     ]);
     console.log(`surgeries: ${surgeries}`);
-    const insertResult = await bulkQuery(INSERT_SURGERY_QUERY, [surgery]);
+    const insertResult = await bulkQuery(INSERT_SURGERY_QUERY, [surgeries]);
     console.log("Patient insert result:", insertResult);
 
     // return res.status(200).json({ message: "Insert Allergies Successful!" });
@@ -263,10 +269,21 @@ export async function postMedicalHistory(req, res) {
     const vaccineList = medData.allVaccines;
     const surgeryList = medData.allSurgeries;
 
-    postAllergies(allergiesList, patientID);
-    postDisabilities(disabilityList, patientID);
-    postVaccines(vaccineList, patientID);
-    postSurgeries(surgeryList, patientID);
+    if (allergiesList.length > 0) {
+      postAllergies(allergiesList, patientID);
+    }
+
+    if (disabilityList.length > 0) {
+      postDisabilities(disabilityList, patientID);
+    }
+
+    if (vaccineList.length > 0) {
+      postVaccines(vaccineList, patientID);
+    }
+
+    if (surgeryList.length > 0) {
+      postSurgeries(surgeryList, patientID);
+    }
 
     return res
       .status(200)

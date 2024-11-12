@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
 import { Heart, Calendar, FileText, CalendarClock } from "lucide-react"
+import { useNavigate, useLocation } from "react-router-dom";
 // import { Link } from 'react-router-dom';
 
 // Sidebar Components
@@ -10,11 +11,16 @@ import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar';
 import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
 
 // Files Linked
+import DoctorDashboard from '../users/doctor/DoctorDashboard';
+import DoctorBookingPage from '../users/doctor/DoctorBookingPage.jsx';
+import DoctorDashboard from '../users/doctor/DoctorDashboard.jsx';
 
-export default function DocDashboard() {
-  const [activeTab, setActiveTab] = useState('dashboard')
+export default function DoctorSidebar() {
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const sidebarItems = {
   
@@ -27,8 +33,21 @@ export default function DocDashboard() {
     ],
   }
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [location]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    navigate(`/doctor/dashboard?tab=${tabId}`);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 relative transition-all duration-300">
       {/* Sidebar */}
       <aside
         className={`transform transition-transform duration-300 fixed h-screen z-50 ${
@@ -51,7 +70,7 @@ export default function DocDashboard() {
                 {sidebarItems[category].map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => handleTabChange(item.id)}
                     className={`flex items-center w-full px-4 py-2 mt-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
                       activeTab === item.id ? 'text-pink-600 bg-pink-100' : 'text-gray-600 hover:bg-gray-200'
                     }`}
@@ -74,26 +93,29 @@ export default function DocDashboard() {
 
 
       {/* Main Content */}
-    <main className="flex-1 p-8">
+      <main
+        className={`p-8 flex-1 transition-all duration-300 min-h-screen ${
+          isSidebarVisible ? 'ml-64' : 'ml-0'
+        }`}
+      >
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
-            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}
+          {activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}
         </h1>
         
        {/* Link pages here to according sidebar items */}
-        {activeTab === 'dashboard' && (
-            <div>
-            <p className="text-gray-700">Place dashboard file here</p>
-            </div>
+       {activeTab === 'dashboard' && <DoctorDashboard />}
+        {activeTab === 'appointments' && <DoctorBookingPage />}
+        {activeTab === 'schedule' && (
+          <div>
+            <p className="text-gray-700">Place schedule file here</p>
+          </div>
         )}
-
-        {activeTab === 'appointments' && (
-            <div>
-            <p className="text-gray-700">Place appointment file here.</p>
-            {/* Add appointments content here */}
-            </div>
+        {activeTab === 'patients-list' && (
+          <div>
+            <p className="text-gray-700">Place patients list file here</p>
+          </div>
         )}
-
-    </main>
+      </main>
     </div>
-  )
-} 
+  );
+}

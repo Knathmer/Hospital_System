@@ -21,14 +21,13 @@ export const INSERT_VACCINE_QUERY =
   "INSERT INTO vaccine (vaccineName, dateAdministered, patientID, doctorID) VALUES ?";
 
 export const INSERT_SURGERY_QUERY =
-  "INSERT INTO vaccine (surgeryType, surgeryDateTime, patientID, doctorID) VALUES ?";
+  "INSERT INTO surgery (surgeryType, surgeryDateTime, patientID, doctorID) VALUES ?";
 
 export const INSERT_EMERGENCY_CONTACT_QUERY = `
   INSERT INTO emergency_contact 
   (firstName, lastName, relationship, emergencyPhoneNumber, emergencyEmail, patientID)
   VALUES (?, ?, ?, ?, ?, ?);
 `;
-
 
 export const INSERT_DOCTOR_QUERY = `
   INSERT INTO doctor 
