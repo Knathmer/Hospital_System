@@ -9,7 +9,7 @@ import {
   Pill,
   Syringe,
   Stethoscope,
-  Activity,
+  Accessibility,
   AlertCircle,
 } from "lucide-react";
 
@@ -660,7 +660,7 @@ export default function EditMedicalHistoryForm() {
 
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold flex items-center">
-                  <Activity className="h-5 w-5 mr-2 text-pink-500" />
+                  <Accessibility className="h-5 w-5 mr-2 text-pink-500" />
                   Disability Information
                 </h2>
                 {disabilities.map((disability, index) => (

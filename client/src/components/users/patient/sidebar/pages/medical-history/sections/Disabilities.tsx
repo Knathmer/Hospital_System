@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Activity, Plus, Trash2 } from "lucide-react";
+import { Accessibility, Plus, Trash2 } from "lucide-react";
 import Input from "../../../../../../ui/Input";
 import DefaultButton from "../../../../../../ui/buttons/DefaultButton";
 
@@ -15,7 +15,7 @@ const Disabilities = ({ disabilities, setDisablilities }) => {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold flex items-center">
-        <Activity className="h-5 w-5 mr-2 text-pink-500" />
+        <Accessibility className="h-5 w-5 mr-2 text-pink-500" />
         Disability Information
       </h2>
       {disabilities.map((disability, index) => (
