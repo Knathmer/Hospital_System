@@ -24,6 +24,7 @@ import {
   House,
   Phone,
   Mail,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function BillingPage() {
@@ -133,29 +134,40 @@ export default function BillingPage() {
     try {
       const token = localStorage.getItem("token");
       let url;
+      let dataKey = "statements";
 
       switch (selectedFilter) {
         case "yearToDate":
           url = "http://localhost:3000/auth/patient/billing/details/ytd";
+          dataKey = "detailsYTD";
           break;
         case "lastYear":
           url = "http://localhost:3000/auth/patient/billing/details/last-year";
+          dataKey = "detailsLastYear";
           break;
         case "dateRange":
-          url =
-            '"http://localhost:3000/auth/patient/billing/details/date-range"';
+          url = `http://localhost:3000/auth/patient/billing/details/date-range?startDate=${startDate}&endDate=${endDate}`;
           break;
         default:
           url = "http://localhost:3000/auth/patient/billing/details/ytd";
       }
 
-      const response = axios.get(url, {
+      const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setBillingStatements(response.data.statements);
-    } catch (error) {}
+      console.log("Billing Statements Response:", response.data);
+
+      setBillingStatements(response.data[dataKey] || []);
+    } catch (error) {
+      console.error("Error fetching billing statements:", error);
+    }
   };
+
+  //Fetch data when a filter changes.
+  useEffect(() => {
+    fetchBillingStatements();
+  }, [selectedFilter, startDate, endDate]);
 
   const handleDateRangeSubmit = () => {
     if (startDate && endDate) {
@@ -175,18 +187,6 @@ export default function BillingPage() {
 
     fetchData();
   }, []);
-
-  useEffect(() => {
-    if (selectedFilter === "dateRange" && (!startDate || !endDate)) return;
-
-    fetchBillingStatements();
-  }, [selectedFilter, startDate, endDate]);
-
-  const recentPayments = [
-    { id: 1, date: "2023-06-15", amount: 200.0 },
-    { id: 2, date: "2023-05-20", amount: 150.0 },
-    { id: 3, date: "2023-04-18", amount: 300.0 },
-  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -487,7 +487,132 @@ export default function BillingPage() {
                   <CardTitle>Billing Details</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>Detailed billing information will be displayed here.</p>
+                  {billingStatements.length > 0 ? (
+                    billingStatements.map((statement) => {
+                      // Get the month, day, and year from the API call.
+                      const date = new Date(statement.visitDate);
+                      const month = date.toLocaleString("en-US", {
+                        month: "short",
+                      }); // e.g., "Nov"
+                      const day = date.getDate(); // Day as a number, e.g., 11
+                      const year = date.getFullYear(); // Full year, e.g., 2024
+
+                      let backgroundColor;
+
+                      switch (statement.paidStatus) {
+                        case "Paid":
+                          backgroundColor = "emerald";
+                          break;
+                        case "Partially Paid":
+                          backgroundColor = "yellow";
+                          break;
+                        case "Overdue":
+                          backgroundColor = "red";
+                          break;
+                        default:
+                          backgroundColor = "emerald";
+                      }
+
+                      return (
+                        <div
+                          key={statement.billID}
+                          className="border rounded-lg p-6 mb-4"
+                        >
+                          <div className="grid grid-cols-[100px_1fr_200px] gap-4">
+                            {/* Date Column */}
+                            <div className="text-center">
+                              <div className="text-pink-600 text-lg font-medium">
+                                {month}
+                              </div>
+                              <div className="text-3xl font-bold text-pink-600">
+                                {day}
+                              </div>
+                              <div className="text-pink-600">{year}</div>
+                            </div>
+
+                            {/* Details Column */}
+                            <div className="space-y-2">
+                              <h3 className="text-xl font-semibold">
+                                {statement.visitType}
+                              </h3>
+                              <p className="text-muted-foreground">
+                                {statement.serviceName}
+                              </p>
+                              <div className="space-y-1">
+                                <p>
+                                  Provider:{" "}
+                                  {statement.doctorFirstName +
+                                    " " +
+                                    statement.doctorLastName}
+                                </p>
+                                <p>
+                                  Patient:{" "}
+                                  {statement.patientFirstName +
+                                    " " +
+                                    statement.patientLastName}
+                                </p>
+                                <p>
+                                  Primary Payer:{" "}
+                                  {statement.insuranceName || "None"}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Amount Column */}
+                            <div className="text-right space-y-2">
+                              <div
+                                className={`inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-${backgroundColor}-100 text-black`}
+                              >
+                                <CheckCircle2 className="w-4 h-4 mr-1" />
+                                {statement.paidStatus}
+                              </div>
+                              <div className="space-y-1">
+                                <div>
+                                  <p className="text-sm text-muted-foreground">
+                                    Billed
+                                  </p>
+                                  <p className="text-lg font-semibold">
+                                    ${statement.billedAmount}
+                                  </p>
+                                </div>
+                                {statement.insuranceCoveredAmount !==
+                                  "0.00" && (
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">
+                                      Insurance Covered
+                                    </p>
+                                    <p className="text-lg font-semibold text-emerald-600">
+                                      - ${statement.insuranceCoveredAmount}
+                                    </p>
+                                  </div>
+                                )}
+                                {statement.paidAmount !== "0.00" && (
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">
+                                      Payments Made
+                                    </p>
+                                    <p className="text-lg font-semibold text-emerald-600">
+                                      - ${statement.paidAmount}
+                                    </p>
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-sm font-medium">
+                                    Your Balance
+                                  </p>
+                                  <p className="text-xl font-bold">
+                                    ${statement.balance}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p>No details for current date range</p>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
