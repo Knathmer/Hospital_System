@@ -40,6 +40,7 @@ export default function BillingPage() {
   const [patientInformation, setPatientInformation] = useState({});
   const [previousPayments, setPreviousPayments] = useState([]);
   const [billingStatements, setBillingStatements] = useState([]);
+  const [paymentsStatements, setPaymentsStatements] = useState([]);
   const [hasMadePayments, setHasMadePayments] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("yearToDate");
   const [startDate, setStartDate] = useState(null);
@@ -203,6 +204,11 @@ export default function BillingPage() {
 
     fetchData();
   }, []);
+
+  const date = new Date("2024-08-14");
+  const month = date.toLocaleString("en-US", { month: "short" });
+  const day = date.getDate();
+  const year = date.getFullYear();
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -668,9 +674,36 @@ export default function BillingPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <p className="text-gray-700">
-                    A comprehensive payment history will be shown here.
-                  </p>
+                  <div className="flex items-start justify-between">
+                    <div className="flex gap-6">
+                      {/* Date Column */}
+                      <div className="text-center w-16">
+                        <div className="text-pink-500 text-lg font-medium">
+                          {month}
+                        </div>
+                        <div className="text-3xl font-bold text-pink-500">
+                          {day}
+                        </div>
+                        <div className="text-pink-500">{year}</div>
+                      </div>
+
+                      {/* Details Column */}
+                      <div className="space-y-1">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Co-Payment
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-medium">VISA</span> x4700
+                          collected at Houston Methodist Primary Care Group
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Amount Column */}
+                    <div className="text-xl font-bold text-gray-900">
+                      $15.00
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
