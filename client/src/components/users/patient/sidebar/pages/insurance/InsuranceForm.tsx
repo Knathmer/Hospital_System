@@ -18,25 +18,25 @@ const insuranceOptions = [
   {
     label: "Blue Cross Blue Shield",
     coverage: ["PPO", "HMO", "POS"],
-    value: "bcbs",
+    value: "Blue Cross Blue Shield",
   },
-  { label: "Aetna", coverage: ["PPO", "HMO", "EPO", "POS"], value: "atena" },
-  { label: "Cigna", coverage: ["PPO", "HMO", "POS", "HDHP"], value: "cigna" },
+  { label: "Aetna", coverage: ["PPO", "HMO", "EPO", "POS"], value: "Atena" },
+  { label: "Cigna", coverage: ["PPO", "HMO", "POS", "HDHP"], value: "Cigna" },
   {
     label: "UnitedHealthcare",
     coverage: ["PPO", "HMO", "POS", "HDHP"],
-    value: "uHealth",
+    value: "UnitedHealthcare",
   },
-  { label: "Humana", coverage: ["PPO", "HMO", "POS"], value: "humana" },
+  { label: "Humana", coverage: ["PPO", "HMO", "POS"], value: "Humana" },
   {
     label: "Anthem",
     coverage: ["PPO", "HMO", "EPO", "Medicaid"],
-    value: "anthem",
+    value: "Anthem",
   },
   {
     label: "Molina Healthcare",
     coverage: ["PPO", "HMO", "Medicaid"],
-    value: "mHealth",
+    value: "Molina Healthcare",
   },
 ];
 
@@ -118,7 +118,7 @@ export default function InsuranceForm() {
         setCoverageOptions(
           selectedProvider.coverage.map((coverage) => ({
             label: coverage,
-            value: coverage.toLowerCase,
+            value: coverage,
           }))
         );
       } else {
