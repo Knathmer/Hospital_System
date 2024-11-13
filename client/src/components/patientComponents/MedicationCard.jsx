@@ -9,8 +9,8 @@ export default function MedicationCard({
   prescriptionDetails = {},
   refillDetails = {},
   pharmacyDetails = {},
-  //   onRequestRefill,
-  //   onRemove,
+  onAssignPharmacy,
+  onChangePharmacy, // Add this prop
 }) {
   return (
     <div className="bg-white shadow rounded-lg p-6 mt-6">
@@ -48,7 +48,8 @@ export default function MedicationCard({
         </div>
         <div>
           <h4 className="font-semibold text-pink-600">Pharmacy Details</h4>
-          {pharmacyDetails.pharmacyName !== "NULL" ? (
+          {pharmacyDetails.pharmacyName !== "NULL" &&
+          pharmacyDetails.pharmacyName ? (
             <>
               <p>
                 {pharmacyDetails.pharmacyName} - {pharmacyDetails.pharmacyCity},{" "}
@@ -60,19 +61,26 @@ export default function MedicationCard({
                 {pharmacyDetails.pharmacyZip}
               </p>
               <p>{pharmacyDetails.pharmacyPhoneNum}</p>
+              {/* Add the "Change" button */}
+              <button
+                className="text-pink-600 hover:underline mt-1"
+                onClick={onChangePharmacy}
+              >
+                Change Pharmacy
+              </button>
             </>
           ) : (
-            <p></p>
+            <div>
+              <p>No pharmacy assigned</p>
+              <button
+                className="text-pink-600 hover:underline mt-1"
+                onClick={onAssignPharmacy}
+              >
+                Assign Pharmacy
+              </button>
+            </div>
           )}
         </div>
-      </div>
-      <div className="mt-6 flex items-center">
-        <button
-          //   onClick={onRequestRefill}
-          className="text-pink-600 hover:text-pink-700 hover:underline"
-        >
-          Request refill
-        </button>
       </div>
     </div>
   );

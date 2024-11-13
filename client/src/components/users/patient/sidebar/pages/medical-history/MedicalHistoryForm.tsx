@@ -17,14 +17,14 @@ import axios from "axios";
 
 export default function MedicalHistoryForm() {
   const [allergies, setAllergies] = useState([
-    { name: null, reaction: null, severity: "" },
+    { name: "", reaction: null, severity: null },
   ]);
   const [disabilities, setDisablilities] = useState([{ name: "" }]);
   const [vaccines, setVaccines] = useState([
-    { name: "", date: "", doctor: null },
+    { name: "", date: null, doctor: null },
   ]);
   const [surgeries, setSurgeries] = useState([
-    { name: "", date: "", doctor: null },
+    { name: "", date: null, doctor: null },
   ]);
   const [formData, setFormData] = useState({
     allAllergies: allergies,
@@ -38,12 +38,23 @@ export default function MedicalHistoryForm() {
 
   // Update formData when allergies change
   useEffect(() => {
+    const filteredAllergies = allergies.filter((allergy) => allergy.name);
+    console.log("allergy filter", filteredAllergies);
+    const filteredDisabilites = disabilities.filter(
+      (disability) => disability.name
+    );
+    console.log("disablilty filter", filteredDisabilites);
+    const filteredVaccines = vaccines.filter((vaccine) => vaccine.name);
+    console.log("vaccine unfilter", vaccines);
+    console.log("vaccine filter", filteredVaccines);
+    const filteredSurgeries = surgeries.filter((surgery) => surgery.name);
+    console.log("surgeries filter", filteredSurgeries);
     setFormData((prevState) => ({
       ...prevState,
-      allAllergies: allergies,
-      allDisabilities: disabilities,
-      allVaccines: vaccines,
-      allSurgeries: surgeries,
+      allAllergies: filteredAllergies,
+      allDisabilities: filteredDisabilites,
+      allVaccines: filteredVaccines,
+      allSurgeries: filteredSurgeries,
     }));
   }, [allergies, disabilities, vaccines, surgeries]);
 
@@ -97,39 +108,40 @@ export default function MedicalHistoryForm() {
     }
   };
   return (
-    <div className="flex flex-col min-h-screen bg-pink-50">
-      <NavbarPatient linkTo={"/patient/dashboard"} />
+    <div className="flex flex-col min-h-screen bg-pink-50 shadow-2xl rounded-lg">
+      <NavbarPatient linkTo={"/patient/dashboard?tab=dashboard"} />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <Link
-            to="/patient/dashboard"
-            className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Link>
-          <h1 className="text-3xl font-bold mb-6">Medical History Form</h1>
-          <form onSubmit={handleSubmit} className="space-y-6 py-4">
-            <FamilyHistory />
+        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="p-6 sm:p-10">
+            <Link
+              to="/patient/dashboard?tab=dashboard"
+              className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Link>
+            <h1 className="text-3xl font-bold mb-6">Medical History Form</h1>
+            <form onSubmit={handleSubmit} className="space-y-6 py-4">
+              <FamilyHistory />
 
-            <Allergies allergies={allergies} setAllergies={setAllergies} />
+              <Allergies allergies={allergies} setAllergies={setAllergies} />
 
-            <Medications />
+              <Medications />
 
-            <Vaccines vaccines={vaccines} setVaccines={setVaccines} />
+              <Vaccines vaccines={vaccines} setVaccines={setVaccines} />
 
-            <Disabilities
-              disabilities={disabilities}
-              setDisablilities={setDisablilities}
-            />
+              <Disabilities
+                disabilities={disabilities}
+                setDisablilities={setDisablilities}
+              />
 
-            <Surgeries surgeries={surgeries} setSurgeries={setSurgeries} />
+              <Surgeries surgeries={surgeries} setSurgeries={setSurgeries} />
 
-            <FormSubmitButton />
-          </form>
+              <FormSubmitButton />
+            </form>
+          </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

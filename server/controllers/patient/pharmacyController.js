@@ -172,6 +172,11 @@ export const deletePharmacyFromPatient = async (req, res) => {
       [patientID, pharmacyID]
     );
 
+    await query(
+      "UPDATE prescription SET pharmacyID = NULL WHERE patientID = ? AND pharmacyID = ?",
+      [patientID, pharmacyID]
+    );
+
     res.status(200).json({ message: "Pharmacy association removed" });
   } catch (error) {
     res.status(500).json({ message: "Error removing pharmacy association" });
