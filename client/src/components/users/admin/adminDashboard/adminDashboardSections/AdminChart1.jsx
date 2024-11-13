@@ -1,6 +1,6 @@
-// PatientOverview.js
+// This file shows appointment chart on dashboard
+
 import React from 'react';
-// import { Card, CardHeader, CardTitle, CardContent } from "../../../../ui/cardComponent";
 import Card from '../../../../ui/cardComponent/Card';
 import CardHeader from '../../../../ui/cardComponent/CardHeader';
 import CardTitle from '../../../../ui/cardComponent/CardTitle';
@@ -17,11 +17,11 @@ const patientData = [
   { month: 'Jun', total: 150 },
 ];
 
-const PatientOverview = () => {
+const AppointmentOverview = () => {
   return (
     <Card className="col-span-4">
       <CardHeader>
-        <CardTitle>Patient Overview</CardTitle>
+        <CardTitle>Appointment Density</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer
@@ -47,4 +47,4 @@ const PatientOverview = () => {
   );
 };
 
-export default PatientOverview;
+export default AppointmentOverview;

@@ -16,11 +16,6 @@ export default function AdminSidebar() {
   const sidebarItems = {
     "Admin Services": [
         { id: 'dashboard', label: 'Dashboard', icon: House },
-        // { id: 'patient-data', label: 'Patient Profiles', icon: FolderHeart },
-        // { id: 'doctor-data', label: 'Doctor Profiles', icon: UserRoundPen },
-        // { id: 'billing-data', label: 'Fianical Overview', icon: CreditCard },
-        // { id: 'prescription-data', label: 'Prescription Analysis', icon: PillBottle },
-        // { id: 'appointment-data', label: 'Appointment Metrics', icon: CalendarSearch },
     ],
     "Manage User":[
         { id: 'patient-data', label: 'Patient Profiles', icon: FolderHeart },

@@ -1,6 +1,6 @@
-// planning to change this later, not sure data im gonna yet
+// This file shows total users chart on dashboard
+
 import React from 'react';
-// import { Card, CardHeader, CardTitle, CardContent } from "../../../../ui/cardComponent";
 import { Card } from '../../../../patientComponents/BillingCards/Card';
 import { CardHeader } from '../../../../patientComponents/BillingCards/CardHeader';
 import { CardTitle } from '../../../../patientComponents/BillingCards/CardTitle';
@@ -17,11 +17,11 @@ const compareData = [
   { month: 'Jun', icu: 60, opd: 90 },
 ];
 
-const ICUvsOPDPatients = () => {
+const TotalUsersCharts = () => {
   return (
     <Card className="col-span-3">
       <CardHeader>
-        <CardTitle>ICU vs OPD Patients</CardTitle>
+        <CardTitle>WomenWell Users</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer
@@ -52,4 +52,4 @@ const ICUvsOPDPatients = () => {
   );
 };
 
-export default ICUvsOPDPatients;
+export default TotalUsersCharts;
