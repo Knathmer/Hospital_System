@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react'
 import { Heart, House, CalendarSearch,  PillBottle, UserRoundSearch ,FolderHeart, CreditCard} from "lucide-react"
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import AdminDashboard from '../users/admin/adminDashboard/AdminDashboard';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+// Sidebar Components
 import LogoSidebar from './sidebarItems/UserLogoSidebar';
 import UserSettingsAndLogout from './sidebarItems/BottomItemsSidebar';
 import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
+import AdminNameDisplay from './sidebarItems/WelcomeAdminName';
+
+// Files Linked
+import AdminDashboard from '../users/admin/adminDashboard/AdminDashboard';
 
 export default function AdminSidebar() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -55,7 +60,7 @@ export default function AdminSidebar() {
             <LogoSidebar />
 
             {/* User Profile Image and Name */}
-            {/* < DoctorNameDisplay /> */}
+            < AdminNameDisplay />
           </div>
 
           <nav className="p-4">
