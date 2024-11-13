@@ -6,6 +6,7 @@ import ManageDoctors from "../components/users/admin/sections/manageDoctors";
 import ManagePatients from "../components/users/admin/sections/managePatients";
 import Settings from "../components/users/admin/sections/settings";
 import SystemReports from "../components/users/admin/sections/system-reports";
+import PrescriptionSummaryReport from "../components/users/admin/reports/PrescriptionSummaryReport";
 
 const AdminRoutes = () => {
   return (
@@ -17,6 +18,10 @@ const AdminRoutes = () => {
       <Route path="system-reports" element={<SystemReports />} />
       <Route path="settings" element={<Settings />} />
       {/* Add other admin routes here */}
+      <Route
+        path="prescription-summary-report"
+        element={<PrescriptionSummaryReport />}
+      />
     </Routes>
   );
 };
