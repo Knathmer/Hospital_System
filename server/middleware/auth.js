@@ -21,6 +21,7 @@ export const verifyToken = (req, res, next) => {
 
     // Attach user info to the request object
     req.user = decoded;
+    console.log("VALID TOKEN!!!!");
     next();
   });
 };
