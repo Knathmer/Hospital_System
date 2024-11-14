@@ -38,9 +38,18 @@ function BookPage() {
 
   useEffect(() => {
     // Fetch doctors based on filters
+    const params = {
+      gender,
+      location,
+      serviceID: selectedService,
+    };
+    if (specialty) {
+      params.specialtyID = specialty;
+    }
+
     axios
       .get("http://localhost:3000/appointment/doctors", {
-        params: { specialty, gender, location, serviceID: selectedService },
+        params,
       })
       .then((response) => setDoctors(response.data))
       .catch((error) => console.error("Error fetching doctors:", error));
@@ -51,20 +60,22 @@ function BookPage() {
   }, [doctors]);
 
   useEffect(() => {
+    // Fetch services
+    const params = {};
     if (specialty) {
-      // Fetch services for the selected specialty
-      axios
-        .get("http://localhost:3000/appointment/services", {
-          params: { specialtyID: specialty },
-        })
-        .then((response) => setServices(response.data))
-        .catch((error) => {
-          console.error("Error fetching services:", error);
-          setServices([]);
-        });
-    } else {
-      setServices([]);
+      params.specialtyID = specialty;
     }
+
+    axios
+      .get("http://localhost:3000/appointment/services", {
+        params,
+      })
+      .then((response) => setServices(response.data))
+      .catch((error) => {
+        console.error("Error fetching services:", error);
+        setServices([]);
+      });
+
     // Reset selected service when specialty changes
     setSelectedService("");
   }, [specialty]);
@@ -227,7 +238,6 @@ function BookPage() {
                   value={selectedService}
                   onChange={(e) => setSelectedService(e.target.value)}
                   className="w-full p-2 border rounded-md"
-                  disabled={!services.length} // Disable if no services are available
                 >
                   <option value="">Select a service</option>
                   {services.map((service) => (

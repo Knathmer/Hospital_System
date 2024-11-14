@@ -18,17 +18,23 @@ export const getServices = async (req, res) => {
   try {
     const { specialtyID } = req.query;
 
-    if (!specialtyID) {
-      return res.status(400).json({ error: "specialtyID is required" });
+    let services;
+    if (specialtyID) {
+      // Fetch services for the specified specialty
+      services = await query(
+        `SELECT service.serviceID, service.serviceName, service.price
+           FROM service
+           JOIN specialty_service ss ON service.serviceID = ss.serviceID
+           WHERE ss.specialtyID = ?`,
+        [specialtyID]
+      );
+    } else {
+      // Fetch all services
+      services = await query(
+        `SELECT service.serviceID, service.serviceName, service.price
+           FROM service`
+      );
     }
-
-    const services = await query(
-      `SELECT service.serviceID, service.serviceName, service.price
-         FROM service
-         JOIN specialty_service ss ON service.serviceID = ss.serviceID
-         WHERE ss.specialtyID = ?`,
-      [specialtyID]
-    );
 
     res.json(services);
   } catch (error) {
@@ -38,35 +44,34 @@ export const getServices = async (req, res) => {
 };
 
 export async function getDoctorsBySpecialty(req, res) {
-  const { specialty, gender, location, serviceID } = req.query;
+  const { specialtyID, gender, location, serviceID } = req.query;
 
   try {
     let queryStr = `
-  SELECT DISTINCT
-    doctor.doctorID,
-    doctor.firstName,
-    doctor.lastName,
-    doctor.gender,
-    doctor.workPhoneNumber,
-    doctor.workEmail,
-    s.specialtyName,
-    doctor.officeID,
-    office.officeName AS officeLocation,
-    CONCAT(addrStreet, ', ', addrcity, ', ', addrstate, ' ', addrzip) AS officeAddress
-  FROM doctor
-  LEFT JOIN office ON doctor.officeID = office.officeID
-  INNER JOIN specialty s ON doctor.specialtyID = s.specialtyID
-  JOIN address ON office.addressID = address.addressID
-  LEFT JOIN specialty_service ss ON s.specialtyID = ss.specialtyID
-  LEFT JOIN service ON ss.serviceID = service.serviceID
-  WHERE 1=1
-`;
-
+        SELECT DISTINCT
+            doctor.doctorID,
+            doctor.firstName,
+            doctor.lastName,
+            doctor.gender,
+            doctor.workPhoneNumber,
+            doctor.workEmail,
+            s.specialtyName,
+            doctor.officeID,
+            office.officeName AS officeLocation,
+            CONCAT(addrStreet, ', ', addrcity, ', ', addrstate, ' ', addrzip) AS officeAddress
+        FROM doctor
+        LEFT JOIN office ON doctor.officeID = office.officeID
+        INNER JOIN specialty s ON doctor.specialtyID = s.specialtyID
+        JOIN address ON office.addressID = address.addressID
+        LEFT JOIN specialty_service ss ON s.specialtyID = ss.specialtyID
+        LEFT JOIN service ON ss.serviceID = service.serviceID
+        WHERE 1=1
+      `;
     const params = [];
 
-    if (specialty) {
+    if (specialtyID) {
       queryStr += " AND s.specialtyID = ?";
-      params.push(specialty);
+      params.push(specialtyID);
     }
 
     if (gender) {
