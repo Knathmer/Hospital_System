@@ -71,8 +71,7 @@ export const SELECT_DOCTOR_NAMES =
 export const SELECT_ADMIN_NAMES =
   "SELECT firstName, lastName from admin WHERE adminID = ?";
 
-
-// Patient Dashboard (DB) Queries 
+// Patient Dashboard (DB) Queries
 export const SELECT_UPCOMING_APPOINTMENTS_DB = `
   SELECT 
       a.appointmentDateTime, a.status, d.firstName AS doctorFirstName, d.lastName AS doctorLastName
@@ -123,5 +122,6 @@ export const GET_RECENT_PAYMENTS = `SELECT p.paymentID, p.paymentDate, p.amount
 
 export const GET_DETAILS_YTD = `SELECT b.billID, a.appointmentDateTime AS visitDate, COALESCE(vt.visitTypeName, 'N/A') AS visitType, s.serviceName AS serviceName, COALESCE(d.firstName, 'N/A') AS doctorFirstName, COALESCE(d.lastName, '') AS doctorLastName, p.firstName AS patientFirstName, p.lastName AS patientLastName, COALESCE(i.providerName, 'N/A') AS insuranceName, b.amount AS billedAmount, b.paidAmount, b.insuranceCoveredAmount, (b.amount - b.paidAmount) AS balance, b.paidStatus FROM bill b INNER JOIN appointment a ON b.appointmentID = a.appointmentID INNER JOIN patient p ON a.patientID = p.patientID INNER JOIN service s ON b.serviceID = s.serviceID LEFT JOIN doctor d ON a.doctorID = d.doctorID LEFT JOIN insurance i ON b.insuranceID = i.insuranceID LEFT JOIN visit_type vt ON a.visitTypeID = vt.visitTypeID WHERE b.patientID = ? AND DATE(a.appointmentDateTime) BETWEEN ? AND ? ORDER BY a.appointmentDateTime DESC;`;
 
-
 export const GET_PAYMENTS_STATEMENTS = `SELECT p.paymentDate, p.amount, p.payerType, p.paymentID FROM payment AS p JOIN bill AS b ON p.billID = b.billID WHERE b.patientID = ? AND DATE(p.paymentDate) BETWEEN ? AND ? ORDER BY p.paymentDate DESC;`;
+
+export const GET_DOCTOR_SCHEDULE = `SELECT p.patientID, CONCAT(p.firstName, ' '  ,p.lastName) AS fullName, a.appointmentDateTime, a.appointmentID, s.serviceName, s.serviceID FROM patient p JOIN appointment a ON p.patientID = a.patientID JOIN service s ON a.serviceID = s.serviceID WHERE a.doctorID = ? AND DATE (a.appointmentDateTime) = CURDATE() AND a.status = 'Scheduled';`;
