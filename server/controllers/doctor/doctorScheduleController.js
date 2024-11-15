@@ -19,3 +19,21 @@ export const getDoctorSchedule = async (req, res) => {
     res.status(500).json({ message: "Server error fetching schedule" });
   }
 };
+
+export const putMissedAppointment = async (req, res) => {
+  try {
+    const { appointmentID, status } = req.body;
+
+    const [result] = await query(
+      "UPDATE appointment a SET a.status = ?  WHERE a.appointmentID = ? AND a.status <> ?;",
+      [status, appointmentID, status]
+    );
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No updates made" });
+    }
+    res.json({ success: true, message: "Appointment status updated." });
+  } catch (error) {}
+};

@@ -13,6 +13,7 @@ import {
 
 export default function DoctorSchedulePage() {
   const [todaysSchedule, setTodaysSchedule] = useState([]);
+  const [updatedAppointments, setUpdatedAppointments] = useState(new Set());
 
   //-----------Fetch Todays Doctor Schedule-----------------\\
   const fetchTodaysSchedule = async () => {
@@ -31,6 +32,47 @@ export default function DoctorSchedulePage() {
     }
   };
 
+  const updateAppointmentToMissed = async (appointmentID) => {
+    //If the appointment has already been updated simply skip the function call.
+    if (updatedAppointments.has(appointmentID)) {
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        "http://localhost:3000/auth/doctor/missed-schedule",
+        { appointmentID, status: "Missed Appointment" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setUpdatedAppointments((prev) => new Set(prev).add(appointmentID));
+    } catch (error) {
+      console.error("Error updating appointment status:", error);
+    }
+  };
+  useEffect(() => {
+    const checkAndUpdateMissedAppointments = async () => {
+      const now = new Date();
+
+      for (const appointment of todaysSchedule) {
+        const appointmentDate = new Date(appointment.appointmentDateTime);
+        const appointmentEndTime = new Date(
+          appointmentDate.getTime() + 30 * 60 * 1000
+        );
+
+        if (
+          now > appointmentEndTime &&
+          !updatedAppointments.has(appointment.appointmentID)
+        ) {
+          await updateAppointmentStatus(appointment.appointmentID);
+        }
+      }
+    };
+
+    checkAndUpdateMissedAppointments();
+  }, [todaysSchedule]);
+
+  //Fetch the doctors schedule on refresh or when the open the site.
   useEffect(() => {
     fetchTodaysSchedule();
   }, []);

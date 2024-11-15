@@ -4,5 +4,6 @@ import { getDoctorSchedule } from "../../controllers/doctor/doctorScheduleContro
 const doctorScheduleRouter = express.Router();
 
 doctorScheduleRouter.get("/", getDoctorSchedule);
+doctorScheduleRouter.put("/missed-appointment");
 
 export default doctorScheduleRouter;
