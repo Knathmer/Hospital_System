@@ -36,6 +36,25 @@ const appointments = [
 ];
 
 export default function DoctorSchedulePage() {
+  const [todaysSchedule, setTodaysSchedule] = useState([]);
+
+  //-----------Fetch Todays Doctor Schedule-----------------\\
+  const fetchTodaysSchedule = async () => {
+    try {
+      //Get the doctors token
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/doctor/schedule",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setTodaysSchedule(response.data.doctorSchedule || []);
+    } catch (error) {
+      console.error("Error fetching doctor's schedule:", error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Today's Schedule</h1>

@@ -10,7 +10,7 @@ const DoctorRoutes = () => {
     <Routes>
       <Route path="dashboard" element={<DocDashboard />} />
       <Route path="patient/:patientID" element={<PatientInfoPage />} />
-      <Route path="view-schedule" element={<DoctorSchedulePage />} />
+      <Route path="schedule" element={<DoctorSchedulePage />} />
 
       {/* Add other doctor routes here */}
     </Routes>
