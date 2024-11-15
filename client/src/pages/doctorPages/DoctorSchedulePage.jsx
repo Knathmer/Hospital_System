@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "../../components/ui/Button";
+import axios from "axios";
 
 import {
   Table,
@@ -55,6 +56,10 @@ export default function DoctorSchedulePage() {
     }
   };
 
+  useEffect(() => {
+    fetchTodaysSchedule();
+  }, []);
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Today's Schedule</h1>
@@ -68,26 +73,57 @@ export default function DoctorSchedulePage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {appointments.map((appointment) => (
-            <React.Fragment key={appointment.id}>
-              <TableRow>
-                <TableCell>{appointment.patientName}</TableCell>
-                <TableCell>{appointment.time}</TableCell>
-                <TableCell>{appointment.serviceType}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => proceedToAppointment(appointment.id)}
-                    >
-                      Proceed with Appointment
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            </React.Fragment>
-          ))}
+          {todaysSchedule && todaysSchedule.length > 0 ? (
+            todaysSchedule.map((appointment) => {
+              const date = new Date(appointment.appointmentDateTime);
+              const timeOfAppointment = date.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+              });
+              const currentTime12Hour = new Date().toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                hour12: true,
+              });
+              return (
+                <React.Fragment key={appointment.appointmentID}>
+                  <TableRow>
+                    <TableCell>{appointment.fullName}</TableCell>
+                    <TableCell>{timeOfAppointment}</TableCell>
+                    <TableCell>{appointment.serviceName}</TableCell>
+                    <TableCell>
+                      {timeOfAppointment < currentTime12Hour ? (
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => proceedToAppointment(appointment.id)}
+                            disabled={true}
+                          >
+                            Proceed with Appointment
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex space-x-2">
+                          <Button variant="primary" size="sm" disabled={true}>
+                            Upcoming Appointment
+                          </Button>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
+              );
+            })
+          ) : (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center">
+                No schedule for today
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>
