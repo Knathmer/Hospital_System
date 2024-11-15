@@ -1,6 +1,29 @@
+type Prescription = {
+  id: string;
+  medicationName: string;
+  dosage: string;
+  quantity: string;
+  provider: string;
+  insurance: string;
+  status: string;
+  patientId: string;
+  patientName: string;
+  condition: string;
+  nextAppointment: string;
+  refillNumber: string;
+  adherenceRate: string;
+  [key: string]: string | undefined;
+};
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+// import { Badge } from "@/components/ui/badge"
+// import { Progress } from "@/components/ui/progress"
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/Card";
 
 import {
@@ -11,8 +34,6 @@ import {
   TableHeader,
   TableRow,
 } from "../../../ui/Table";
-// import { Badge } from "@/components/ui/badge";
-// import { Progress } from "@/components/ui/progress";
 
 import Label from "../../../ui/Label";
 import Input from "../../../ui/Input";
@@ -21,35 +42,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../ui/Tabs";
 import {
   PillIcon,
   CalendarIcon,
-  Filter,
   ActivityIcon,
   UserIcon,
   Maximize2,
 } from "lucide-react";
 
 export default function PrescriptionSummaryReport() {
-  type Prescription = {
-    id: string;
-    quantity: string;
-    dosage: string;
-    nextRefillDate: Date;
-    adherenceRate: string;
-    medicationName: string;
-    provider: string;
-    patientName: string;
-    condition: string;
-    nextAppointment: string;
-  };
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [filteredPrescriptions, setFilteredPrescriptions] = useState<
     Prescription[]
   >([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("prescriptions");
   const [filters, setFilters] = useState({
-    prescription: "",
-    quantity: "",
-    medication: "",
-    patient: "",
+    prescriptions: {
+      prescription: "",
+      medication: "",
+      dosage: "",
+      quantity: "",
+      provider: "",
+      insurance: "",
+      status: "",
+    },
+    refills: {
+      patientId: "",
+      medication: "",
+      refillFrequency: "",
+      provider: "",
+    },
   });
 
   useEffect(() => {
@@ -77,28 +97,88 @@ export default function PrescriptionSummaryReport() {
 
   useEffect(() => {
     const filtered = prescriptions.filter((prescription) => {
-      return (
-        prescription.id
-          .toLowerCase()
-          .includes(filters.prescription.toLowerCase()) &&
-        prescription.quantity.toString().includes(filters.quantity) &&
-        prescription.medicationName
-          .toLowerCase()
-          .includes(filters.medication.toLowerCase()) &&
-        prescription.patientName
-          .toLowerCase()
-          .includes(filters.patient.toLowerCase())
-      );
+      const activeFilters = filters[activeTab as keyof typeof filters];
+      return Object.entries(activeFilters).every(([key, filterValue]) => {
+        if (!filterValue) return true;
+        const prescriptionValue = prescription[key as keyof Prescription];
+        return (
+          typeof prescriptionValue === "string" &&
+          prescriptionValue.toLowerCase().includes(filterValue.toLowerCase())
+        );
+      });
     });
     setFilteredPrescriptions(filtered);
-  }, [filters, prescriptions]);
+  }, [filters, prescriptions, activeTab]);
 
-  const handleFilterChange = (e) => {
+  const handleFilterChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({
       ...prevFilters,
-      [name]: value,
+      [activeTab]: {
+        ...(prevFilters[activeTab as keyof typeof filters] as Record<
+          string,
+          string
+        >),
+        [name]: value,
+      },
     }));
+  };
+
+  const renderFilters = () => {
+    console.log("activeTab: ", activeTab);
+    const activeFilters = filters[activeTab as keyof typeof filters] as Record<
+      string,
+      string
+    >;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Object.entries(activeFilters).map(([key, value]: [string, string]) => {
+          if (key === "refillFrequency") {
+            return (
+              <div key={key}>
+                <Label
+                  htmlFor={`${key}-filter`}
+                  className="text-pink-600 capitalize"
+                >
+                  {key}
+                </Label>
+                <select
+                  id={`${key}-filter`}
+                  name={key}
+                  value={value}
+                  onChange={handleFilterChange}
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-pink-200 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md"
+                >
+                  <option value="">Select frequency</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+            );
+          }
+          return (
+            <div key={key}>
+              <Label
+                htmlFor={`${key}-filter`}
+                className="text-pink-600 capitalize"
+              >
+                {key}
+              </Label>
+              <Input
+                id={`${key}-filter`}
+                name={key}
+                value={value}
+                onChange={handleFilterChange}
+                placeholder={`Filter by ${key}`}
+                className="mt-1 border-pink-200 focus:ring-pink-500 focus:border-pink-500"
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   if (loading) {
@@ -110,7 +190,7 @@ export default function PrescriptionSummaryReport() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 p-6 space-y-6 shadow-2xl rounded-lg">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 p-6 space-y-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-6 text-black">
           Prescription Summary Report
@@ -119,84 +199,31 @@ export default function PrescriptionSummaryReport() {
         <Card className="mb-6 border-pink-200 shadow-lg">
           <CardHeader className="border-b border-pink-200">
             <CardTitle className="flex items-center text-black">
-              <Filter className="mr-2 h-4 w-4 text-pink-500" />
+              <ActivityIcon className="mr-2 text-pink-500" />
               Filters
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <Label htmlFor="prescription-filter" className="text-pink-600">
-                  Prescription ID
-                </Label>
-                <Input
-                  id="prescription-filter"
-                  name="prescription"
-                  value={filters.prescription}
-                  onChange={handleFilterChange}
-                  placeholder="Filter by prescription ID"
-                  className="mt-1 border-pink-200 focus:ring-pink-500 focus:border-pink-500"
-                />
-              </div>
-              <div>
-                <Label htmlFor="quantity-filter" className="text-pink-600">
-                  Quantity
-                </Label>
-                <Input
-                  id="quantity-filter"
-                  name="quantity"
-                  value={filters.quantity}
-                  onChange={handleFilterChange}
-                  placeholder="Filter by quantity"
-                  type="number"
-                  className="mt-1 border-pink-200 focus:ring-pink-500 focus:border-pink-500"
-                />
-              </div>
-              <div>
-                <Label htmlFor="medication-filter" className="text-pink-600">
-                  Medication
-                </Label>
-                <Input
-                  id="medication-filter"
-                  name="medication"
-                  value={filters.medication}
-                  onChange={handleFilterChange}
-                  placeholder="Filter by medication"
-                  className="mt-1 border-pink-200 focus:ring-pink-500 focus:border-pink-500"
-                />
-              </div>
-              <div>
-                <Label htmlFor="patient-filter" className="text-pink-600">
-                  Patient
-                </Label>
-                <Input
-                  id="patient-filter"
-                  name="patient"
-                  value={filters.patient}
-                  onChange={handleFilterChange}
-                  placeholder="Filter by patient name"
-                  className="mt-1 border-pink-200 focus:ring-pink-500 focus:border-pink-500"
-                />
-              </div>
-            </div>
-          </CardContent>
+          <CardContent>{renderFilters()}</CardContent>
         </Card>
 
-        <Tabs defaultValue="prescriptions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-pink-100 p-1 rounded-lg">
+        <Tabs
+          defaultValue="prescriptions"
+          className="space-y-6"
+          onTabChange={(value) => {
+            setActiveTab(value);
+            setFilters((prevFilters) => ({
+              ...prevFilters,
+              [value]: { ...prevFilters[value as keyof typeof filters] },
+            }));
+          }}
+        >
+          <TabsList className="grid w-full grid-cols-2 bg-pink-100 p-1 rounded-lg">
             <TabsTrigger
               value="prescriptions"
-              //className="data-[state=active]:bg-white data-[state=active]:text-pink-700"
+              className="data-[state=active]:bg-white data-[state=active]:text-pink-700"
             >
               <PillIcon className="mr-2 h-4 w-4" />
               Prescriptions
-            </TabsTrigger>
-            <TabsTrigger
-              value="patient"
-              //className="data-[state=active]:bg-white data-[state=active]:text-pink-700"
-            >
-              <UserIcon className="mr-2 h-4 w-4" />
-              Patient
             </TabsTrigger>
             <TabsTrigger
               value="refills"
@@ -204,13 +231,6 @@ export default function PrescriptionSummaryReport() {
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               Refills
-            </TabsTrigger>
-            <TabsTrigger
-              value="adherence"
-              className="data-[state=active]:bg-white data-[state=active]:text-pink-700"
-            >
-              <ActivityIcon className="mr-2 h-4 w-4" />
-              Adherence
             </TabsTrigger>
           </TabsList>
 
@@ -223,7 +243,6 @@ export default function PrescriptionSummaryReport() {
                 <button
                   className="absolute top-2 right-2 p-1 rounded-full hover:bg-pink-200 transition-colors"
                   onClick={() => {
-                    // Implement expand functionality here
                     console.log("Expand Active Prescriptions");
                   }}
                 >
@@ -243,6 +262,8 @@ export default function PrescriptionSummaryReport() {
                       <TableHead className="text-pink-700">Dosage</TableHead>
                       <TableHead className="text-pink-700">Quantity</TableHead>
                       <TableHead className="text-pink-700">Provider</TableHead>
+                      <TableHead className="text-pink-700">Insurance</TableHead>
+                      <TableHead className="text-pink-700">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -253,34 +274,12 @@ export default function PrescriptionSummaryReport() {
                         <TableCell>{prescription.dosage}</TableCell>
                         <TableCell>{prescription.quantity}</TableCell>
                         <TableCell>{prescription.provider}</TableCell>
+                        <TableCell>{prescription.insurance}</TableCell>
+                        <TableCell>{prescription.status}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="patient">
-            <Card className="border-pink-200 shadow-lg">
-              <CardHeader className="border-b border-pink-200">
-                <CardTitle className="text-black">Patient Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <p>
-                    <strong className="text-pink-600">Name:</strong>{" "}
-                    {filteredPrescriptions[0]?.patientName}
-                  </p>
-                  <p>
-                    <strong className="text-pink-600">Condition:</strong>{" "}
-                    {filteredPrescriptions[0]?.condition}
-                  </p>
-                  <p>
-                    <strong className="text-pink-600">Next Appointment:</strong>{" "}
-                    {filteredPrescriptions[0]?.nextAppointment}
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -295,68 +294,31 @@ export default function PrescriptionSummaryReport() {
                   <TableHeader>
                     <TableRow className="bg-pink-50">
                       <TableHead className="text-pink-700">
-                        Medication
+                        Patient ID
                       </TableHead>
                       <TableHead className="text-pink-700">
-                        Next Refill
+                        Medication
                       </TableHead>
-                      <TableHead className="text-pink-700">Status</TableHead>
+                      <TableHead className="text-pink-700">Refill #</TableHead>
+                      <TableHead className="text-pink-700">Provider</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredPrescriptions.map((prescription, index) => (
                       <TableRow key={index} className="hover:bg-pink-50">
+                        <TableCell>{prescription.patientId}</TableCell>
                         <TableCell>{prescription.medicationName}</TableCell>
-                        <TableCell>{prescription.nextRefillDate}</TableCell>
-                        {/* <TableCell>
-                          <Badge
-                            variant={
-                              prescription.refillStatus === "Available"
-                                ? "default"
-                                : "secondary"
-                            }
-                            className="bg-pink-100 text-pink-700"
-                          >
-                            {prescription.refillStatus}
-                          </Badge>
-                        </TableCell> */}
+                        <TableCell>
+                          {prescription.refillNumber}/
+                          {filters.refills.refillFrequency === "monthly"
+                            ? "month"
+                            : "year"}
+                        </TableCell>
+                        <TableCell>{prescription.provider}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="adherence">
-            <Card className="border-pink-200 shadow-lg">
-              <CardHeader className="border-b border-pink-200">
-                <CardTitle className="text-black">
-                  Medication Adherence
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {filteredPrescriptions.map((prescription, index) => (
-                  <div key={index} className="mb-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-pink-600">
-                        {prescription.medicationName}
-                      </span>
-                      <span className="text-pink-700 font-semibold">
-                        {prescription.adherenceRate}%
-                      </span>
-                    </div>
-                    {/* <Progress
-                      value={prescription.adherenceRate}
-                      className="w-full h-2 bg-pink-200"
-                    >
-                      <div
-                        className="h-full bg-pink-500 rounded-full"
-                        style={{ width: `${prescription.adherenceRate}%` }}
-                      />
-                    </Progress> */}
-                  </div>
-                ))}
               </CardContent>
             </Card>
           </TabsContent>
