@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import axios from "axios";
 
@@ -14,6 +15,8 @@ import {
 export default function DoctorSchedulePage() {
   const [todaysSchedule, setTodaysSchedule] = useState([]);
   const [updatedAppointments, setUpdatedAppointments] = useState(new Set());
+
+  const navigate = useNavigate();
 
   //-----------Fetch Todays Doctor Schedule-----------------\\
   const fetchTodaysSchedule = async () => {
@@ -31,6 +34,14 @@ export default function DoctorSchedulePage() {
       console.error("Error fetching doctor's schedule:", error);
     }
   };
+  //Fetch the doctors schedule on refresh or when the open the site.
+  useEffect(() => {
+    fetchTodaysSchedule();
+  }, []);
+
+  //-------End of Fetching Todays Schedule-------------------\\
+
+  //-------If the appointment is after the appointment window, set appt status to missed\\
 
   const updateAppointmentToMissed = async (appointmentID) => {
     //If the appointment has already been updated simply skip the function call.
@@ -64,18 +75,17 @@ export default function DoctorSchedulePage() {
           now > appointmentEndTime &&
           !updatedAppointments.has(appointment.appointmentID)
         ) {
-          await updateAppointmentStatus(appointment.appointmentID);
+          await updateAppointmentToMissed(appointment.appointmentID);
         }
       }
     };
 
     checkAndUpdateMissedAppointments();
   }, [todaysSchedule]);
-
-  //Fetch the doctors schedule on refresh or when the open the site.
-  useEffect(() => {
-    fetchTodaysSchedule();
-  }, []);
+  //---------------------------------------------------------
+  const proceedToAppointment = (appointmentID) => {
+    navigate(`/doctor/schedule/appointments/${appointmentID}`);
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -123,7 +133,9 @@ export default function DoctorSchedulePage() {
                           <Button
                             variant="primary"
                             size="sm"
-                            onClick={() => proceedToAppointment(appointment.id)}
+                            onClick={() =>
+                              proceedToAppointment(appointment.appointmentID)
+                            }
                           >
                             Proceed with Appointment
                           </Button>
