@@ -11,31 +11,6 @@ import {
   TableRow,
 } from "../../components/ui/Table";
 
-// Mock data for demonstration
-const appointments = [
-  {
-    id: 1,
-    patientName: "John Doe",
-    time: "09:00 AM",
-    serviceType: "Check-up",
-    medications: ["Aspirin", "Lisinopril"],
-  },
-  {
-    id: 2,
-    patientName: "Jane Smith",
-    time: "10:30 AM",
-    serviceType: "Follow-up",
-    medications: ["Metformin"],
-  },
-  {
-    id: 3,
-    patientName: "Bob Johnson",
-    time: "02:00 PM",
-    serviceType: "Consultation",
-    medications: [],
-  },
-];
-
 export default function DoctorSchedulePage() {
   const [todaysSchedule, setTodaysSchedule] = useState([]);
 
@@ -75,18 +50,25 @@ export default function DoctorSchedulePage() {
         <TableBody>
           {todaysSchedule && todaysSchedule.length > 0 ? (
             todaysSchedule.map((appointment) => {
-              const date = new Date(appointment.appointmentDateTime);
-              const timeOfAppointment = date.toLocaleTimeString("en-US", {
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              });
-              const currentTime12Hour = new Date().toLocaleTimeString("en-US", {
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
-                hour12: true,
-              });
+              const appointmentDate = new Date(appointment.appointmentDateTime);
+              const currentTime = new Date();
+              const timeOfAppointment = appointmentDate.toLocaleTimeString(
+                "en-US",
+                {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                }
+              );
+
+              const appointmentEndTime = new Date(
+                appointmentDate.getTime() + 30 * 60 * 1000
+              );
+              const isBeforeAppointment = currentTime < appointmentDate;
+              const isDuringAppointment =
+                currentTime >= appointmentDate &&
+                currentTime <= appointmentEndTime;
+              const isAfterAppointment = currentTime > appointmentEndTime;
               return (
                 <React.Fragment key={appointment.appointmentID}>
                   <TableRow>
@@ -94,24 +76,25 @@ export default function DoctorSchedulePage() {
                     <TableCell>{timeOfAppointment}</TableCell>
                     <TableCell>{appointment.serviceName}</TableCell>
                     <TableCell>
-                      {timeOfAppointment < currentTime12Hour ? (
-                        <div className="flex space-x-2">
+                      <div className="flex space-x-2">
+                        {isDuringAppointment ? (
                           <Button
                             variant="primary"
                             size="sm"
                             onClick={() => proceedToAppointment(appointment.id)}
-                            disabled={true}
                           >
                             Proceed with Appointment
                           </Button>
-                        </div>
-                      ) : (
-                        <div className="flex space-x-2">
-                          <Button variant="primary" size="sm" disabled={true}>
+                        ) : isBeforeAppointment ? (
+                          <Button variant="primary" size="sm" disabled>
                             Upcoming Appointment
                           </Button>
-                        </div>
-                      )}
+                        ) : (
+                          <Button variant="secondary" size="sm" disabled>
+                            Missed Appointment
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 </React.Fragment>
