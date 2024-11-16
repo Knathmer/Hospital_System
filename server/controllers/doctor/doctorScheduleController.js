@@ -3,6 +3,11 @@ import {
   GET_DOCTOR_SCHEDULE,
   GET_PATIENT_INFO_DOC_APPT,
   GET_PATIENT_INSURANCE_DOC_APPT,
+  GET_PATIENT_ALLERGIES,
+  GET_PATIENT_DISABILITIES,
+  GET_PATIENT_FAMILY_HISTORY,
+  GET_PATIENT_SURGERIES,
+  GET_PATIENT_VACCINE,
 } from "../../queries/constants/selectQueries.js";
 
 export const getDoctorSchedule = async (req, res) => {
@@ -89,12 +94,10 @@ export const getPatientInformation = async (req, res) => {
 
 export const getInsuranceInformation = async (req, res) => {
   try {
-    const { patientID } = req.query; // Extract patientID from query parameters
+    const { patientID } = req.query;
 
     if (!patientID) {
-      return res
-        .status(400) // Use 400 for bad requests
-        .json({ message: "Patient ID is required!" });
+      return res.status(400).json({ message: "Patient ID is required!" });
     }
 
     const [insuranceInformation] = await query(GET_PATIENT_INSURANCE_DOC_APPT, [
@@ -106,11 +109,116 @@ export const getInsuranceInformation = async (req, res) => {
         .status(200)
         .json({ message: "Insurance information not found!" });
     }
+
     res.status(200).json({ insuranceInformation });
   } catch (error) {
     console.error("Error fetching patient's insurance information ", error);
     res
       .status(500)
       .json({ message: "Server error fetching patient's insurance info" });
+  }
+};
+
+export const getAllergiesInformation = async (req, res) => {
+  try {
+    const { patientID } = req.query;
+
+    if (!patientID) {
+      return res.status(400).json({ message: "Patient ID is required!" });
+    }
+
+    const allergiesInformation = await query(GET_PATIENT_ALLERGIES, [
+      patientID,
+    ]);
+
+    res.status(200).json({ allergiesInformation });
+  } catch (error) {
+    console.error("Error fetching patient's allergies information ", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching patient's allergies info" });
+  }
+};
+
+export const getDisabilitiesInformation = async (req, res) => {
+  try {
+    const { patientID } = req.query;
+
+    if (!patientID) {
+      return res.status(400).json({ message: "Patient ID is required!" });
+    }
+
+    const disabilitiesInformation = await query(GET_PATIENT_DISABILITIES, [
+      patientID,
+    ]);
+
+    res.status(200).json({ disabilitiesInformation });
+  } catch (error) {
+    console.error("Error fetching patient's disabilities information ", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching patient's disabilities info" });
+  }
+};
+
+export const getFamilyHistoryInformation = async (req, res) => {
+  try {
+    const { patientID } = req.query;
+
+    if (!patientID) {
+      return res.status(400).json({ message: "Patient ID is required!" });
+    }
+
+    const familyHistoryInformation = await query(GET_PATIENT_FAMILY_HISTORY, [
+      patientID,
+    ]);
+
+    res.status(200).json({ familyHistoryInformation });
+  } catch (error) {
+    console.error(
+      "Error fetching patient's family history information ",
+      error
+    );
+    res
+      .status(500)
+      .json({ message: "Server error fetching patient's family history info" });
+  }
+};
+
+export const getSurgeriesInformation = async (req, res) => {
+  try {
+    const { patientID } = req.query;
+
+    if (!patientID) {
+      return res.status(400).json({ message: "Patient ID is required!" });
+    }
+
+    const surgeryInformation = await query(GET_PATIENT_SURGERIES, [patientID]);
+
+    res.status(200).json({ surgeryInformation });
+  } catch (error) {
+    console.error("Error fetching patient's surgeries information ", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching patient's surgeries info" });
+  }
+};
+
+export const getVaccinesInformation = async (req, res) => {
+  try {
+    const { patientID } = req.query;
+
+    if (!patientID) {
+      return res.status(400).json({ message: "Patient ID is required!" });
+    }
+
+    const vaccineInformation = await query(GET_PATIENT_VACCINE, [patientID]);
+
+    res.status(200).json({ vaccineInformation });
+  } catch (error) {
+    console.error("Error fetching patient's vaccine information ", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching patient's vaccine info" });
   }
 };

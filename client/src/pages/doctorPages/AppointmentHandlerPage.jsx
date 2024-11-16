@@ -47,13 +47,19 @@ const appointmentData = {
 export default function AppointmentHandlerPage() {
   const [patientInformation, setPatientInformation] = useState({});
   const [insuranceInformation, setInsuranceInformation] = useState({});
+  const [allergies, setAllergies] = useState([]);
+  const [disabilities, setDisabilities] = useState([]);
+  const [vaccines, setVaccines] = useState([]);
+  const [surgeries, setSurgeries] = useState([]);
+  const [familyHistory, setFamilyHistory] = useState([]);
   const { appointmentID } = useParams(); //extract the appointmentID from the URL.
   const navigate = useNavigate();
 
   const fetchPatientInformation = async () => {
     try {
-      //Step 1: Fetch patient information
       const token = localStorage.getItem("token");
+
+      // Step 1: Fetch Patient Information
       const patientInfoResponse = await axios.get(
         "http://localhost:3000/auth/doctor/schedule/patient-info",
         {
@@ -65,37 +71,59 @@ export default function AppointmentHandlerPage() {
       const patientInfo = patientInfoResponse.data.patientInfo;
       setPatientInformation(patientInfo);
 
-      //Step 2: Fetch Insurance Information
-      const insuranceInfoResponse = await axios.get(
-        "http://localhost:3000/auth/doctor/schedule/insurance-info",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { patientID: patientInfo.patientID },
-        }
-      );
+      // Step 2: Fetch Related Data in Parallel
+      const patientID = patientInfo.patientID;
 
+      const [
+        insuranceInfoResponse,
+        allergiesInfoResponse,
+        disabilitiesInfoResponse,
+        vaccineInfoResponse,
+        surgeriesInfoResponse,
+        familyInfoResponse,
+      ] = await Promise.all([
+        axios.get("http://localhost:3000/auth/doctor/schedule/insurance-info", {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+        axios.get("http://localhost:3000/auth/doctor/schedule/allergy-info", {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+        axios.get(
+          "http://localhost:3000/auth/doctor/schedule/disability-info",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { patientID },
+          }
+        ),
+        axios.get("http://localhost:3000/auth/doctor/schedule/vaccine-info", {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+        axios.get("http://localhost:3000/auth/doctor/schedule/surgery-info", {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+        axios.get("http://localhost:3000/auth/doctor/schedule/family-info", {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+      ]);
+
+      // Step 3: Set States
       setInsuranceInformation(
         insuranceInfoResponse.data.insuranceInformation || {}
       );
-    } catch (error) {
-      console.error("Error getting patient information: ", error);
-    }
-  };
-
-  const fetchInsuranceInformation = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const patientID = patientInformation.patientID;
-      const response = await axios.get(
-        "http://localhost:3000/auth/doctor/schedule/patient-info",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { patientID },
-        }
+      setAllergies(allergiesInfoResponse.data.allergiesInformation || []);
+      setDisabilities(
+        disabilitiesInfoResponse.data.disabilitiesInformation || []
       );
-      setInsuranceInformation(response.data.insuranceInformation || {});
+      setVaccines(vaccineInfoResponse.data.vaccineInformation || []);
+      setSurgeries(surgeriesInfoResponse.data.surgeryInformation || []);
+      setFamilyHistory(familyInfoResponse.data.familyHistoryInformation || []);
     } catch (error) {
-      console.error("Error getting patient's insurance information: ", error);
+      console.error("Error fetching patient information: ", error);
     }
   };
 

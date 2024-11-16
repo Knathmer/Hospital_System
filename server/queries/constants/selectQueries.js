@@ -129,3 +129,14 @@ export const GET_DOCTOR_SCHEDULE = `SELECT p.patientID, CONCAT(p.firstName, ' ',
 export const GET_PATIENT_INFO_DOC_APPT = `SELECT p.patientID, CONCAT(p.firstName, ' ', p.lastName) AS patientFullName, p.dateOfBirth, p.phoneNumber, p.email FROM patient p INNER JOIN appointment a ON p.patientID = a.patientID WHERE a.appointmentID = ? AND a.doctorID = ?;`;
 
 export const GET_PATIENT_INSURANCE_DOC_APPT = `SELECT i.insuranceID, i.providerName, i.policy_number, i.coverageDetails, i.coverage_expiration_date FROM insurance i INNER JOIN patient p ON i.patientID = p.patientID WHERE p.patientID = ?;`;
+
+export const GET_PATIENT_ALLERGIES = `SELECT a.allergyID, a.allergen, a.severity, a.severity FROM allergy a INNER JOIN patient p ON a.patientID = p.patientID WHERE p.patientID = ?;`;
+
+export const GET_PATIENT_SURGERIES = `SELECT s.surgeryID, s.surgeryType, s.surgeryDateTime, CONCAT(d.firstName, ' ' , d.lastName) AS doctorFullName, sp.specialtyName , o.officeName FROM surgery s LEFT JOIN doctor d ON s.doctorID = d.doctorID LEFT JOIN specialty sp ON d.specialtyID = sp.specialtyID INNER JOIN office o ON d.officeID = o.officeID INNER JOIN patient p ON s.patientID = p.patientID WHERE p.patientID = ?;`;
+
+export const GET_PATIENT_DISABILITIES = `SELECT d.disabilityID, d.disabilityType FROM disability d WHERE d.patientID = ?;`;
+
+export const GET_PATIENT_VACCINE = `SELECT v.vaccineID, v.vaccineName, v.dateAdministered AS date, CONCAT(d.firstName, ' ', d.lastName) AS doctorFullName, o.officeName FROM vaccine v LEFT JOIN doctor d ON v.doctorID = d.doctorID INNER JOIN office o ON d.officeID = o.officeID INNER JOIN patient p ON v.patientID = p.patientID WHERE p.patientID = ?;`;
+
+export const GET_PATIENT_FAMILY_HISTORY =
+  "SELECT fh.`condition`, fh.familyHistoryID FROM family_history fh INNER JOIN patient p ON fh.patientID = p.patientID WHERE p.patientID = ?;";
