@@ -26,7 +26,7 @@ const AdminDashboard = () => {
               <UserPlus className="h-8 w-8 text-pink-500 mr-4" />
               <span className="text-xl font-semibold text-gray-800">Manage Doctors</span>
             </Link>
-            <Link to="/admin/system-reports" className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <Link to="/admin/AppointmentAnalytics" className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
               <FileText className="h-8 w-8 text-pink-500 mr-4" />
               <span className="text-xl font-semibold text-gray-800">System Reports</span>
             </Link>

@@ -5,7 +5,7 @@ import RegisterDoctor from "../components/users/admin/sections/doctorRegistratio
 import ManageDoctors from "../components/users/admin/sections/manageDoctors";
 import ManagePatients from "../components/users/admin/sections/managePatients";
 import Settings from "../components/users/admin/sections/settings";
-import SystemReports from "../components/users/admin/sections/system-reports";
+import AppointmentAnalytics from "../components/users/admin/sections/AppointmentAnalytics";
 
 const AdminRoutes = () => {
   return (
@@ -14,7 +14,7 @@ const AdminRoutes = () => {
       <Route path="register-doctor" element={<RegisterDoctor />} />
       <Route path="manage-patients" element={<ManagePatients />} />
       <Route path="manage-doctors" element={<ManageDoctors />} />
-      <Route path="system-reports" element={<SystemReports />} />
+      <Route path="AppointmentAnalytics" element={<AppointmentAnalytics />} />
       <Route path="settings" element={<Settings />} />
       {/* Add other admin routes here */}
     </Routes>
