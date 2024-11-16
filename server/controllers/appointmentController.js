@@ -1,6 +1,73 @@
 import { query } from "../database.js"; // Import query function
 import pool from "../database.js"; // Import pool for transactions
 
+// Function to get unique states tied to offices
+export async function getStates(req, res) {
+  try {
+    const statesData = await query(
+      `SELECT DISTINCT a.addrstate AS state
+       FROM office o
+       JOIN address a ON o.addressID = a.addressID
+       ORDER BY a.addrstate`
+    );
+    const states = statesData.map(item => item.state);
+    res.json(states);
+  } catch (error) {
+    console.error("Error fetching states:", error);
+    res.status(500).json({ error: "Error fetching states" });
+  }
+}
+
+// Function to get unique cities based on state
+export async function getCities(req, res) {
+  const { state } = req.query;
+
+  if (!state) {
+    return res.status(400).json({ error: "State parameter is required" });
+  }
+
+  try {
+    const citiesData = await query(
+      `SELECT DISTINCT a.addrcity AS city
+       FROM office o
+       JOIN address a ON o.addressID = a.addressID
+       WHERE a.addrstate = ?
+       ORDER BY a.addrcity`,
+      [state]
+    );
+    const cities = citiesData.map(item => item.city);
+    res.json(cities);
+  } catch (error) {
+    console.error("Error fetching cities:", error);
+    res.status(500).json({ error: "Error fetching cities" });
+  }
+}
+
+// Function to get offices based on state and city
+export async function getOffices(req, res) {
+  const { state, city } = req.query;
+
+  if (!state || !city) {
+    return res.status(400).json({ error: "State and city parameters are required" });
+  }
+
+  try {
+    const officesData = await query(
+      `SELECT o.officeID, o.officeName, CONCAT(a.addrStreet, ', ', a.addrcity, ', ', a.addrstate, ' ', a.addrzip) AS address
+       FROM office o
+       JOIN address a ON o.addressID = a.addressID
+       WHERE a.addrstate = ? AND a.addrcity = ?
+       ORDER BY o.officeName`,
+      [state, city]
+    );
+    res.json(officesData);
+  } catch (error) {
+    console.error("Error fetching offices:", error);
+    res.status(500).json({ error: "Error fetching offices" });
+  }
+}
+
+
 export async function getPatientAppointments(req, res) {
   const patientID = req.user.patientID; // Get patientID from the verified JWT
 
@@ -119,29 +186,29 @@ export const getServices = async (req, res) => {
 };
 
 export async function getDoctorsBySpecialty(req, res) {
-  const { specialtyID, gender, location, serviceID } = req.query;
+  const { specialtyID, gender, state, city, officeID, serviceID } = req.query;
 
   try {
     let queryStr = `
-        SELECT DISTINCT
-            doctor.doctorID,
-            doctor.firstName,
-            doctor.lastName,
-            doctor.gender,
-            doctor.workPhoneNumber,
-            doctor.workEmail,
-            s.specialtyName,
-            doctor.officeID,
-            office.officeName AS officeLocation,
-            CONCAT(addrStreet, ', ', addrcity, ', ', addrstate, ' ', addrzip) AS officeAddress
-        FROM doctor
-        LEFT JOIN office ON doctor.officeID = office.officeID
-        INNER JOIN specialty s ON doctor.specialtyID = s.specialtyID
-        JOIN address ON office.addressID = address.addressID
-        LEFT JOIN specialty_service ss ON s.specialtyID = ss.specialtyID
-        LEFT JOIN service ON ss.serviceID = service.serviceID
-        WHERE 1=1
-      `;
+      SELECT DISTINCT
+        doctor.doctorID,
+        doctor.firstName,
+        doctor.lastName,
+        doctor.gender,
+        doctor.workPhoneNumber,
+        doctor.workEmail,
+        s.specialtyName,
+        doctor.officeID,
+        office.officeName AS officeLocation,
+        CONCAT(a.addrStreet, ', ', a.addrcity, ', ', a.addrstate, ' ', a.addrzip) AS officeAddress
+      FROM doctor
+      LEFT JOIN office ON doctor.officeID = office.officeID
+      INNER JOIN specialty s ON doctor.specialtyID = s.specialtyID
+      JOIN address a ON office.addressID = a.addressID
+      LEFT JOIN specialty_service ss ON s.specialtyID = ss.specialtyID
+      LEFT JOIN service ON ss.serviceID = service.serviceID
+      WHERE 1=1
+    `;
     const params = [];
 
     if (specialtyID) {
@@ -154,9 +221,19 @@ export async function getDoctorsBySpecialty(req, res) {
       params.push(gender);
     }
 
-    if (location) {
-      queryStr += " AND office.officeName = ?";
-      params.push(location);
+    if (state) {
+      queryStr += " AND a.addrstate = ?";
+      params.push(state);
+    }
+
+    if (city) {
+      queryStr += " AND a.addrcity = ?";
+      params.push(city);
+    }
+
+    if (officeID) {
+      queryStr += " AND office.officeID = ?";
+      params.push(officeID);
     }
 
     if (serviceID) {
@@ -164,7 +241,7 @@ export async function getDoctorsBySpecialty(req, res) {
       params.push(serviceID);
     }
 
-    queryStr += " ORDER BY s.specialtyName, doctor.gender, office.officeName";
+    queryStr += " ORDER BY s.specialtyName, doctor.lastName";
 
     const doctors = await query(queryStr, params);
     res.json(doctors);
