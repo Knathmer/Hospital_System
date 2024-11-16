@@ -2,6 +2,7 @@ import { query } from "../../database.js";
 import {
   GET_DOCTOR_SCHEDULE,
   GET_PATIENT_INFO_DOC_APPT,
+  GET_PATIENT_INSURANCE_DOC_APPT,
 } from "../../queries/constants/selectQueries.js";
 
 export const getDoctorSchedule = async (req, res) => {
@@ -83,5 +84,33 @@ export const getPatientInformation = async (req, res) => {
   } catch (error) {
     console.error("Error fetching patient information ", error);
     res.status(500).json({ message: "Server error fetching patient info" });
+  }
+};
+
+export const getInsuranceInformation = async (req, res) => {
+  try {
+    const { patientID } = req.query; // Extract patientID from query parameters
+
+    if (!patientID) {
+      return res
+        .status(400) // Use 400 for bad requests
+        .json({ message: "Patient ID is required!" });
+    }
+
+    const [insuranceInformation] = await query(GET_PATIENT_INSURANCE_DOC_APPT, [
+      patientID,
+    ]);
+
+    if (!insuranceInformation) {
+      return res
+        .status(200)
+        .json({ message: "Insurance information not found!" });
+    }
+    res.status(200).json({ insuranceInformation });
+  } catch (error) {
+    console.error("Error fetching patient's insurance information ", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching patient's insurance info" });
   }
 };

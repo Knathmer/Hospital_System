@@ -127,3 +127,5 @@ export const GET_PAYMENTS_STATEMENTS = `SELECT p.paymentDate, p.amount, p.payerT
 export const GET_DOCTOR_SCHEDULE = `SELECT p.patientID, CONCAT(p.firstName, ' ', p.lastName) AS fullName, a.appointmentDateTime, a.appointmentID,  s.serviceName,  s.serviceID FROM patient p JOIN appointment a ON p.patientID = a.patientID JOIN service s ON a.serviceID = s.serviceID WHERE a.doctorID = ? AND a.appointmentDateTime >= ? AND a.appointmentDateTime < ? AND a.status = 'Scheduled';`;
 
 export const GET_PATIENT_INFO_DOC_APPT = `SELECT p.patientID, CONCAT(p.firstName, ' ', p.lastName) AS patientFullName, p.dateOfBirth, p.phoneNumber, p.email FROM patient p INNER JOIN appointment a ON p.patientID = a.patientID WHERE a.appointmentID = ? AND a.doctorID = ?;`;
+
+export const GET_PATIENT_INSURANCE_DOC_APPT = `SELECT i.insuranceID, i.providerName, i.policy_number, i.coverageDetails, i.coverage_expiration_date FROM insurance i INNER JOIN patient p ON i.patientID = p.patientID WHERE p.patientID = ?;`;

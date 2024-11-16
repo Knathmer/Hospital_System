@@ -46,22 +46,56 @@ const appointmentData = {
 
 export default function AppointmentHandlerPage() {
   const [patientInformation, setPatientInformation] = useState({});
+  const [insuranceInformation, setInsuranceInformation] = useState({});
   const { appointmentID } = useParams(); //extract the appointmentID from the URL.
   const navigate = useNavigate();
 
   const fetchPatientInformation = async () => {
     try {
+      //Step 1: Fetch patient information
       const token = localStorage.getItem("token");
-      const response = await axios.get(
+      const patientInfoResponse = await axios.get(
         "http://localhost:3000/auth/doctor/schedule/patient-info",
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { appointmentID },
         }
       );
-      setPatientInformation(response.data.patientInfo || {});
+
+      const patientInfo = patientInfoResponse.data.patientInfo;
+      setPatientInformation(patientInfo);
+
+      //Step 2: Fetch Insurance Information
+      const insuranceInfoResponse = await axios.get(
+        "http://localhost:3000/auth/doctor/schedule/insurance-info",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID: patientInfo.patientID },
+        }
+      );
+
+      setInsuranceInformation(
+        insuranceInfoResponse.data.insuranceInformation || {}
+      );
     } catch (error) {
       console.error("Error getting patient information: ", error);
+    }
+  };
+
+  const fetchInsuranceInformation = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const patientID = patientInformation.patientID;
+      const response = await axios.get(
+        "http://localhost:3000/auth/doctor/schedule/patient-info",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }
+      );
+      setInsuranceInformation(response.data.insuranceInformation || {});
+    } catch (error) {
+      console.error("Error getting patient's insurance information: ", error);
     }
   };
 
@@ -146,7 +180,7 @@ export default function AppointmentHandlerPage() {
               <CardTitle className="text-white">Patient Information</CardTitle>
             </CardHeader>
             <CardContent>
-              {patientInformation ? (
+              {patientInformation.patientFullName ? (
                 <>
                   <p>
                     <strong>Name:</strong> {patientInformation.patientFullName}
@@ -176,7 +210,9 @@ export default function AppointmentHandlerPage() {
                   </p>
                 </>
               ) : (
-                <p>No patient information found!</p>
+                <p className="text-center text-gray-400">
+                  No patient information found!
+                </p>
               )}
             </CardContent>
           </Card>
@@ -187,18 +223,37 @@ export default function AppointmentHandlerPage() {
                 Insurance Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="mt-4">
-              <p>
-                <strong>Provider:</strong> {appointmentData.insurance.provider}
-              </p>
-              <p>
-                <strong>Policy Number:</strong>{" "}
-                {appointmentData.insurance.policyNumber}
-              </p>
-              <p>
-                <strong>Group Number:</strong>{" "}
-                {appointmentData.insurance.groupNumber}
-              </p>
+            <CardContent>
+              {insuranceInformation.providerName ? (
+                <>
+                  <p>
+                    <strong>Provider:</strong>{" "}
+                    {insuranceInformation.providerName}
+                  </p>
+                  <p>
+                    <strong>Policy Number:</strong>{" "}
+                    {insuranceInformation.policy_number}
+                  </p>
+                  <p>
+                    <strong>Coverage Details:</strong>{" "}
+                    {insuranceInformation.coverageDetails}
+                  </p>
+                  <p>
+                    <strong>Coverage Expiration Date: </strong>{" "}
+                    {new Date(
+                      insuranceInformation.coverage_expiration_date
+                    ).toLocaleDateString("en-US", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
+                  </p>
+                </>
+              ) : (
+                <p className="text-center text-gray-400">
+                  No insurance coverage
+                </p>
+              )}
             </CardContent>
           </Card>
 
