@@ -1,11 +1,34 @@
 import { query } from "../../database.js";
-import { GET_DOCTOR_SCHEDULE } from "../../queries/constants/selectQueries.js";
+import {
+  GET_DOCTOR_SCHEDULE,
+  GET_PATIENT_INFO_DOC_APPT,
+} from "../../queries/constants/selectQueries.js";
 
 export const getDoctorSchedule = async (req, res) => {
   try {
-    const doctorID = req.user.doctorID;
+    const now = new Date();
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+    const endOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1
+    );
+    const startOfDayStr = startOfDay
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+    const endOfDayStr = endOfDay.toISOString().slice(0, 19).replace("T", " ");
 
-    const doctorSchedule = await query(GET_DOCTOR_SCHEDULE, [doctorID]);
+    const doctorID = req.user.doctorID;
+    const doctorSchedule = await query(GET_DOCTOR_SCHEDULE, [
+      doctorID,
+      startOfDayStr,
+      endOfDayStr,
+    ]);
 
     if (doctorSchedule.length === 0) {
       return res.status(200).json({
@@ -36,4 +59,29 @@ export const putMissedAppointment = async (req, res) => {
     }
     res.json({ success: true, message: "Appointment status updated." });
   } catch (error) {}
+};
+
+export const getPatientInformation = async (req, res) => {
+  try {
+    const doctorID = req.user.doctorID;
+    const { appointmentID } = req.query;
+
+    if (!appointmentID) {
+      return res.status(400).json({ message: "Appointment ID is required" });
+    }
+
+    const [patientInfo] = await query(GET_PATIENT_INFO_DOC_APPT, [
+      appointmentID,
+      doctorID,
+    ]);
+
+    if (!patientInfo) {
+      return res.status(200).json({ message: "Patient not found!" });
+    }
+
+    res.status(200).json({ patientInfo });
+  } catch (error) {
+    console.error("Error fetching patient information ", error);
+    res.status(500).json({ message: "Server error fetching patient info" });
+  }
 };

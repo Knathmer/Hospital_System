@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import {
   Card,
@@ -12,6 +12,7 @@ import Label from "../../components/ui/Label";
 import Textarea from "../../components/ui/TextArea";
 import Checkbox from "../../components/ui/Checkbox";
 import { ArrowLeft, Plus, X } from "lucide-react";
+import axios from "axios";
 
 // Mock data for the appointment
 const appointmentData = {
@@ -44,7 +45,29 @@ const appointmentData = {
 };
 
 export default function AppointmentHandlerPage() {
+  const [patientInformation, setPatientInformation] = useState({});
+  const { appointmentID } = useParams(); //extract the appointmentID from the URL.
   const navigate = useNavigate();
+
+  const fetchPatientInformation = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        "http://localhost:3000/auth/doctor/schedule/patient-info",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { appointmentID },
+        }
+      );
+      setPatientInformation(response.data.patientInfo || {});
+    } catch (error) {
+      console.error("Error getting patient information: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPatientInformation();
+  }, []);
 
   const [notes, setNotes] = useState("");
   const [showCharges, setShowCharges] = useState(false);
@@ -122,19 +145,39 @@ export default function AppointmentHandlerPage() {
             <CardHeader className="bg-gradient-to-r from-pink-500 to-pink-600">
               <CardTitle className="text-white">Patient Information</CardTitle>
             </CardHeader>
-            <CardContent className="mt-4">
-              <p>
-                <strong>Name:</strong> {appointmentData.patient.name}
-              </p>
-              <p>
-                <strong>Date of Birth:</strong> {appointmentData.patient.dob}
-              </p>
-              <p>
-                <strong>Phone:</strong> {appointmentData.patient.phone}
-              </p>
-              <p>
-                <strong>Email:</strong> {appointmentData.patient.email}
-              </p>
+            <CardContent>
+              {patientInformation ? (
+                <>
+                  <p>
+                    <strong>Name:</strong> {patientInformation.patientFullName}
+                  </p>
+                  <p>
+                    <strong>Date of Birth:</strong>{" "}
+                    {new Date(
+                      patientInformation.dateOfBirth
+                    ).toLocaleDateString("en-US", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
+                  </p>
+                  <p>
+                    <strong>Phone:</strong>{" "}
+                    {patientInformation.phoneNumber
+                      ? patientInformation.phoneNumber.slice(0, 3) +
+                        "-" +
+                        patientInformation.phoneNumber.slice(3, 6) +
+                        "-" +
+                        patientInformation.phoneNumber.slice(6)
+                      : "N/A"}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {patientInformation.email}
+                  </p>
+                </>
+              ) : (
+                <p>No patient information found!</p>
+              )}
             </CardContent>
           </Card>
 

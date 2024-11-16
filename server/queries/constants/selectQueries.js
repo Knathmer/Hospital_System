@@ -124,4 +124,6 @@ export const GET_DETAILS_YTD = `SELECT b.billID, a.appointmentDateTime AS visitD
 
 export const GET_PAYMENTS_STATEMENTS = `SELECT p.paymentDate, p.amount, p.payerType, p.paymentID FROM payment AS p JOIN bill AS b ON p.billID = b.billID WHERE b.patientID = ? AND DATE(p.paymentDate) BETWEEN ? AND ? ORDER BY p.paymentDate DESC;`;
 
-export const GET_DOCTOR_SCHEDULE = `SELECT p.patientID, CONCAT(p.firstName, ' '  ,p.lastName) AS fullName, a.appointmentDateTime, a.appointmentID, s.serviceName, s.serviceID FROM patient p JOIN appointment a ON p.patientID = a.patientID JOIN service s ON a.serviceID = s.serviceID WHERE a.doctorID = ? AND DATE (a.appointmentDateTime) = CURDATE() AND a.status = 'Scheduled';`;
+export const GET_DOCTOR_SCHEDULE = `SELECT p.patientID, CONCAT(p.firstName, ' ', p.lastName) AS fullName, a.appointmentDateTime, a.appointmentID,  s.serviceName,  s.serviceID FROM patient p JOIN appointment a ON p.patientID = a.patientID JOIN service s ON a.serviceID = s.serviceID WHERE a.doctorID = ? AND a.appointmentDateTime >= ? AND a.appointmentDateTime < ? AND a.status = 'Scheduled';`;
+
+export const GET_PATIENT_INFO_DOC_APPT = `SELECT p.patientID, CONCAT(p.firstName, ' ', p.lastName) AS patientFullName, p.dateOfBirth, p.phoneNumber, p.email FROM patient p INNER JOIN appointment a ON p.patientID = a.patientID WHERE a.appointmentID = ? AND a.doctorID = ?;`;
