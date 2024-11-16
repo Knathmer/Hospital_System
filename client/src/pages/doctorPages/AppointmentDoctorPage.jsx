@@ -80,6 +80,7 @@ export default function AppointmentPage() {
   const [insuranceInformation, setInsuranceInformation] = useState({});
   const [appointmentInformation, setAppointmentInformation] = useState({});
   const [previousAppointments, setPreviousAppointments] = useState([]);
+  const [medication, setMedication] = useState([]);
   const [allergies, setAllergies] = useState([]);
   const [disabilities, setDisabilities] = useState([]);
   const [vaccines, setVaccines] = useState([]);
@@ -116,6 +117,7 @@ export default function AppointmentPage() {
         surgeriesInfoResponse,
         familyInfoResponse,
         previousAppointmentsResponse,
+        patientMedicationResponse,
       ] = await Promise.all([
         axios.get("http://localhost:3000/auth/doctor/schedule/insurance-info", {
           headers: { Authorization: `Bearer ${token}` },
@@ -158,6 +160,13 @@ export default function AppointmentPage() {
             params: { patientID },
           }
         ),
+        axios.get(
+          "http://localhost:3000/auth/doctor/schedule/patient-medication",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { patientID },
+          }
+        ),
       ]);
 
       // Step 3: Set States
@@ -177,6 +186,7 @@ export default function AppointmentPage() {
       setPreviousAppointments(
         previousAppointmentsResponse.data.previousAppointments || []
       );
+      setMedication(patientMedicationResponse.data.patientMedication || []);
     } catch (error) {
       console.error("Error fetching patient information: ", error);
     }
@@ -472,15 +482,20 @@ export default function AppointmentPage() {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Medications</h2>
           <div className="space-y-4 mb-6">
-            {medications.map((med) => (
+            {medication.map((med) => (
               <div
-                key={med.id}
+                key={med.prescriptionID}
                 className="flex items-center justify-between bg-gray-50 p-4 rounded-md"
               >
                 <div>
-                  <p className="font-semibold text-gray-800">{med.name}</p>
+                  <p className="font-semibold text-gray-800">
+                    {med.medicationName}
+                  </p>
                   <p className="text-sm text-gray-600">
                     {med.dosage} - {med.frequency}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Refills: {med.refillCount}/{med.refillsRemaining}
                   </p>
                 </div>
                 <Button
