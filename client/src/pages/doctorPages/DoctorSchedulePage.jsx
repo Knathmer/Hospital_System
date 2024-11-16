@@ -51,7 +51,7 @@ export default function DoctorSchedulePage() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:3000/auth/doctor/missed-schedule",
+        "http://localhost:3000/auth/doctor/schedule/missed-appointment",
         { appointmentID, status: "Missed Appointment" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -84,7 +84,7 @@ export default function DoctorSchedulePage() {
   }, [todaysSchedule]);
   //---------------------------------------------------------
   const proceedToAppointment = (appointmentID) => {
-    navigate(`/doctor/schedule/appointments/${appointmentID}`);
+    navigate(`/doctor/schedule/appointment/${appointmentID}`);
   };
 
   return (
