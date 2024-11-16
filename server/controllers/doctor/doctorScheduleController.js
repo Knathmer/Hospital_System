@@ -294,3 +294,43 @@ export const getPatientMedication = async (req, res) => {
       .json({ message: "Server error fetching patient's medication info" });
   }
 };
+
+export const deactivateMedication = async (req, res) => {
+  try {
+    const { prescriptionID } = req.body;
+
+    if (!prescriptionID) {
+      return res.status(400).json({ message: "Prescription ID is required" });
+    }
+
+    // Update the medication to set active to false
+    await query("UPDATE prescription SET active = 0 WHERE prescriptionID = ?", [
+      prescriptionID,
+    ]);
+
+    res.status(200).json({ message: "Medication deactivated successfully" });
+  } catch (error) {
+    console.error("Error deactivating medication:", error);
+    res.status(500).json({ message: "Server error deactivating medication" });
+  }
+};
+
+export const reactivateMedication = async (req, res) => {
+  try {
+    const { prescriptionID } = req.body;
+
+    if (!prescriptionID) {
+      return res.status(400).json({ message: "Prescription ID is required" });
+    }
+
+    // Update the medication to set active to true
+    await query("UPDATE prescription SET active = 1 WHERE prescriptionID = ?", [
+      prescriptionID,
+    ]);
+
+    res.status(200).json({ message: "Medication reactivated successfully" });
+  } catch (error) {
+    console.error("Error reactivating medication:", error);
+    res.status(500).json({ message: "Server error reactivating medication" });
+  }
+};

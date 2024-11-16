@@ -12,6 +12,8 @@ import {
   getPreviousAppointments,
   putMissedAppointment,
   getPatientMedication,
+  deactivateMedication,
+  reactivateMedication,
 } from "../../controllers/doctor/doctorScheduleController.js";
 
 const doctorScheduleRouter = express.Router();
@@ -31,5 +33,9 @@ doctorScheduleRouter.get("/family-info", getFamilyHistoryInformation);
 doctorScheduleRouter.get("/appointment-info", getAppointmentInformation);
 doctorScheduleRouter.get("/previous-appointments", getPreviousAppointments);
 doctorScheduleRouter.get("/patient-medication", getPatientMedication);
+
+//Appointment Handler PUT Requests
+doctorScheduleRouter.put("/deactivate-medication", deactivateMedication);
+doctorScheduleRouter.put("/reactivate-medication", reactivateMedication);
 
 export default doctorScheduleRouter;

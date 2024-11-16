@@ -8,7 +8,16 @@ import Input from "../../components/ui/Input";
 import Label from "../../components/ui/Label";
 import Textarea from "../../components/ui/TextArea";
 import Checkbox from "../../components/ui/Checkbox";
-import { ArrowLeft, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ArrowLeft,
+  Plus,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Pill,
+  CircleMinus,
+  CirclePlus,
+} from "lucide-react";
 
 // Mock data for the appointment
 const appointmentData = {
@@ -247,8 +256,60 @@ export default function AppointmentPage() {
     }
   };
 
-  const handleRemoveMedication = (id) => {
-    setMedications(medications.filter((med) => med.id !== id));
+  const handleRemoveMedication = async (prescriptionID) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Send a request to the backend to deactivate the medication
+      await axios.put(
+        "http://localhost:3000/auth/doctor/schedule/deactivate-medication",
+        { prescriptionID },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Update the local state to reflect the change
+      setMedication((prevMedications) =>
+        prevMedications.map((med) =>
+          med.prescriptionID === prescriptionID
+            ? { ...med, active: 0 } // Set active to false for the specified medication
+            : med
+        )
+      );
+    } catch (error) {
+      console.error("Error deactivating medication:", error);
+    }
+  };
+  const handleReactivateMedication = async (prescriptionID) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Send a request to the backend to reactivate the medication
+      await axios.put(
+        "http://localhost:3000/auth/doctor/schedule/reactivate-medication",
+        { prescriptionID },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Update the local state to reflect the change
+      setMedication((prevMedications) =>
+        prevMedications.map((med) =>
+          med.prescriptionID === prescriptionID
+            ? { ...med, active: 1 } // Set active to true for the specified medication
+            : med
+        )
+      );
+    } catch (error) {
+      console.error("Error reactivating medication:", error);
+    }
+  };
+  const handleRefillMedication = async (prescriptionID) => {
+    try {
+      const token = localStorage.getItem("token");
+    } catch (error) {}
   };
 
   const handleAddMedicalHistoryItem = (category, item) => {
@@ -524,75 +585,149 @@ export default function AppointmentPage() {
 
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Medications</h2>
+          {/* Notification Box */}
+          {medication.some(
+            (med) => med.refillsRemaining === 0 && med.active === 1
+          ) && (
+            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md">
+              <h3 className="font-semibold text-lg mb-2">Attention Needed:</h3>
+              <p>
+                The following medications have no refills remaining. Please
+                refill or remove them:
+              </p>
+              <ul className="list-disc ml-5 mt-2">
+                {medication
+                  .filter(
+                    (med) => med.refillsRemaining === 0 && med.active === 1
+                  )
+                  .map((med) => (
+                    <li key={med.prescriptionID}>
+                      {med.medicationName} - {med.dosage}, {med.frequency}
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
           <div>
+            <h3 className="font-semibold text-lg mb-4">Active Medications</h3>
             {medication && medication.length > 0 ? (
               <>
                 <div className="space-y-4 mb-6">
-                  {medication.map((med) => (
-                    <div
-                      key={med.prescriptionID}
-                      className="flex items-center justify-between bg-gray-50 p-4 rounded-md"
-                    >
-                      <div>
-                        <p className="font-semibold text-gray-800">
-                          {med.medicationName}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {med.dosage} - {med.frequency}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Refills: {med.refillCount}/{med.refillsRemaining}
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveMedication(med.id)}
-                        className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                  {medication
+                    .filter((med) => med.active === 1)
+                    .map((med) => (
+                      <div
+                        key={med.prescriptionID}
+                        className="flex items-center justify-between bg-gray-50 p-4 rounded-md"
                       >
-                        <X className="h-5 w-5" />
-                      </Button>
+                        <div>
+                          <p className="font-semibold text-gray-800">
+                            {med.medicationName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {med.dosage} - {med.frequency}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Refills: {med.refillsRemaining}/{med.refillCount}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {/* New Button */}
+                          {med.refillsRemaining === 0 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleRefillMedication(med.prescriptionID)
+                              }
+                              className="text-pink-600 hover:text-pink-700 hover:bg-pink-100 text-center"
+                            >
+                              <Pill />
+                              Refill
+                            </Button>
+                          )}
+                          {/* Existing Remove Button */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              handleRemoveMedication(med.prescriptionID)
+                            }
+                            className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                          >
+                            <CircleMinus className="h-5 w-5" />
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg mb-4">
+                    Inactive Medications
+                  </h3>
+                  {medication.some((med) => med.active === 0) ? (
+                    <div className="space-y-4 mb-6">
+                      {medication
+                        .filter((med) => med.active === 0)
+                        .map((med) => (
+                          <div
+                            key={med.prescriptionID}
+                            className="flex items-center justify-between bg-gray-50 p-4 rounded-md"
+                          >
+                            <div>
+                              <p className="font-semibold text-gray-800">
+                                {med.medicationName}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                {med.dosage} - {med.frequency}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                Refills: {med.refillsRemaining}/
+                                {med.refillCount}
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              {/* Option to Reactivate or Remove */}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleReactivateMedication(med.prescriptionID)
+                                }
+                                className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                              >
+                                <CirclePlus />
+                                Reactivate
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleRemoveMedication(med.prescriptionID)
+                                }
+                                className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                              >
+                                <CircleMinus className="h-5 w-5" />
+                                Remove
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
                     </div>
-                  ))}
+                  ) : (
+                    <p className="text-center text-gray-400 mb-6">
+                      Patient does not have any inactive medications.
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-4">
-                  <Input
-                    placeholder="Medication name"
-                    value={newMedication.name}
-                    onChange={(e) =>
-                      setNewMedication({
-                        ...newMedication,
-                        name: e.target.value,
-                      })
-                    }
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      placeholder="Dosage"
-                      value={newMedication.dosage}
-                      onChange={(e) =>
-                        setNewMedication({
-                          ...newMedication,
-                          dosage: e.target.value,
-                        })
-                      }
-                    />
-                    <Input
-                      placeholder="Frequency"
-                      value={newMedication.frequency}
-                      onChange={(e) =>
-                        setNewMedication({
-                          ...newMedication,
-                          frequency: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
                   <Button
                     onClick={handleAddMedication}
                     className="w-full bg-pink-600 hover:bg-pink-700 text-white"
                   >
-                    <Plus className="mr-2 h-5 w-5" /> Add Medication
+                    <Plus className="mr-2 h-5 w-5" />
+                    Add Medication
                   </Button>
                 </div>
               </>

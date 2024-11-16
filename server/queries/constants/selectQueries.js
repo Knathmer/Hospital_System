@@ -15,7 +15,7 @@ export const SELECT_ADDRESSID_QUERY = `
 //Patient Medication Queries
 export const SELECT_PATIENT_MEDICATION_INFORMATION_QUERY = `SELECT
     p.prescriptionID, p.medicationName, p.dosage, p.frequency, p.start,
-    p.quantity, p.daySupply, p.instruction, p.refillCount, p.refillsRemaining,
+    p.quantity, p.daySupply, p.instruction, p.refillCount, p.refillsRemaining, p.active,
     d.lastName, d.firstName,
     ph.pharmacyName, ph.address, ph.city, ph.state, ph.zipCode, ph.phoneNumber
 FROM
