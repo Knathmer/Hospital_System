@@ -5,6 +5,7 @@ import DocDashboard from "../components/userLoginRoot/DoctorSidebar";
 import PatientInfoPage from "../components/users/doctor/PatientInfoPage.jsx";
 import DoctorSchedulePage from "../pages/doctorPages/DoctorSchedulePage.jsx";
 import AppointmentHandlerPage from "../pages/doctorPages/AppointmentHandlerPage.jsx";
+import AppointmentDoctorPage from "../pages/doctorPages/AppointmentDoctorPage.jsx";
 
 const DoctorRoutes = () => {
   return (
@@ -17,6 +18,10 @@ const DoctorRoutes = () => {
           path="appointments/:appointmentID"
           element={<AppointmentHandlerPage />}
         />
+        <Route
+          path="appointment/:appointmentID"
+          element={<AppointmentDoctorPage />}
+        ></Route>
       </Route>
 
       {/* Add other doctor routes here */}
