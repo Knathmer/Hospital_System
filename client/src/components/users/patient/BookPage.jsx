@@ -18,6 +18,9 @@ function BookPage() {
   const [offices, setOffices] = useState([]);
   const [selectedOffice, setSelectedOffice] = useState("");
 
+  // State variables for Visit-Type (as an input option, not a filter)
+  const [selectedVisitType, setSelectedVisitType] = useState("");
+
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [reason, setReason] = useState("");
@@ -28,6 +31,14 @@ function BookPage() {
   const BUSINESS_HOURS_START = 9; // 9 AM
   const BUSINESS_HOURS_END = 17; // 5 PM
   const TIME_INTERVAL = 30; // 30 minutes
+
+  // Define Visit-Type options directly
+  const visitTypeOptions = [
+    'Telemedicine (Video)',
+    'Over-the-Phone',
+    'In-Person',
+    'Home Visit'
+  ];
 
   useEffect(() => {
     // Fetch specialties
@@ -84,13 +95,14 @@ function BookPage() {
   }, [selectedState, selectedCity]);
 
   useEffect(() => {
-    // Fetch doctors based on filters
+    // Fetch doctors based on filters (excluding Visit-Type)
     const params = {
       gender,
       serviceID: selectedService,
-      state: selectedState,   // New filter
-      city: selectedCity,     // New filter
+      state: selectedState,
+      city: selectedCity,
       officeID: selectedOffice,
+      // Removed visitTypeID to prevent filtering doctors based on Visit-Type
     };
     if (specialty) {
       params.specialtyID = specialty;
@@ -177,7 +189,7 @@ function BookPage() {
   const isWeekend = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDay();
-    return day === 5 || day === 6; // Saturday (6) and Sunday (5)
+    return day === 0 || day === 6; // Sunday (0) and Saturday (6)
   };
 
   const convertTo24HourFormat = (timeStr) => {
@@ -198,39 +210,60 @@ function BookPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Validation Checks
     if (!selectedDoctor) {
       setMessage("Please select a doctor.");
       return;
     }
-
+  
     if (!selectedService) {
       setMessage("Please select a service.");
       return;
     }
-
+  
+    if (!selectedVisitType) {
+      setMessage("Please select a visit type.");
+      return;
+    }
+  
+    if (!selectedOffice) { // New Validation for Office Selection
+      setMessage("Please select an office location.");
+      return;
+    }
+  
     if (isWeekend(date)) {
       setMessage("Weekends are not available for appointments.");
       return;
     }
-
+  
     try {
       const token = localStorage.getItem("token");
       const formattedTime = convertTo24HourFormat(time); // Convert to 24-hour format
+  
+      // Parse officeID to integer
+      const parsedOfficeID = parseInt(selectedOffice, 10);
+      if (isNaN(parsedOfficeID)) {
+        setMessage("Invalid office selected.");
+        return;
+      }
+  
       await axios.post(
         "http://localhost:3000/appointment/book",
         {
           appointmentDateTime: `${date}T${formattedTime}:00`,
           reason,
           doctorID: selectedDoctor.doctorID,
-          officeID: selectedOffice, // Use selectedOffice ID
+          officeID: parsedOfficeID, // Send as integer
           serviceID: selectedService, // Include the selected service ID
+          visitType: selectedVisitType, // Include the selected visit type as a string
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
       setMessage("Appointment booked successfully!");
-
+  
       // Reset form fields
       setSpecialty("");
       setGender("");
@@ -242,6 +275,7 @@ function BookPage() {
       setReason("");
       setSelectedDoctor(null);
       setSelectedService("");
+      setSelectedVisitType("");
       setBookedTimes([]);
       setAvailableTimes([]);
     } catch (error) {
@@ -495,7 +529,31 @@ function BookPage() {
                     </select>
                   </div>
 
-                  {/* Service Dropdown (Moved Below Time) */}
+                  {/* Visit-Type Dropdown (as an input option) */}
+                  <div>
+                    <label
+                      htmlFor="visitType"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Visit Type
+                    </label>
+                    <select
+                      id="visitType"
+                      name="visitType"
+                      value={selectedVisitType}
+                      onChange={(e) => setSelectedVisitType(e.target.value)}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value="">Select a visit type</option>
+                      {visitTypeOptions.map((visit, index) => (
+                        <option key={index} value={visit}>
+                          {visit}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Service Dropdown (Moved Below Time and Visit-Type) */}
                   <div>
                     <label
                       htmlFor="service"
@@ -552,9 +610,9 @@ function BookPage() {
                   <button
                     type="submit"
                     className={`w-full py-2 px-4 bg-pink-600 text-white font-semibold rounded-md shadow-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 transition ${
-                      !time || isWeekend(date) ? "opacity-50 cursor-not-allowed" : ""
+                      !time || isWeekend(date) || !selectedVisitType ? "opacity-50 cursor-not-allowed" : ""
                     }`}
-                    disabled={!time || isWeekend(date)}
+                    disabled={!time || isWeekend(date) || !selectedVisitType}
                   >
                     Book Appointment
                   </button>

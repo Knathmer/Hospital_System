@@ -253,8 +253,7 @@ export async function getDoctorsBySpecialty(req, res) {
 
 // Function to book an appointment
 export async function bookAppointment(req, res) {
-  const { appointmentDateTime, reason, doctorID, officeID, serviceID } =
-    req.body;
+  const { appointmentDateTime, reason, doctorID, officeID, serviceID, visitType } = req.body;
   const patientID = req.user.patientID; // Get the patientID from the verified JWT
 
   if (!patientID) {
@@ -265,6 +264,22 @@ export async function bookAppointment(req, res) {
 
   if (!serviceID) {
     return res.status(400).json({ message: "Service ID is required" });
+  }
+
+  if (!visitType) {
+    return res.status(400).json({ message: "Visit Type is required" });
+  }
+
+  // Validate visitType against allowed enum values
+  const allowedVisitTypes = [
+    'Telemedicine (Video)',
+    'Over-the-Phone',
+    'In-Person',
+    'Home Visit'
+  ];
+
+  if (!allowedVisitTypes.includes(visitType)) {
+    return res.status(400).json({ message: "Invalid Visit Type selected" });
   }
 
   let connection;
@@ -286,9 +301,9 @@ export async function bookAppointment(req, res) {
     // Book the appointment
     await connection.query(
       `INSERT INTO appointment 
-           (appointmentDateTime, reason, status, patientID, doctorID, officeID, serviceID)
-           VALUES (?, ?, 'Requested', ?, ?, ?, ?)`,
-      [appointmentDateTime, reason, patientID, doctorID, officeID, serviceID]
+           (appointmentDateTime, reason, status, patientID, doctorID, officeID, serviceID, visitType)
+           VALUES (?, ?, 'Requested', ?, ?, ?, ?, ?)`,
+      [appointmentDateTime, reason, patientID, doctorID, officeID, serviceID, visitType]
     );
 
     await connection.commit();
