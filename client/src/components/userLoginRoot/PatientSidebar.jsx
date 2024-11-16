@@ -7,7 +7,9 @@ import {
   CreditCard,
   ShieldPlus,
   User,
-  Building,
+  Settings,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -31,6 +33,7 @@ import PrescriptionPage from "../../pages/patientPages/PatientMedicationPage.jsx
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
+
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
   const location = useLocation();
@@ -42,7 +45,7 @@ export default function PatientSidebar() {
       { id: "appointments", label: "Appointments", icon: Calendar },
       { id: "medical-records", label: "Medical Records", icon: FileText },
       { id: "medications", label: "Medications", icon: PillBottle },
-      { id: "personal-info", label: "Personal Info", icon: User },
+      //{ id: "personal-info", label: "Personal Info", icon: User },
     ],
     "Billing & Payments": [
       { id: "billing", label: "Billing", icon: CreditCard },
@@ -156,7 +159,7 @@ export default function PatientSidebar() {
             <PrescriptionPage />
           </div>
         )}
-        {activeTab === "personal-info" && (
+        {activeTab === "settings-personal-info" && (
           <div>
             <PersonalInfoForm />
           </div>

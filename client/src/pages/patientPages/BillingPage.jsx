@@ -47,6 +47,9 @@ export default function BillingPage() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [dateRangeApplied, setDateRangeApplied] = useState(false);
+  const [outstandingBills, setOutstandingBills] = useState([]);
+  const [selectedBill, setSelectedBill] = useState(null);
+  const [paymentAmount, setPaymentAmount] = useState("");
 
   const fetchBalanceSummary = async () => {
     try {
@@ -255,10 +258,67 @@ export default function BillingPage() {
     }
   }, [paymentsFilter, dateRangeApplied, startDate, endDate]);
 
-  const date = new Date("2024-08-14");
-  const month = date.toLocaleString("en-US", { month: "short" });
-  const day = date.getDate();
-  const year = date.getFullYear();
+  //----------Make Payments Tab Fetch Function & Hooks------------------
+  const fetchOutstandingBills = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        "http://localhost:3000/auth/patient/billing/outstanding-bills",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setOutstandingBills(response.data.outstandingBills || []);
+    } catch (error) {
+      console.error("Error fetching outstanding bills:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchOutstandingBills();
+  }, []);
+
+  const handlePaymentSubmit = async () => {
+    try {
+      const amountToPay = parseFloat(paymentAmount);
+      const outstandingBalance = selectedBill.outstandingBalance;
+
+      if (amountToPay <= 0 || amountToPay > outstandingBalance) {
+        alert(
+          `Please enter a valid amount up to $${outstandingBalance.toFixed(2)}`
+        );
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:3000/auth/patient/billing/make-payment",
+        {
+          billID: selectedBill.billID,
+          amount: amountToPay,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        alert("Payment successful!");
+        // Refresh the outstanding bills and other relevant data
+        await fetchOutstandingBills();
+        await fetchBalanceSummary();
+        await fetchRecentPayments();
+        await fetchPaymentsTabStatements();
+        await fetchBillingStatements();
+
+        // Reset state
+        setSelectedBill(null);
+        setPaymentAmount("");
+      } else {
+        alert("Payment failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error making payment:", error);
+      alert("An error occurred while processing your payment.");
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -267,6 +327,7 @@ export default function BillingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-8 text-gray-800">Billing</h1>
 
+          {/*----------------Start of Tab Buttons------------------------------*/}
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList className="flex space-x-1 rounded-xl bg-gray-200 p-1">
               <TabsTrigger
@@ -290,7 +351,16 @@ export default function BillingPage() {
                 <CreditCard className="w-4 h-4 mr-2" />
                 Payments
               </TabsTrigger>
+              <TabsTrigger
+                value={"makePayment"}
+                className="w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-gray-700 ring-white ring-opacity-60 ring-offset-2 ring-offset-pink-600 focus:outline-none focus:ring-2 aria-selected:bg-white aria-selected:shadow aria-selected:text-pink-600"
+              >
+                <DollarSign className="w-4 h-4 mr-2" />
+                Make a Payment
+              </TabsTrigger>
             </TabsList>
+
+            {/*----------------End of Tab Buttons------------------------------*/}
 
             <TabsContent value="overview" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -613,6 +683,14 @@ export default function BillingPage() {
                           statusColor = "bg-gray-100 text-gray-800";
                       }
 
+                      const dueDate = new Date(
+                        statement.dueDate
+                      ).toLocaleDateString("en-US", {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                      });
+
                       return (
                         <div
                           key={statement.billID}
@@ -653,6 +731,7 @@ export default function BillingPage() {
                                   Primary Payer:{" "}
                                   {statement.insuranceName || "None"}
                                 </p>
+                                <p>Due Date: {dueDate}</p>
                               </div>
                             </div>
 
@@ -852,6 +931,98 @@ export default function BillingPage() {
                     <p className="text-gray-500 text-center py-4">
                       No payments made in current date range
                     </p>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/*-----------------Start of Make a Payment Tab Content--------------------------- */}
+            <TabsContent value={"makePayment"}>
+              <Card className=" overflow-hidden shadow-lg rounded-lg">
+                <CardHeader className="text-lg font-semibold text-gray-800">
+                  <CardTitle className="text-lg font-semibold text-gray-800">
+                    Make a Payment
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div>
+                    {outstandingBills && outstandingBills.length > 0 ? (
+                      outstandingBills.map((bill) => (
+                        <div
+                          key={bill.billID}
+                          className="border rounded-lg p-6 mb-6 shadow-sm"
+                        >
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="text-lg font-semibold text-gray-800">
+                                {bill.serviceName} at {bill.officeName}
+                              </h3>
+                              <p className="text-gray-600">
+                                Due Date:{" "}
+                                {new Date(bill.dueDate).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "2-digit",
+                                    day: "2-digit",
+                                    year: "numeric",
+                                  }
+                                )}
+                              </p>
+                              <p className="text-gray-600">
+                                Outstanding Balance: ${bill.outstandingBalance}
+                              </p>
+                            </div>
+                            <button
+                              className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors"
+                              onClick={() => setSelectedBill(bill)}
+                            >
+                              Pay Now
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">
+                        No bills to pay at the moment.
+                      </p>
+                    )}
+                  </div>
+                  {selectedBill && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                      <div className="bg-white p-6 rounded-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">
+                          Make a Payment for Bill ID: {selectedBill.billID}
+                        </h2>
+                        <p className="mb-2">
+                          Outstanding Balance: $
+                          {selectedBill.outstandingBalance}
+                        </p>
+                        <input
+                          type="number"
+                          className="w-full mb-4 px-3 py-2 border border-gray-300 rounded-md"
+                          placeholder="Enter payment amount"
+                          value={paymentAmount}
+                          onChange={(e) => setPaymentAmount(e.target.value)}
+                        />
+                        <div className="flex justify-end space-x-4">
+                          <button
+                            className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors"
+                            onClick={() => {
+                              setSelectedBill(null);
+                              setPaymentAmount("");
+                            }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors"
+                            onClick={handlePaymentSubmit}
+                          >
+                            Submit Payment
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </CardContent>
               </Card>

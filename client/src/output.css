@@ -1418,6 +1418,10 @@ video {
   padding-bottom: 2rem;
 }
 
+.pl-8 {
+  padding-left: 2rem;
+}
+
 .pr-4 {
   padding-right: 1rem;
 }
@@ -1770,6 +1774,7 @@ video {
 .last\:mb-0:last-child {
   margin-bottom: 0px;
 }
+
 
 .last\:border-b-0:last-child {
   border-bottom-width: 0px;
