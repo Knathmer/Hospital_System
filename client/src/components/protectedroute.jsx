@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import jwt_decode from 'jwt-decode';
+import { jwtDecode as jwt_decode } from "jwt-decode"; // Fixed import
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const token = localStorage.getItem("token");

@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
-import jwtDecode from 'jwt-decode'; // Assuming jwt-decode library is installed
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useState, useEffect } from "react";
+import { jwtDecode as jwt_decode } from "jwt-decode"; // Fixed import
+import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
@@ -11,32 +11,34 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      const decoded = jwtDecode(token);
+      const decoded = jwt_decode(token);
       setUserRole(decoded.role); // Extract and set user role
     }
     setIsLoading(false);
   }, []);
 
   const login = (token) => {
-    localStorage.setItem('token', token);
+    localStorage.setItem("token", token);
     setIsLoggedIn(true);
-    const decoded = jwtDecode(token);
+    const decoded = jwt_decode(token);
     setUserRole(decoded.role); // Extract and set user role on login
-    navigate('/');
+    navigate("/");
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setIsLoggedIn(false);
     setUserRole(null); // Clear role on logout
-    navigate('/');
+    navigate("/");
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, userRole, isLoading }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, login, logout, userRole, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
