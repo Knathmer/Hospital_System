@@ -37,6 +37,7 @@ import {
 
 import Label from "../../../ui/Label";
 import Input from "../../../ui/Input";
+import Select from "../../../ui/select/Select";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../ui/Tabs";
 import {
@@ -46,6 +47,7 @@ import {
   UserIcon,
   Maximize2,
 } from "lucide-react";
+import SelectItem from "../../../ui/select/SelectItem";
 
 export default function PrescriptionSummaryReport() {
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
@@ -148,17 +150,17 @@ export default function PrescriptionSummaryReport() {
                 >
                   {key}
                 </Label>
-                <select
+                <Select
                   id={`${key}-filter`}
                   name={key}
                   value={value}
                   onChange={handleFilterChange}
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-pink-200 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md"
                 >
-                  <option value="">Select frequency</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="yearly">Yearly</option>
-                </select>
+                  <SelectItem value="">Select frequency</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="yearly">Yearly</SelectItem>
+                </Select>
               </div>
             );
           }
@@ -311,7 +313,7 @@ export default function PrescriptionSummaryReport() {
                     {filteredPrescriptions.map((prescription, index) => (
                       <TableRow key={index} className="hover:bg-pink-50">
                         <TableCell>{prescription.patientId}</TableCell>
-                        <TableCell>{prescription.medicationName}</TableCell>
+                        <TableCell>{prescription.medication}</TableCell>
                         <TableCell>
                           {prescription.refillNumber}/
                           {filters.refills.refillFrequency === "monthly"
