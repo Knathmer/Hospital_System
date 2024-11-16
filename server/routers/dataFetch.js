@@ -5,7 +5,7 @@ import { welcomePatientName } from '../controllers/patient/patientNameInSidebarC
 import { welcomeDocName } from '../controllers/doctor/docNameInSidebar.js';
 import { welcomeAdminName } from '../controllers/adminNameInSidebar.js';
 import { getAppointmentsDashboard, getBillDashboard, getMedsResultsDashboard } from '../controllers/patient/patientDashboard.js';
-import { totalAdmins, totalAppointments, totalDoctors, totalPatients } from '../controllers/adminDashboard.js';
+import { getUpcomingAppointmentAdmin, listOfDocAdmin, totalAdmins, totalAppointments, totalDoctors, totalPatients } from '../controllers/adminDashboard.js';
 
 const router = express.Router();
 
@@ -16,9 +16,13 @@ router.get('/get-admin-name', verifyToken, welcomeAdminName);
 router.get('/get-appointment-dashboard', verifyToken, getAppointmentsDashboard);
 router.get('/get-meds-dashboard', verifyToken, getMedsResultsDashboard);
 router.get('/get-billing-dashboard', verifyToken, getBillDashboard);
+
+// Admin Dashboard
 router.get('/get-total-doctors', verifyToken, totalDoctors);
 router.get('/get-total-patients', verifyToken, totalPatients);
 router.get('/get-total-admin', verifyToken, totalAdmins );
 router.get('/get-total-appointments', verifyToken, totalAppointments);
+router.get('/get-upcoming-appointments', verifyToken, getUpcomingAppointmentAdmin);
+router.get('/get-doctors-list', verifyToken, listOfDocAdmin);
 
 export default router;
