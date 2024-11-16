@@ -5,15 +5,20 @@ import axios from "axios";
 
 // Utility function to format phone numbers
 const formatPhoneNumber = (phoneNumber) => {
-    const cleaned = ("" + phoneNumber).replace(/\D/g, "");
-    if (cleaned.length === 10) {
-      const part1 = cleaned.slice(0, 3);
-      const part2 = cleaned.slice(3, 6);
-      const part3 = cleaned.slice(6);
-      return `(${part1}) ${part2}-${part3}`;
-    }
-    return phoneNumber;
-  };
+  const cleaned = ("" + phoneNumber).replace(/\D/g, "");
+  if (cleaned.length === 10) {
+    const part1 = cleaned.slice(0, 3);
+    const part2 = cleaned.slice(3, 6);
+    const part3 = cleaned.slice(6);
+    return `(${part1}) ${part2}-${part3}`;
+  }
+  return phoneNumber;
+};
+
+// Utility function to sort appointments in descending order
+const sortAppointmentsAscending = (appointmentsList) => {
+  return [...appointmentsList].sort((a, b) => new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime));
+};
 
 function AppointmentOverview() {
   const [appointments, setAppointments] = useState({
@@ -146,49 +151,57 @@ function AppointmentOverview() {
     return <p className="text-center text-red-500">{error}</p>;
   }
 
-  const renderAppointmentList = (title, list) => (
-    <div className="mb-8">
-      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-      {list.length === 0 ? (
-        <p className="text-gray-500">No appointments in this category.</p>
-      ) : (
-        <ul className="space-y-4">
-          {list.map((appointment) => (
-            <li
-              key={appointment.appointmentID}
-              className="bg-white shadow-md rounded-lg p-4 cursor-pointer hover:bg-gray-100"
-              onClick={() => handleSelectEvent(appointment)}
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-xl font-bold">
-                    {new Date(appointment.appointmentDateTime).toLocaleString()}
-                  </p>
-                  <p className="text-gray-600">Reason: {appointment.reason || "N/A"}</p>
-                  <p className="text-gray-600">Status: {appointment.status}</p>
-                  <p className="text-gray-600">
-                    Doctor: Dr. {appointment.doctorFirstName} {appointment.doctorLastName}
-                  </p>
-                  <p className="text-gray-600">
-                    Service: {appointment.service || "N/A"}
-                  </p>
-                  <p className="text-gray-600">
-                    Doctor's Email: {appointment.doctorEmail || "N/A"}
-                  </p>
-                  <p className="text-gray-600">
-                    Doctor's Phone: {appointment.doctorPhone ? formatPhoneNumber(appointment.doctorPhone) : "N/A"}
-                  </p>
-                  <p className="text-gray-600">
-                    Location: {appointment.officeName}, {appointment.officeAddress}
-                  </p>
+  const renderAppointmentList = (title, list) => {
+    // Determine if the current list should be sorted in descending order
+    const shouldSortDescending = title === "Upcoming Appointments" || title === "Requested Appointments";
+    
+    // Sort the list if necessary
+    const sortedList = shouldSortDescending ? sortAppointmentsAscending(list) : list;
+
+    return (
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+        {sortedList.length === 0 ? (
+          <p className="text-gray-500">No appointments in this category.</p>
+        ) : (
+          <ul className="space-y-4">
+            {sortedList.map((appointment) => (
+              <li
+                key={appointment.appointmentID}
+                className="bg-white shadow-md rounded-lg p-4 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSelectEvent(appointment)}
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-xl font-bold">
+                      {new Date(appointment.appointmentDateTime).toLocaleString()}
+                    </p>
+                    <p className="text-gray-600">Reason: {appointment.reason || "N/A"}</p>
+                    <p className="text-gray-600">Status: {appointment.status}</p>
+                    <p className="text-gray-600">
+                      Doctor: Dr. {appointment.doctorFirstName} {appointment.doctorLastName}
+                    </p>
+                    <p className="text-gray-600">
+                      Service: {appointment.service || "N/A"}
+                    </p>
+                    <p className="text-gray-600">
+                      Doctor's Email: {appointment.doctorEmail || "N/A"}
+                    </p>
+                    <p className="text-gray-600">
+                      Doctor's Phone: {appointment.doctorPhone ? formatPhoneNumber(appointment.doctorPhone) : "N/A"}
+                    </p>
+                    <p className="text-gray-600">
+                      Location: {appointment.officeName}, {appointment.officeAddress}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -309,7 +322,7 @@ function AppointmentOverview() {
               {selectedAppointment.doctorPhone ? formatPhoneNumber(selectedAppointment.doctorPhone) : "N/A"}
             </p>
             {/* Add more details as needed */}
-            <div className="mt-6 text-right">
+            <div className="flex justify-end mt-6">
               <button
                 onClick={closeModal}
                 className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none"
