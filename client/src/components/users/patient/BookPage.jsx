@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function BookPage() {
+function BookPage() { 
   const [specialty, setSpecialty] = useState("");
   const [specialties, setSpecialties] = useState([]);
   const [services, setServices] = useState([]);
@@ -29,7 +29,7 @@ function BookPage() {
       .then((response) => setSpecialties(response.data))
       .catch((error) => console.error("Error fetching specialties:", error));
 
-    // Fetch office locations
+      // Fetch office locations
     axios
       .get("http://localhost:3000/appointment/locations")
       .then((response) => setLocations(response.data))
@@ -56,10 +56,6 @@ function BookPage() {
   }, [specialty, gender, location, selectedService]);
 
   useEffect(() => {
-    console.log("Doctors data updated:", doctors);
-  }, [doctors]);
-
-  useEffect(() => {
     // Fetch services
     const params = {};
     if (specialty) {
@@ -76,7 +72,7 @@ function BookPage() {
         setServices([]);
       });
 
-    // Reset selected service when specialty changes
+      // Reset selected service when specialty changes
     setSelectedService("");
   }, [specialty]);
 
@@ -98,7 +94,7 @@ function BookPage() {
     };
 
     if (date && selectedDoctor) {
-      // Fetch booked times for the selected doctor and date
+        // Fetch booked times for the selected doctor and date
       axios
         .get("http://localhost:3000/appointment/appointments", {
           params: { doctorID: selectedDoctor.doctorID, date },
@@ -204,206 +200,266 @@ function BookPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <section className="min-w-full py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center text-center">
-            <h1 className="text-3xl font-bold">Book an Appointment</h1>
-            <p className="mt-2 text-gray-500">
-              Schedule your visit with our expert healthcare professionals.
-            </p>
-          </div>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Doctor Selection Section */}
-            <div className="space-y-4 border-r pr-4">
-              <h2 className="text-lg font-semibold">Select a Doctor</h2>
-              <div>
-                <label className="block text-sm font-medium">Specialty:</label>
-                <select
-                  value={specialty}
-                  onChange={(e) => setSpecialty(e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select a specialty</option>
-                  {specialties.map((spec) => (
-                    <option key={spec.specialtyID} value={spec.specialtyID}>
-                      {spec.specialtyName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Service:</label>
-                <select
-                  value={selectedService}
-                  onChange={(e) => setSelectedService(e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select a service</option>
-                  {services.map((service) => (
-                    <option key={service.serviceID} value={service.serviceID}>
-                      {service.serviceName} - ${service.price}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">Gender:</label>
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Any</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                  <option value="Prefer not to say">Prefer not to say</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Location:</label>
-                <select
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Any</option>
-                  {locations.map((loc) => (
-                    <option key={loc.officeID} value={loc.officeName}>
-                      {loc.officeName} - {loc.address}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-md font-semibold">Available Doctors</h3>
-                <div className="space-y-2">
-                  {doctors.length === 0 && (
-                    <p>No Doctors Available For The Selected Fields</p>
-                  )}
-                  {doctors.map((doc) => (
-                    <div
-                      key={doc.doctorID}
-                      className={`p-4 border rounded-md cursor-pointer ${
-                        selectedDoctor?.doctorID === doc.doctorID
-                          ? "bg-blue-100 border-blue-500"
-                          : "hover:bg-gray-100"
-                      }`}
-                      onClick={() => setSelectedDoctor(doc)}
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-pink-50 to-purple-50">
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <div className="mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="p-6 sm:p-10">
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-bold text-gray-800">
+                Book an Appointment
+              </h1>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Doctor Selection Section */}
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold text-gray-700 flex items-center">
+                    Select a Doctor
+                  </h2>
+                  <div>
+                    <label
+                      htmlFor="specialty"
+                      className="block text-sm font-medium text-gray-700"
                     >
-                      <p className="text-lg font-medium">
-                        Dr. {doc.firstName} {doc.lastName}
+                      Specialty
+                    </label>
+                    <select
+                      id="specialty"
+                      name="specialty"
+                      value={specialty}
+                      onChange={(e) => setSpecialty(e.target.value)}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value="">Select a specialty</option>
+                      {specialties.map((spec) => (
+                        <option key={spec.specialtyID} value={spec.specialtyID}>
+                          {spec.specialtyName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="service"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Service
+                    </label>
+                    <select
+                      id="service"
+                      name="service"
+                      value={selectedService}
+                      onChange={(e) => setSelectedService(e.target.value)}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value="">Select a service</option>
+                      {services.map((service) => (
+                        <option key={service.serviceID} value={service.serviceID}>
+                          {service.serviceName} - ${service.price}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="gender"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Gender
+                    </label>
+                    <select
+                      id="gender"
+                      name="gender"
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value="">Any</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                      <option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="location"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Location
+                    </label>
+                    <select
+                      id="location"
+                      name="location"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value="">Any</option>
+                      {locations.map((loc) => (
+                        <option key={loc.officeID} value={loc.officeName}>
+                          {loc.officeName} - {loc.address}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-700">
+                      Available Doctors
+                    </h3>
+                    <div className="space-y-2">
+                      {doctors.length === 0 && (
+                        <p className="text-gray-500">
+                          No Doctors Available For The Selected Fields
+                        </p>
+                      )}
+                      {doctors.map((doc) => (
+                        <div
+                          key={doc.doctorID}
+                          className={`p-4 border border-gray-300 rounded-md cursor-pointer ${
+                            selectedDoctor?.doctorID === doc.doctorID
+                              ? "bg-pink-50 border-pink-500"
+                              : "hover:bg-pink-50"
+                          }`}
+                          onClick={() => setSelectedDoctor(doc)}
+                        >
+                          <p className="text-lg font-medium text-gray-800">
+                            Dr. {doc.firstName} {doc.lastName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Specialty: {doc.specialtyName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Gender: {doc.gender}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Location: {doc.officeLocation} - {doc.officeAddress}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Phone: {formatPhoneNumber(doc.workPhoneNumber)}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Email: {doc.workEmail}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Appointment Booking Section */}
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold text-gray-700 flex items-center">
+                    Appointment Details
+                  </h2>
+                  <div>
+                    <label
+                      htmlFor="date"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      id="date"
+                      name="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      min={new Date().toISOString().split("T")[0]}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    />
+                    {isWeekend(date) && (
+                      <p className="text-pink-500 text-sm mt-1">
+                        Weekends are not available for appointments.
                       </p>
-                      <p className="text-sm text-gray-500">
-                        Specialty: {doc.specialtyName}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Gender: {doc.gender}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Location: {doc.officeLocation} - {doc.officeAddress}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Phone: {formatPhoneNumber(doc.workPhoneNumber)}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Email: {doc.workEmail}
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="time"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Time
+                    </label>
+                    <select
+                      id="time"
+                      name="time"
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value="">Select a time</option>
+                      {availableTimes.map((t) => (
+                        <option
+                          key={t}
+                          value={t}
+                          disabled={bookedTimes.includes(t)}
+                          className={
+                            bookedTimes.includes(t)
+                              ? "text-gray-400 opacity-50"
+                              : ""
+                          }
+                        >
+                          {t} {bookedTimes.includes(t) ? "(Unavailable)" : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {selectedService && (
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Selected Service:{" "}
+                        {
+                          services.find(
+                            (service) =>
+                              service.serviceID === parseInt(selectedService)
+                          )?.serviceName
+                        }
                       </p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Appointment Booking Section */}
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold">Appointment Details</h2>
-              <div>
-                <label className="block text-sm font-medium">Date:</label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  min={new Date().toISOString().split("T")[0]} // Disable past dates
-                  className="w-full p-2 border rounded-md"
-                />
-                {isWeekend(date) && (
-                  <p className="text-red-500 text-sm mt-1">
-                    Weekends are not available for appointments.
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Time:</label>
-                <select
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select a time</option>
-                  {availableTimes.map((t) => (
-                    <option
-                      key={t}
-                      value={t}
-                      disabled={bookedTimes.includes(t)} // Disable unavailable times
-                      className={
-                        bookedTimes.includes(t)
-                          ? "text-gray-400 opacity-50"
-                          : ""
-                      }
+                  )}
+                  <div>
+                    <label
+                      htmlFor="reason"
+                      className="block text-sm font-medium text-gray-700"
                     >
-                      {t} {bookedTimes.includes(t) ? "(Unavailable)" : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {selectedService && (
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Selected Service:{" "}
-                    {
-                      services.find(
-                        (service) =>
-                          service.serviceID === parseInt(selectedService)
-                      )?.serviceName
-                    }
-                  </p>
+                      Reason
+                    </label>
+                    <textarea
+                      id="reason"
+                      name="reason"
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      rows={4}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className={`w-full py-2 px-4 bg-pink-600 text-white font-semibold rounded-md shadow-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 transition ${
+                      !time || isWeekend(date) ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={!time || isWeekend(date)}
+                  >
+                    Book Appointment
+                  </button>
+                  {message && (
+                    <p
+                      className={`mt-4 ${
+                        message.includes("successfully")
+                          ? "text-green-500"
+                          : "text-pink-600"
+                      }`}
+                    >
+                      {message}
+                    </p>
+                  )}
                 </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium">Reason:</label>
-                <textarea
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                  rows={4}
-                />
               </div>
-              <button
-                onClick={handleSubmit}
-                className="w-full py-2 bg-blue-600 text-white rounded-md"
-                disabled={!time || isWeekend(date)} // Disable if no time selected or weekend
-              >
-                Book Appointment
-              </button>
-              {message && (
-                <p
-                  className={`mt-4 ${
-                    message.includes("successfully")
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
-                >
-                  {message}
-                </p>
-              )}
-            </div>
+            </form>
           </div>
         </div>
-      </section>
+      </main>
     </div>
   );
 }
