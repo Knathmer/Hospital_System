@@ -30,7 +30,7 @@ import MedicalHistoryPage from "../users/patient/sidebar/pages/medical-history/M
 import PersonalInfoForm from "../users/patient/sidebar/pages/personal-info/PersonalInfoForm.tsx";
 import ManagePharmaciesPage from "../../pages/patientPages/ManagePharmaciesPage.jsx";
 import PrescriptionPage from "../../pages/patientPages/PatientMedicationPage.jsx";
-import AppointmentsPage from "../users/patient/AppointmentsPage.jsx";
+import AppointmentsPage from "../users/patient/sidebar/pages/AppointmentInfo/AppointmentsPage.jsx";
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
