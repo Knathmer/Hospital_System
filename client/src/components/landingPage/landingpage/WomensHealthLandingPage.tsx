@@ -1,53 +1,71 @@
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
-import { Heart, Users, Calendar, Phone } from "lucide-react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import IconLogo from "../header/IconLogo";
 import Navbar from "../header/Navbar";
 import NavButton from "../../ui/buttons/NavButton";
 import MainSection from "./sections/MainSection";
-import { useNavigate } from "react-router-dom";
-
 import Footer from "../../ui/Footer";
 import GynecologyService from "./services/GynecologyService";
 import ObstetricsService from "./services/ObstetricsService";
 import WellnessService from "./services/WellnessService";
 import Input from "../../ui/Input";
-import { AuthContext } from "../../../context/AuthContext";
-
-
 
 export default function WomensHealthLandingPage() {
-  const { isLoggedIn, logout, userRole } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Get the token and login status from localStorage
+    const token = localStorage.getItem("token");
+    const currentLoginStatus = localStorage.getItem("Login");
+
+    // Determine if a refresh is needed
+    if (token && currentLoginStatus !== "true") {
+      localStorage.setItem("Login", "true");
+      window.location.reload();
+    } else if (!token && currentLoginStatus !== "false") {
+      localStorage.setItem("Login", "false");
+      window.location.reload();
+    }
+  }, []); // Run only once on mount
+
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    localStorage.removeItem("token"); // Remove token from localStorage
+    localStorage.setItem("Login", "false"); // Update Login status
+    navigate("/login");
   };
 
   const navigateProfile = () => {
-    switch (userRole) {
-      case "admin":
-        navigate("/admin/dashboard");
-        break;
-      case "doctor":
-        navigate("/doctor/dashboard");
-        break;
-      case "patient":
-        navigate("/patient/dashboard");
-        break;
-      default:
-        navigate("/");
+    // Get user role from token (assumes the role is stored in the token payload)
+    const token = localStorage.getItem("token");
+    if (token) {
+      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+      const userRole = payload.role;
+
+      switch (userRole) {
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "doctor":
+          navigate("/doctor/dashboard");
+          break;
+        case "patient":
+          navigate("/patient/dashboard");
+          break;
+        default:
+          navigate("/");
+      }
+    } else {
+      navigate("/");
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen min-screen">
+    <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-16 flex items-center justify-between">
         <IconLogo />
         <Navbar />
         <div className="flex items-center gap-4 ml-auto px-6">
-          {isLoggedIn ? (
+          {localStorage.getItem("Login") === "true" ? (
             <>
               <NavButton className="text-sm" onClick={navigateProfile}>
                 Profile
@@ -57,7 +75,7 @@ export default function WomensHealthLandingPage() {
               </NavButton>
             </>
           ) : (
-            <NavButton className="text-sm" to="/login" onClick={() => {}}>
+            <NavButton className="text-sm" onClick={() => navigate("/login")}>
               Log in
             </NavButton>
           )}
@@ -89,8 +107,12 @@ export default function WomensHealthLandingPage() {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row lg:justify-end">
-              <NavButton onClick={() => {}}>Schedule a Consultation</NavButton>
-              <NavButton variant="outline" onClick={() => {}}>View Our Services</NavButton>
+              <NavButton onClick={() => navigate("/consultation")}>
+                Schedule a Consultation
+              </NavButton>
+              <NavButton variant="outline" onClick={() => navigate("/services")}>
+                View Our Services
+              </NavButton>
             </div>
           </div>
         </section>
@@ -112,7 +134,9 @@ export default function WomensHealthLandingPage() {
                   placeholder="Enter your email"
                   type="email"
                 />
-                <NavButton onClick={() => {}}>Subscribe</NavButton>
+                <NavButton onClick={() => alert("Subscribed!")}>
+                  Subscribe
+                </NavButton>
               </form>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 By subscribing, you agree to our Terms & Conditions and Privacy
