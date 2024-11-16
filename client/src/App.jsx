@@ -26,12 +26,8 @@ import InsuranceForm from "./components/users/patient/sidebar/pages/insurance/In
 import EditInsuranceForm from "./components/users/patient/sidebar/pages/insurance/EditInsuranceForm.tsx";
 import EditMedicalHistoryForm from "./components/users/patient/sidebar/pages/medical-history/EditMedicalHistoryForm.tsx";
 
-//Contexts
-import { AuthProvider } from "./context/AuthContext.jsx";
-
 function App() {
   return (
-    <AuthProvider>
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<WomensHealthLandingPage />} />
@@ -85,7 +81,6 @@ function App() {
       {/* Catch-all route for 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-    </AuthProvider>
   );
 }
 
