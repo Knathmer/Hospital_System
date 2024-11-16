@@ -18,6 +18,10 @@ export async function getAppointmentAnalytics(req, res) {
     const officeIDs = parseArray(req.query.officeIDs);
     const doctorIDs = parseArray(req.query.doctorIDs);
     const patientIDs = parseArray(req.query.patientIDs);
+    const statuses = parseArray(req.query.statuses);
+    const visitTypes = parseArray(req.query.visitTypes);
+    const specialtyIDs = parseArray(req.query.specialtyIDs);
+    const serviceIDs = parseArray(req.query.serviceIDs);
 
     // Build the SQL query dynamically based on provided filters
     let sql = `
@@ -26,14 +30,18 @@ export async function getAppointmentAnalytics(req, res) {
         a.appointmentDateTime,
         a.status,
         a.visitType,
+        s.serviceID,
         s.serviceName,
         s.price,
+        p.patientID,
         p.firstName AS patientFirstName,
         p.lastName AS patientLastName,
+        d.doctorID,
         d.firstName AS doctorFirstName,
         d.lastName AS doctorLastName,
         d.specialtyID,
         sp.specialtyName,
+        o.officeID,
         o.officeName,
         addr.addrstate AS state,
         addr.addrcity AS city
@@ -84,6 +92,30 @@ export async function getAppointmentAnalytics(req, res) {
       params.push(...patientIDs);
     }
 
+    if (statuses && statuses.length > 0) {
+      const statusPlaceholders = statuses.map(() => '?').join(',');
+      sql += ` AND a.status IN (${statusPlaceholders})`;
+      params.push(...statuses);
+    }
+
+    if (visitTypes && visitTypes.length > 0) {
+      const visitTypePlaceholders = visitTypes.map(() => '?').join(',');
+      sql += ` AND a.visitType IN (${visitTypePlaceholders})`;
+      params.push(...visitTypes);
+    }
+
+    if (specialtyIDs && specialtyIDs.length > 0) {
+      const specialtyPlaceholders = specialtyIDs.map(() => '?').join(',');
+      sql += ` AND sp.specialtyID IN (${specialtyPlaceholders})`;
+      params.push(...specialtyIDs);
+    }
+
+    if (serviceIDs && serviceIDs.length > 0) {
+      const servicePlaceholders = serviceIDs.map(() => '?').join(',');
+      sql += ` AND s.serviceID IN (${servicePlaceholders})`;
+      params.push(...serviceIDs);
+    }
+
     // Execute the query to get appointments
     const appointments = await query(sql, params);
 
@@ -94,14 +126,19 @@ export async function getAppointmentAnalytics(req, res) {
     const appointmentsByDate = {};
     const specialtyCounts = {};
     const serviceCounts = {};
+    const stateCounts = {};
+    const cityCounts = {};
+    const officeCounts = {};
+    const doctorCounts = {};
+    const patientCounts = {};
 
     appointments.forEach(appointment => {
       // Count by status
-      const status = appointment.status;
+      const status = appointment.status || 'Unknown';
       statusCounts[status] = (statusCounts[status] || 0) + 1;
 
       // Count by visitType
-      const visitType = appointment.visitType;
+      const visitType = appointment.visitType || 'Unknown';
       visitTypeCounts[visitType] = (visitTypeCounts[visitType] || 0) + 1;
 
       // Count appointments by date
@@ -115,16 +152,41 @@ export async function getAppointmentAnalytics(req, res) {
       // Count by service
       const service = appointment.serviceName || 'Unknown Service';
       serviceCounts[service] = (serviceCounts[service] || 0) + 1;
+
+      // Count by state
+      const state = appointment.state || 'Unknown State';
+      stateCounts[state] = (stateCounts[state] || 0) + 1;
+
+      // Count by city
+      const city = appointment.city || 'Unknown City';
+      cityCounts[city] = (cityCounts[city] || 0) + 1;
+
+      // Count by office
+      const office = appointment.officeName || 'Unknown Office';
+      officeCounts[office] = (officeCounts[office] || 0) + 1;
+
+      // Count by doctor
+      const doctorName = `${appointment.doctorFirstName} ${appointment.doctorLastName}` || 'Unknown Doctor';
+      doctorCounts[doctorName] = (doctorCounts[doctorName] || 0) + 1;
+
+      // Count by patient
+      const patientName = `${appointment.patientFirstName} ${appointment.patientLastName}` || 'Unknown Patient';
+      patientCounts[patientName] = (patientCounts[patientName] || 0) + 1;
     });
 
-    res.status(200).json({ 
-      appointments, 
-      totalAppointments, 
-      statusCounts, 
-      visitTypeCounts, 
+    res.status(200).json({
+      appointments,
+      totalAppointments,
+      statusCounts,
+      visitTypeCounts,
       appointmentsByDate,
       specialtyCounts,
-      serviceCounts
+      serviceCounts,
+      stateCounts,
+      cityCounts,
+      officeCounts,
+      doctorCounts,
+      patientCounts,
     });
   } catch (error) {
     console.error('Error fetching appointment analytics:', error);
@@ -220,3 +282,49 @@ export async function getAppointmentAnalytics(req, res) {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
+
+  // Function to get appointment statuses
+export async function getAppointmentStatuses(req, res) {
+  try {
+    const result = await query(`SELECT DISTINCT status FROM appointment`);
+    const statuses = result.map(row => row.status);
+    res.status(200).json({ statuses });
+  } catch (error) {
+    console.error('Error fetching appointment statuses:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+// Function to get visit types
+export async function getVisitTypes(req, res) {
+  try {
+    const result = await query(`SELECT DISTINCT visitType FROM appointment`);
+    const visitTypes = result.map(row => row.visitType);
+    res.status(200).json({ visitTypes });
+  } catch (error) {
+    console.error('Error fetching visit types:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+// Function to get specialties
+export async function getSpecialties(req, res) {
+  try {
+    const specialties = await query('SELECT specialtyID, specialtyName FROM specialty');
+    res.status(200).json({ specialties });
+  } catch (error) {
+    console.error('Error fetching specialties:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+// Function to get services
+export async function getServices(req, res) {
+  try {
+    const services = await query('SELECT serviceID, serviceName FROM service');
+    res.status(200).json({ services });
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}

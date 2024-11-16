@@ -1,13 +1,12 @@
-// client/src/components/users/admin/sections/AppointmentAnalytics.jsx
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import DateRangePicker from './DateRangePicker';
-import MultiSelectInput from './MultiSelectInput';
-import AppointmentCharts from './AppointmentCharts';
+import DateRangePicker from './DateRangePicker.jsx';
+import MultiSelectInput from './MultiSelectInput.jsx';
+import AppointmentCharts from './AppointmentCharts.jsx';
+import AppointmentsTable from './AppointmentsTable.jsx';
+import ChartDisplayToggle from './ChartDisplayToggle.jsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 const AppointmentAnalytics = () => {
   const [startDate, setStartDate] = useState('');
@@ -28,18 +27,44 @@ const AppointmentAnalytics = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatients, setSelectedPatients] = useState([]);
 
+  const [statuses, setStatuses] = useState([]);
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+
+  const [visitTypes, setVisitTypes] = useState([]);
+  const [selectedVisitTypes, setSelectedVisitTypes] = useState([]);
+
+  const [specialties, setSpecialties] = useState([]);
+  const [selectedSpecialties, setSelectedSpecialties] = useState([]);
+
+  const [services, setServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
+
   const [appointments, setAppointments] = useState([]);
 
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [statusCounts, setStatusCounts] = useState({});
   const [visitTypeCounts, setVisitTypeCounts] = useState({});
+  const [appointmentsByDate, setAppointmentsByDate] = useState({});
   const [specialtyCounts, setSpecialtyCounts] = useState({});
   const [serviceCounts, setServiceCounts] = useState({});
-  const [appointmentsByDate, setAppointmentsByDate] = useState({});
+  const [stateCounts, setStateCounts] = useState({});
+  const [cityCounts, setCityCounts] = useState({});
+  const [officeCounts, setOfficeCounts] = useState({});
+  const [doctorCounts, setDoctorCounts] = useState({});
+  const [patientCounts, setPatientCounts] = useState({});
 
-  const [sortConfig, setSortConfig] = useState({
-    key: 'appointmentDateTime',
-    direction: 'descending',
+  // Chart display options
+  const [chartDisplayOptions, setChartDisplayOptions] = useState({
+    status: true,
+    visitType: true,
+    specialty: true,
+    service: true,
+    state: true,
+    city: true,
+    office: true,
+    doctor: true,
+    patient: true,
+    appointmentsOverTime: true,
   });
 
   const token = localStorage.getItem('token');
@@ -56,17 +81,34 @@ const AppointmentAnalytics = () => {
     // Fetch initial data for filters
     const fetchData = async () => {
       try {
-        const [statesRes, citiesRes, doctorsRes, patientsRes] = await Promise.all([
-          axios.get('http://localhost:3000/auth/admin/states', { headers: { 'Authorization': `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/cities', { headers: { 'Authorization': `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/doctors', { headers: { 'Authorization': `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/patients', { headers: { 'Authorization': `Bearer ${token}` } }),
+        const [
+          statesRes,
+          citiesRes,
+          doctorsRes,
+          patientsRes,
+          statusesRes,
+          visitTypesRes,
+          specialtiesRes,
+          servicesRes,
+        ] = await Promise.all([
+          axios.get('http://localhost:3000/auth/admin/states', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:3000/auth/admin/cities', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:3000/auth/admin/doctors', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:3000/auth/admin/patients', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:3000/auth/admin/statuses', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:3000/auth/admin/visitTypes', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:3000/auth/admin/specialties', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:3000/auth/admin/services', { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         setStates(statesRes.data.states);
         setCities(citiesRes.data.cities);
         setDoctors(doctorsRes.data.doctors);
         setPatients(patientsRes.data.patients);
+        setStatuses(statusesRes.data.statuses);
+        setVisitTypes(visitTypesRes.data.visitTypes);
+        setSpecialties(specialtiesRes.data.specialties);
+        setServices(servicesRes.data.services);
 
         // Fetch offices after fetching states and cities
         fetchOffices(statesRes.data.states, citiesRes.data.cities);
@@ -81,11 +123,11 @@ const AppointmentAnalytics = () => {
   const fetchOffices = async (states = selectedStates, cities = selectedCities) => {
     try {
       const params = {};
-      if (states.length > 0) params.states = states.map(s => s.value).join(',');
-      if (cities.length > 0) params.cities = cities.map(c => c.value).join(',');
+      if (states.length > 0) params.states = states.map((s) => s.value).join(',');
+      if (cities.length > 0) params.cities = cities.map((c) => c.value).join(',');
 
       const officesRes = await axios.get('http://localhost:3000/auth/admin/offices', {
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
         params,
       });
       setOffices(officesRes.data.offices);
@@ -109,27 +151,43 @@ const AppointmentAnalytics = () => {
       }
 
       if (selectedStates.length > 0) {
-        params.states = selectedStates.map(s => s.value).join(',');
+        params.states = selectedStates.map((s) => s.value).join(',');
       }
 
       if (selectedCities.length > 0) {
-        params.cities = selectedCities.map(c => c.value).join(',');
+        params.cities = selectedCities.map((c) => c.value).join(',');
       }
 
       if (selectedOffices.length > 0) {
-        params.officeIDs = selectedOffices.map(o => o.value).join(',');
+        params.officeIDs = selectedOffices.map((o) => o.value).join(',');
       }
 
       if (selectedDoctors.length > 0) {
-        params.doctorIDs = selectedDoctors.map(d => d.value).join(',');
+        params.doctorIDs = selectedDoctors.map((d) => d.value).join(',');
       }
 
       if (selectedPatients.length > 0) {
-        params.patientIDs = selectedPatients.map(p => p.value).join(',');
+        params.patientIDs = selectedPatients.map((p) => p.value).join(',');
+      }
+
+      if (selectedStatuses.length > 0) {
+        params.statuses = selectedStatuses.map((s) => s.value).join(',');
+      }
+
+      if (selectedVisitTypes.length > 0) {
+        params.visitTypes = selectedVisitTypes.map((v) => v.value).join(',');
+      }
+
+      if (selectedSpecialties.length > 0) {
+        params.specialtyIDs = selectedSpecialties.map((s) => s.value).join(',');
+      }
+
+      if (selectedServices.length > 0) {
+        params.serviceIDs = selectedServices.map((s) => s.value).join(',');
       }
 
       const res = await axios.get('http://localhost:3000/auth/admin/appointmentAnalytics', {
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
         params,
       });
 
@@ -137,9 +195,14 @@ const AppointmentAnalytics = () => {
       setTotalAppointments(res.data.totalAppointments);
       setStatusCounts(res.data.statusCounts);
       setVisitTypeCounts(res.data.visitTypeCounts);
+      setAppointmentsByDate(res.data.appointmentsByDate);
       setSpecialtyCounts(res.data.specialtyCounts);
       setServiceCounts(res.data.serviceCounts);
-      setAppointmentsByDate(res.data.appointmentsByDate);
+      setStateCounts(res.data.stateCounts);
+      setCityCounts(res.data.cityCounts);
+      setOfficeCounts(res.data.officeCounts);
+      setDoctorCounts(res.data.doctorCounts);
+      setPatientCounts(res.data.patientCounts);
     } catch (error) {
       console.error('Error fetching appointments:', error);
     }
@@ -147,81 +210,59 @@ const AppointmentAnalytics = () => {
 
   useEffect(() => {
     fetchAppointments();
-  }, [startDate, endDate, selectedStates, selectedCities, selectedOffices, selectedDoctors, selectedPatients]);
+  }, [
+    startDate,
+    endDate,
+    selectedStates,
+    selectedCities,
+    selectedOffices,
+    selectedDoctors,
+    selectedPatients,
+    selectedStatuses,
+    selectedVisitTypes,
+    selectedSpecialties,
+    selectedServices,
+  ]);
 
   // Prepare options for react-select
-  const stateOptions = states.map(state => ({ value: state, label: state }));
-  const cityOptions = cities.map(city => ({ value: city, label: city }));
-  const officeOptions = offices.map(office => ({ value: office.officeID.toString(), label: office.officeName }));
-  const doctorOptions = doctors.map(doctor => ({ value: doctor.doctorID.toString(), label: `${doctor.firstName} ${doctor.lastName}` }));
-  const patientOptions = patients.map(patient => ({ value: patient.patientID.toString(), label: `${patient.firstName} ${patient.lastName}` }));
-
-  const handleSort = (key) => {
-    let direction = 'ascending';
-    if (
-      sortConfig.key === key &&
-      sortConfig.direction === 'ascending'
-    ) {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const getSortedAppointments = () => {
-    const sortedAppointments = [...appointments];
-    sortedAppointments.sort((a, b) => {
-      let aValue;
-      let bValue;
-  
-      switch (sortConfig.key) {
-        case 'appointmentDateTime':
-          aValue = new Date(a.appointmentDateTime).getTime();
-          bValue = new Date(b.appointmentDateTime).getTime();
-          break;
-        case 'patientName':
-          aValue = `${a.patientFirstName} ${a.patientLastName}`.toLowerCase();
-          bValue = `${b.patientFirstName} ${b.patientLastName}`.toLowerCase();
-          break;
-        case 'doctorName':
-          aValue = `${a.doctorFirstName} ${a.doctorLastName}`.toLowerCase();
-          bValue = `${b.doctorFirstName} ${b.doctorLastName}`.toLowerCase();
-          break;
-        default:
-          aValue = a[sortConfig.key]?.toString().toLowerCase() || '';
-          bValue = b[sortConfig.key]?.toString().toLowerCase() || '';
-          break;
-      }
-  
-      if (aValue < bValue) {
-        return sortConfig.direction === 'ascending' ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return sortConfig.direction === 'ascending' ? 1 : -1;
-      }
-      return 0;
-    });
-    return sortedAppointments;
-  };
+  const stateOptions = states.map((state) => ({ value: state, label: state }));
+  const cityOptions = cities.map((city) => ({ value: city, label: city }));
+  const officeOptions = offices.map((office) => ({ value: office.officeID.toString(), label: office.officeName }));
+  const doctorOptions = doctors.map((doctor) => ({
+    value: doctor.doctorID.toString(),
+    label: `${doctor.firstName} ${doctor.lastName}`,
+  }));
+  const patientOptions = patients.map((patient) => ({
+    value: patient.patientID.toString(),
+    label: `${patient.firstName} ${patient.lastName}`,
+  }));
+  const statusOptions = statuses.map((status) => ({ value: status, label: status }));
+  const visitTypeOptions = visitTypes.map((visitType) => ({ value: visitType, label: visitType }));
+  const specialtyOptions = specialties.map((specialty) => ({
+    value: specialty.specialtyID.toString(),
+    label: specialty.specialtyName,
+  }));
+  const serviceOptions = services.map((service) => ({ value: service.serviceID.toString(), label: service.serviceName }));
 
   const exportToPDF = () => {
-  const input = document.getElementById('report-content');
-  html2canvas(input, { scale: 2, useCORS: true })
-    .then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
+    const input = document.getElementById('report-content');
+    html2canvas(input, { scale: 2, useCORS: true })
+      .then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
 
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: [canvas.width, canvas.height],
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'px',
+          format: [canvas.width, canvas.height],
+        });
+
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+        pdf.save('appointment-report.pdf');
+      })
+      .catch((error) => {
+        console.error('Error exporting to PDF:', error);
       });
-
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-
-      pdf.save('appointment-report.pdf');
-    })
-    .catch((error) => {
-      console.error('Error exporting to PDF:', error);
-    });
   };
 
   return (
@@ -235,132 +276,173 @@ const AppointmentAnalytics = () => {
           Export Report as PDF
         </button>
       </div>
+
+      {/* Wrap the content you want to export */}
       <div id="report-content">
-      <h1 className="text-3xl font-bold text-center mb-6">Appointment Analytics</h1>
+        <h1 className="text-3xl font-bold text-center mb-6">Appointment Analytics</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {/* Date Range Inputs */}
-        <DateRangePicker
-          startDate={startDate}
-          endDate={endDate}
-          setStartDate={setStartDate}
-          setEndDate={setEndDate}
-        />
+        {/* Filters Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* Date Range Inputs */}
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+          />
+          <ChartDisplayToggle
+            label="Appointments Over Time"
+            chartToggleState={chartDisplayOptions.appointmentsOverTime}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, appointmentsOverTime: value }))
+            }
+          />
 
-        {/* States Selector */}
-        <MultiSelectInput
-          options={stateOptions}
-          selectedValues={selectedStates}
-          setSelectedValues={setSelectedStates}
-          label="States"
-          placeholder="Select States"
-        />
+          {/* MultiSelect Inputs with Chart Toggles */}
+          <MultiSelectInput
+            label="States"
+            options={stateOptions}
+            selectedValues={selectedStates}
+            setSelectedValues={setSelectedStates}
+            placeholder="Select States"
+            chartToggle
+            chartToggleState={chartDisplayOptions.state}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, state: value }))
+            }
+          />
 
-        {/* Cities Selector */}
-        <MultiSelectInput
-          options={cityOptions}
-          selectedValues={selectedCities}
-          setSelectedValues={setSelectedCities}
-          label="Cities"
-          placeholder="Select Cities"
-        />
+          {/* Repeat for other filters */}
+          {/* Cities */}
+          <MultiSelectInput
+            label="Cities"
+            options={cityOptions}
+            selectedValues={selectedCities}
+            setSelectedValues={setSelectedCities}
+            placeholder="Select Cities"
+            chartToggle
+            chartToggleState={chartDisplayOptions.city}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, city: value }))
+            }
+          />
 
-        {/* Offices Selector */}
-        <MultiSelectInput
-          options={officeOptions}
-          selectedValues={selectedOffices}
-          setSelectedValues={setSelectedOffices}
-          label="Offices"
-          placeholder="Select Offices"
-        />
+          {/* Offices */}
+          <MultiSelectInput
+            label="Offices"
+            options={officeOptions}
+            selectedValues={selectedOffices}
+            setSelectedValues={setSelectedOffices}
+            placeholder="Select Offices"
+            chartToggle
+            chartToggleState={chartDisplayOptions.office}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, office: value }))
+            }
+          />
 
-        {/* Doctors Selector */}
-        <MultiSelectInput
-          options={doctorOptions}
-          selectedValues={selectedDoctors}
-          setSelectedValues={setSelectedDoctors}
-          label="Doctors"
-          placeholder="Select Doctors"
-        />
+          {/* Doctors */}
+          <MultiSelectInput
+            label="Doctors"
+            options={doctorOptions}
+            selectedValues={selectedDoctors}
+            setSelectedValues={setSelectedDoctors}
+            placeholder="Select Doctors"
+            chartToggle
+            chartToggleState={chartDisplayOptions.doctor}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, doctor: value }))
+            }
+          />
 
-        {/* Patients Selector */}
-        <MultiSelectInput
-          options={patientOptions}
-          selectedValues={selectedPatients}
-          setSelectedValues={setSelectedPatients}
-          label="Patients"
-          placeholder="Select Patients"
-        />
-      </div>
+          {/* Patients */}
+          <MultiSelectInput
+            label="Patients"
+            options={patientOptions}
+            selectedValues={selectedPatients}
+            setSelectedValues={setSelectedPatients}
+            placeholder="Select Patients"
+            chartToggle
+            chartToggleState={chartDisplayOptions.patient}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, patient: value }))
+            }
+          />
 
-      {/* Charts */}
-      <AppointmentCharts
-        statusCounts={statusCounts}
-        visitTypeCounts={visitTypeCounts}
-        appointmentsByDate={appointmentsByDate}
-        specialtyCounts={specialtyCounts}
-        serviceCounts={serviceCounts}
-      />
+          {/* Status */}
+          <MultiSelectInput
+            label="Status"
+            options={statusOptions}
+            selectedValues={selectedStatuses}
+            setSelectedValues={setSelectedStatuses}
+            placeholder="Select Statuses"
+            chartToggle
+            chartToggleState={chartDisplayOptions.status}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, status: value }))
+            }
+          />
 
-      {/* Display Appointments */}
-      <div>
-          <h2 className="text-2xl font-bold mb-4">Appointments</h2>
-          <div className="overflow-auto">
-            <table className="min-w-full bg-white">
-              <thead>
-                <tr>
-                  {[
-                    { label: 'Date & Time', key: 'appointmentDateTime' },
-                    { label: 'Patient', key: 'patientName' },
-                    { label: 'Doctor', key: 'doctorName' },
-                    { label: 'Office', key: 'officeName' },
-                    { label: 'Status', key: 'status' },
-                    { label: 'Visit Type', key: 'visitType' },
-                    { label: 'Service', key: 'serviceName' },
-                  ].map((column) => (
-                    <th
-                      key={column.key}
-                      className="py-2 px-4 cursor-pointer select-none"
-                      onClick={() => handleSort(column.key)}
-                    >
-                      <div className="flex items-center justify-center">
-                        {column.label}
-                        {sortConfig.key === column.key ? (
-                          sortConfig.direction === 'ascending' ? (
-                            <FaSortUp className="ml-1" />
-                          ) : (
-                            <FaSortDown className="ml-1" />
-                          )
-                        ) : (
-                          <FaSort className="ml-1 opacity-50" />
-                        )}
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {getSortedAppointments().map((appointment) => (
-                  <tr key={appointment.appointmentID} className="text-center">
-                    <td className="py-2 px-4">
-                      {new Date(appointment.appointmentDateTime).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-4">
-                      {appointment.patientFirstName} {appointment.patientLastName}
-                    </td>
-                    <td className="py-2 px-4">
-                      {appointment.doctorFirstName} {appointment.doctorLastName}
-                    </td>
-                    <td className="py-2 px-4">{appointment.officeName}</td>
-                    <td className="py-2 px-4">{appointment.status}</td>
-                    <td className="py-2 px-4">{appointment.visitType}</td>
-                    <td className="py-2 px-4">{appointment.serviceName}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {/* Visit Types */}
+          <MultiSelectInput
+            label="Visit Types"
+            options={visitTypeOptions}
+            selectedValues={selectedVisitTypes}
+            setSelectedValues={setSelectedVisitTypes}
+            placeholder="Select Visit Types"
+            chartToggle
+            chartToggleState={chartDisplayOptions.visitType}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, visitType: value }))
+            }
+          />
+
+          {/* Specialties */}
+          <MultiSelectInput
+            label="Specialties"
+            options={specialtyOptions}
+            selectedValues={selectedSpecialties}
+            setSelectedValues={setSelectedSpecialties}
+            placeholder="Select Specialties"
+            chartToggle
+            chartToggleState={chartDisplayOptions.specialty}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, specialty: value }))
+            }
+          />
+
+          {/* Services */}
+          <MultiSelectInput
+            label="Services"
+            options={serviceOptions}
+            selectedValues={selectedServices}
+            setSelectedValues={setSelectedServices}
+            placeholder="Select Services"
+            chartToggle
+            chartToggleState={chartDisplayOptions.service}
+            setChartToggleState={(value) =>
+              setChartDisplayOptions((prev) => ({ ...prev, service: value }))
+            }
+          />
         </div>
+
+        {/* Charts */}
+        <AppointmentCharts
+          statusCounts={statusCounts}
+          visitTypeCounts={visitTypeCounts}
+          appointmentsByDate={appointmentsByDate}
+          specialtyCounts={specialtyCounts}
+          serviceCounts={serviceCounts}
+          stateCounts={stateCounts}
+          cityCounts={cityCounts}
+          officeCounts={officeCounts}
+          doctorCounts={doctorCounts}
+          patientCounts={patientCounts}
+          chartDisplayOptions={chartDisplayOptions}
+        />
+
+        {/* Display Appointments */}
+        <AppointmentsTable appointments={appointments} />
       </div>
     </div>
   );

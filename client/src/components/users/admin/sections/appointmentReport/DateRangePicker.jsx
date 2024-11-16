@@ -1,5 +1,3 @@
-// client/src/components/users/admin/sections/DateRangePicker.jsx
-
 import React from 'react';
 
 const DateRangePicker = ({ startDate, endDate, setStartDate, setEndDate }) => {
@@ -10,7 +8,7 @@ const DateRangePicker = ({ startDate, endDate, setStartDate, setEndDate }) => {
         <input
           type="date"
           value={startDate}
-          onChange={e => setStartDate(e.target.value)}
+          onChange={(e) => setStartDate(e.target.value)}
           className="border rounded p-2 w-full"
         />
       </div>
@@ -19,7 +17,7 @@ const DateRangePicker = ({ startDate, endDate, setStartDate, setEndDate }) => {
         <input
           type="date"
           value={endDate}
-          onChange={e => setEndDate(e.target.value)}
+          onChange={(e) => setEndDate(e.target.value)}
           className="border rounded p-2 w-full"
         />
       </div>
