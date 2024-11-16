@@ -9,8 +9,15 @@ function BookPage() {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null); // For row selection
   const [gender, setGender] = useState("");
-  const [location, setLocation] = useState("");
-  const [locations, setLocations] = useState([]);
+
+  // State variables for cascading filters
+  const [states, setStates] = useState([]);
+  const [selectedState, setSelectedState] = useState("");
+  const [cities, setCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("");
+  const [offices, setOffices] = useState([]);
+  const [selectedOffice, setSelectedOffice] = useState("");
+
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [reason, setReason] = useState("");
@@ -29,19 +36,61 @@ function BookPage() {
       .then((response) => setSpecialties(response.data))
       .catch((error) => console.error("Error fetching specialties:", error));
 
-      // Fetch office locations
+    // Fetch states tied to offices
     axios
-      .get("http://localhost:3000/appointment/locations")
-      .then((response) => setLocations(response.data))
-      .catch((error) => console.error("Error fetching locations:", error));
+      .get("http://localhost:3000/appointment/states")
+      .then((response) => setStates(response.data))
+      .catch((error) => console.error("Error fetching states:", error));
   }, []);
+
+  useEffect(() => {
+    if (selectedState) {
+      // Fetch cities based on selected state
+      axios
+        .get("http://localhost:3000/appointment/cities", {
+          params: { state: selectedState },
+        })
+        .then((response) => setCities(response.data))
+        .catch((error) => console.error("Error fetching cities:", error));
+
+      // Reset city and office selections
+      setSelectedCity("");
+      setOffices([]);
+      setSelectedOffice("");
+    } else {
+      setCities([]);
+      setSelectedCity("");
+      setOffices([]);
+      setSelectedOffice("");
+    }
+  }, [selectedState]);
+
+  useEffect(() => {
+    if (selectedState && selectedCity) {
+      // Fetch offices based on selected state and city
+      axios
+        .get("http://localhost:3000/appointment/offices", {
+          params: { state: selectedState, city: selectedCity },
+        })
+        .then((response) => setOffices(response.data))
+        .catch((error) => console.error("Error fetching offices:", error));
+
+      // Reset office selection
+      setSelectedOffice("");
+    } else {
+      setOffices([]);
+      setSelectedOffice("");
+    }
+  }, [selectedState, selectedCity]);
 
   useEffect(() => {
     // Fetch doctors based on filters
     const params = {
       gender,
-      location,
       serviceID: selectedService,
+      state: selectedState,   // New filter
+      city: selectedCity,     // New filter
+      officeID: selectedOffice,
     };
     if (specialty) {
       params.specialtyID = specialty;
@@ -53,7 +102,7 @@ function BookPage() {
       })
       .then((response) => setDoctors(response.data))
       .catch((error) => console.error("Error fetching doctors:", error));
-  }, [specialty, gender, location, selectedService]);
+  }, [specialty, gender, selectedState, selectedCity, selectedOffice, selectedService]);
 
   useEffect(() => {
     // Fetch services
@@ -72,7 +121,7 @@ function BookPage() {
         setServices([]);
       });
 
-      // Reset selected service when specialty changes
+    // Reset selected service when specialty changes
     setSelectedService("");
   }, [specialty]);
 
@@ -94,7 +143,7 @@ function BookPage() {
     };
 
     if (date && selectedDoctor) {
-        // Fetch booked times for the selected doctor and date
+      // Fetch booked times for the selected doctor and date
       axios
         .get("http://localhost:3000/appointment/appointments", {
           params: { doctorID: selectedDoctor.doctorID, date },
@@ -128,7 +177,7 @@ function BookPage() {
   const isWeekend = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDay();
-    return day === 5 || day === 6; // Sunday (5) and Saturday (6)
+    return day === 0 || day === 6; // Sunday (0) and Saturday (6)
   };
 
   const convertTo24HourFormat = (timeStr) => {
@@ -173,7 +222,7 @@ function BookPage() {
           appointmentDateTime: `${date}T${formattedTime}:00`,
           reason,
           doctorID: selectedDoctor.doctorID,
-          officeID: selectedDoctor.officeID,
+          officeID: selectedOffice, // Use selectedOffice ID
           serviceID: selectedService, // Include the selected service ID
         },
         {
@@ -185,7 +234,9 @@ function BookPage() {
       // Reset form fields
       setSpecialty("");
       setGender("");
-      setLocation("");
+      setSelectedState("");
+      setSelectedCity("");
+      setSelectedOffice("");
       setDate("");
       setTime("");
       setReason("");
@@ -216,6 +267,8 @@ function BookPage() {
                   <h2 className="text-xl font-semibold text-gray-700 flex items-center">
                     Select a Doctor
                   </h2>
+
+                  {/* Specialty Dropdown */}
                   <div>
                     <label
                       htmlFor="specialty"
@@ -238,28 +291,8 @@ function BookPage() {
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label
-                      htmlFor="service"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Service
-                    </label>
-                    <select
-                      id="service"
-                      name="service"
-                      value={selectedService}
-                      onChange={(e) => setSelectedService(e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
-                    >
-                      <option value="">Select a service</option>
-                      {services.map((service) => (
-                        <option key={service.serviceID} value={service.serviceID}>
-                          {service.serviceName} - ${service.price}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+
+                  {/* Gender Dropdown */}
                   <div>
                     <label
                       htmlFor="gender"
@@ -281,28 +314,84 @@ function BookPage() {
                       <option value="Prefer not to say">Prefer not to say</option>
                     </select>
                   </div>
+
+                  {/* State Dropdown */}
                   <div>
                     <label
-                      htmlFor="location"
+                      htmlFor="state"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Location
+                      State
                     </label>
                     <select
-                      id="location"
-                      name="location"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
+                      id="state"
+                      name="state"
+                      value={selectedState}
+                      onChange={(e) => setSelectedState(e.target.value)}
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
                     >
-                      <option value="">Any</option>
-                      {locations.map((loc) => (
-                        <option key={loc.officeID} value={loc.officeName}>
-                          {loc.officeName} - {loc.address}
+                      <option value="">Select a state</option>
+                      {states.map((state) => (
+                        <option key={state} value={state}>
+                          {state}
                         </option>
                       ))}
                     </select>
                   </div>
+
+                  {/* City Dropdown */}
+                  {cities.length > 0 && (
+                    <div>
+                      <label
+                        htmlFor="city"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        City
+                      </label>
+                      <select
+                        id="city"
+                        name="city"
+                        value={selectedCity}
+                        onChange={(e) => setSelectedCity(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                      >
+                        <option value="">Select a city</option>
+                        {cities.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Office Location Dropdown */}
+                  {offices.length > 0 && (
+                    <div>
+                      <label
+                        htmlFor="office"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Office Location
+                      </label>
+                      <select
+                        id="office"
+                        name="office"
+                        value={selectedOffice}
+                        onChange={(e) => setSelectedOffice(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                      >
+                        <option value="">Select an office</option>
+                        {offices.map((office) => (
+                          <option key={office.officeID} value={office.officeID}>
+                            {office.officeName} - {office.address}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Available Doctors */}
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold text-gray-700">
                       Available Doctors
@@ -405,6 +494,31 @@ function BookPage() {
                       ))}
                     </select>
                   </div>
+
+                  {/* Service Dropdown (Moved Below Time) */}
+                  <div>
+                    <label
+                      htmlFor="service"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Service
+                    </label>
+                    <select
+                      id="service"
+                      name="service"
+                      value={selectedService}
+                      onChange={(e) => setSelectedService(e.target.value)}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value="">Select a service</option>
+                      {services.map((service) => (
+                        <option key={service.serviceID} value={service.serviceID}>
+                          {service.serviceName} - ${service.price}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   {selectedService && (
                     <div>
                       <p className="text-sm text-gray-700">
@@ -418,6 +532,7 @@ function BookPage() {
                       </p>
                     </div>
                   )}
+
                   <div>
                     <label
                       htmlFor="reason"
