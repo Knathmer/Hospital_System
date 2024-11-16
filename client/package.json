@@ -20,7 +20,8 @@
     "react-big-calendar": "^1.15.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
-    "react-select": "^5.8.2"
+    "react-select": "^5.8.2",
+    "recharts": "^2.13.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
