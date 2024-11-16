@@ -9,6 +9,7 @@ import {
   getSurgeriesInformation,
   getVaccinesInformation,
   getAppointmentInformation,
+  getPreviousAppointments,
   putMissedAppointment,
 } from "../../controllers/doctor/doctorScheduleController.js";
 
@@ -27,5 +28,6 @@ doctorScheduleRouter.get("/vaccine-info", getVaccinesInformation);
 doctorScheduleRouter.get("/surgery-info", getSurgeriesInformation);
 doctorScheduleRouter.get("/family-info", getFamilyHistoryInformation);
 doctorScheduleRouter.get("/appointment-info", getAppointmentInformation);
+doctorScheduleRouter.get("/previous-appointments", getPreviousAppointments);
 
 export default doctorScheduleRouter;

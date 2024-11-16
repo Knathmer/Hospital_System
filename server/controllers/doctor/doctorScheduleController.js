@@ -9,6 +9,7 @@ import {
   GET_PATIENT_SURGERIES,
   GET_PATIENT_VACCINE,
   GET_PATIENT_APPOINTMENT_INFO,
+  GET_PREVIOUS_APPOINTMENTS,
 } from "../../queries/constants/selectQueries.js";
 
 export const getDoctorSchedule = async (req, res) => {
@@ -247,5 +248,26 @@ export const getAppointmentInformation = async (req, res) => {
     res
       .status(500)
       .json({ message: "Server error fetching patient's vaccine info" });
+  }
+};
+
+export const getPreviousAppointments = async (req, res) => {
+  try {
+    const { patientID } = req.query;
+
+    if (!patientID) {
+      return res.status(400).json({ message: "Patient ID is required!" });
+    }
+
+    const previousAppointments = await query(GET_PREVIOUS_APPOINTMENTS, [
+      patientID,
+    ]);
+
+    res.status(200).json({ previousAppointments });
+  } catch (error) {
+    console.error("Error fetching patient's disabilities information ", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching patient's disabilities info" });
   }
 };

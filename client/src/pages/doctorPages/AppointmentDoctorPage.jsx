@@ -79,6 +79,7 @@ export default function AppointmentPage() {
   const [patientInformation, setPatientInformation] = useState({});
   const [insuranceInformation, setInsuranceInformation] = useState({});
   const [appointmentInformation, setAppointmentInformation] = useState({});
+  const [previousAppointments, setPreviousAppointments] = useState([]);
   const [allergies, setAllergies] = useState([]);
   const [disabilities, setDisabilities] = useState([]);
   const [vaccines, setVaccines] = useState([]);
@@ -114,6 +115,7 @@ export default function AppointmentPage() {
         vaccineInfoResponse,
         surgeriesInfoResponse,
         familyInfoResponse,
+        previousAppointmentsResponse,
       ] = await Promise.all([
         axios.get("http://localhost:3000/auth/doctor/schedule/insurance-info", {
           headers: { Authorization: `Bearer ${token}` },
@@ -149,6 +151,13 @@ export default function AppointmentPage() {
           headers: { Authorization: `Bearer ${token}` },
           params: { patientID },
         }),
+        axios.get(
+          "http://localhost:3000/auth/doctor/schedule/previous-appointments",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { patientID },
+          }
+        ),
       ]);
 
       // Step 3: Set States
@@ -165,6 +174,9 @@ export default function AppointmentPage() {
       setVaccines(vaccineInfoResponse.data.vaccineInformation || []);
       setSurgeries(surgeriesInfoResponse.data.surgeryInformation || []);
       setFamilyHistory(familyInfoResponse.data.familyHistoryInformation || []);
+      setPreviousAppointments(
+        previousAppointmentsResponse.data.previousAppointments || []
+      );
     } catch (error) {
       console.error("Error fetching patient information: ", error);
     }
@@ -426,17 +438,32 @@ export default function AppointmentPage() {
             Previous Appointments
           </h2>
           <div className="space-y-4">
-            {appointmentData.previousAppointments.map((appointment, index) => (
-              <div key={index} className="bg-gray-50 p-4 rounded-md">
+            {previousAppointments.map((appointment) => (
+              <div
+                key={appointment.appointmentID}
+                className="bg-gray-50 p-4 rounded-md"
+              >
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="font-semibold text-gray-900">
-                    {appointment.date}
+                    {new Date(appointment.date).toLocaleDateString("en-US", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
                   </h4>
                   <span className="text-sm text-gray-600">
-                    {appointment.doctor}
+                    Dr. {appointment.doctorFullName}
                   </span>
                 </div>
-                <p className="text-gray-700">{appointment.reason}</p>
+                <p className="text-gray-700">
+                  Service: {appointment.serviceName}
+                </p>
+                <p className="text-gray-700">
+                  Notes: {appointment.afterAppointmentNotes}
+                </p>
+                <p className="text-gray-700">
+                  {appointment.officeName} at {appointment.officeAddress}
+                </p>
               </div>
             ))}
           </div>
