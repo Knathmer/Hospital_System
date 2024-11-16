@@ -1,5 +1,3 @@
-// client/src/components/users/patient/AppointmentCalendar.jsx
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Calendar, Views } from "react-big-calendar";

@@ -1,5 +1,3 @@
-// client/src/components/users/patient/AppointmentOverview.jsx
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 
