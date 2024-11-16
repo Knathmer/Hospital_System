@@ -1,19 +1,29 @@
-const PRESCRIPTION_REPORT_QUERY = `SELECT 
-                                        pres.prescriptionID, 
-                                        pres.medicationName, 
-                                        pres.dosage, 
-                                        pres.quantity, 
+export const PRESCRIPTION_REPORT_QUERY = `SELECT 
+                                        p.prescriptionID, 
+                                        p.medicationName, 
+                                        p.dosage, 
+                                        p.quantity, 
                                         d.firstName, 
                                         d.lastName, 
                                         i.providerName
                                     FROM 
-                                        prescription pres
+                                        prescription AS p
+                                    JOIN
+                                        doctor AS d ON p.doctorID = d.doctorID
                                     JOIN 
-                                        patient pat ON pres.patientID = pat.patientID
+                                        patient AS pat ON p.patientID = pat.patientID
                                     JOIN
-                                        insurance i ON pat.patientID = i.patientID
-                                    JOIN
-                                        doctor d ON pres.doctorID = d.doctorID; `;
+                                        insurance AS i ON pat.patientID = i.patientID
+                                    WHERE 
+                                        p.prescriptionID IS NOT NULL 
+                                        AND p.activeStatus = 'Active'
+                                        AND p.prescriptionID LIKE ?
+                                        AND p.dosage LIKE ?
+                                        AND p.quantity LIKE ?
+                                        AND i.providerName LIKE ?
+                                        AND p.medicationName LIKE ?;
+                                         
+                                     `;
 
 const REFILL_REPORT_QUERY = `SELECT
                                 pres.patientID,

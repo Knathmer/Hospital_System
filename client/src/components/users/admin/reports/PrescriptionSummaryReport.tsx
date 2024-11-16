@@ -1,6 +1,6 @@
 type Prescription = {
-  id: string;
-  medicationName: string;
+  prescriptionID: string;
+  medication: string;
   dosage: string;
   quantity: string;
   provider: string;
@@ -56,7 +56,7 @@ export default function PrescriptionSummaryReport() {
   const [activeTab, setActiveTab] = useState("prescriptions");
   const [filters, setFilters] = useState({
     prescriptions: {
-      prescription: "",
+      prescriptionID: "",
       medication: "",
       dosage: "",
       quantity: "",
@@ -76,16 +76,20 @@ export default function PrescriptionSummaryReport() {
     const fetchPrescriptions = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log("filters: ", filters);
         const response = await axios.get(
-          "http://localhost:3000/dataFetch/get-patient-prescriptions",
+          "http://localhost:3000/auth/admin/get-prescription-report",
+
           {
+            params: filters,
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setPrescriptions(response.data);
-        setFilteredPrescriptions(response.data);
+        console.log("response pres report: ", response.data.data);
+        setPrescriptions(response.data.data);
+        setFilteredPrescriptions(response.data.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching prescriptions:", error);
@@ -93,7 +97,7 @@ export default function PrescriptionSummaryReport() {
       }
     };
     fetchPrescriptions();
-  }, []);
+  }, [activeTab === "prescriptions" && filters]);
 
   useEffect(() => {
     const filtered = prescriptions.filter((prescription) => {
@@ -238,7 +242,7 @@ export default function PrescriptionSummaryReport() {
             <Card className="border-pink-200 shadow-lg relative">
               <CardHeader className="border-b border-pink-200">
                 <CardTitle className="text-black">
-                  Active Prescriptions
+                  Insurance Prescription Approvals
                 </CardTitle>
                 <button
                   className="absolute top-2 right-2 p-1 rounded-full hover:bg-pink-200 transition-colors"
@@ -269,8 +273,8 @@ export default function PrescriptionSummaryReport() {
                   <TableBody>
                     {filteredPrescriptions.map((prescription, index) => (
                       <TableRow key={index} className="hover:bg-pink-50">
-                        <TableCell>{prescription.id}</TableCell>
-                        <TableCell>{prescription.medicationName}</TableCell>
+                        <TableCell>{prescription.prescriptionID}</TableCell>
+                        <TableCell>{prescription.medication}</TableCell>
                         <TableCell>{prescription.dosage}</TableCell>
                         <TableCell>{prescription.quantity}</TableCell>
                         <TableCell>{prescription.provider}</TableCell>
