@@ -189,7 +189,7 @@ function BookPage() {
   const isWeekend = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDay();
-    return day === 0 || day === 6; // Sunday (0) and Saturday (6)
+    return day === 5 || day === 6; // Sunday (5) and Saturday (6)
   };
 
   const convertTo24HourFormat = (timeStr) => {

@@ -299,12 +299,31 @@ export async function bookAppointment(req, res) {
       return res.status(400).json({ message: "Time slot is already booked" });
     }
 
-    // Book the appointment without officeID and visitTypeID
+    // Retrieve the officeID associated with the doctor
+    const [doctorRows] = await connection.query(
+      "SELECT officeID FROM doctor WHERE doctorID = ?",
+      [doctorID]
+    );
+
+    if (doctorRows.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+
+    const officeID = doctorRows[0].officeID;
+
+    // Ensure the doctor has an associated office
+    if (!officeID) {
+      await connection.rollback();
+      return res.status(400).json({ message: "Doctor does not have an associated office" });
+    }
+
+    // Book the appointment with officeID
     await connection.query(
       `INSERT INTO appointment 
-           (appointmentDateTime, reason, status, patientID, doctorID, serviceID, visitType)
-           VALUES (?, ?, 'Requested', ?, ?, ?, ?)`,
-      [appointmentDateTime, reason, patientID, doctorID, serviceID, visitType]
+          (appointmentDateTime, reason, status, patientID, doctorID, officeID, serviceID, visitType)
+          VALUES (?, ?, 'Requested', ?, ?, ?, ?, ?)`,
+      [appointmentDateTime, reason, patientID, doctorID, officeID, serviceID, visitType]
     );
 
     await connection.commit();
