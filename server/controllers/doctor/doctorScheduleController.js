@@ -8,6 +8,7 @@ import {
   GET_PATIENT_FAMILY_HISTORY,
   GET_PATIENT_SURGERIES,
   GET_PATIENT_VACCINE,
+  GET_PATIENT_APPOINTMENT_INFO,
 } from "../../queries/constants/selectQueries.js";
 
 export const getDoctorSchedule = async (req, res) => {
@@ -215,6 +216,32 @@ export const getVaccinesInformation = async (req, res) => {
     const vaccineInformation = await query(GET_PATIENT_VACCINE, [patientID]);
 
     res.status(200).json({ vaccineInformation });
+  } catch (error) {
+    console.error("Error fetching patient's vaccine information ", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching patient's vaccine info" });
+  }
+};
+
+export const getAppointmentInformation = async (req, res) => {
+  try {
+    const doctorID = req.user.doctorID;
+    const { patientID, appointmentID } = req.query;
+
+    if (!patientID || !appointmentID || !doctorID) {
+      return res
+        .status(400)
+        .json({ message: "Unauthorized access to appointment" });
+    }
+
+    const [appointmentInformation] = await query(GET_PATIENT_APPOINTMENT_INFO, [
+      appointmentID,
+      patientID,
+      doctorID,
+    ]);
+
+    res.status(200).json({ appointmentInformation });
   } catch (error) {
     console.error("Error fetching patient's vaccine information ", error);
     res

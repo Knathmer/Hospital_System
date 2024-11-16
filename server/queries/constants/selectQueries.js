@@ -130,7 +130,7 @@ export const GET_PATIENT_INFO_DOC_APPT = `SELECT p.patientID, CONCAT(p.firstName
 
 export const GET_PATIENT_INSURANCE_DOC_APPT = `SELECT i.insuranceID, i.providerName, i.policy_number, i.coverageDetails, i.coverage_expiration_date FROM insurance i INNER JOIN patient p ON i.patientID = p.patientID WHERE p.patientID = ?;`;
 
-export const GET_PATIENT_ALLERGIES = `SELECT a.allergyID, a.allergen, a.severity, a.severity FROM allergy a INNER JOIN patient p ON a.patientID = p.patientID WHERE p.patientID = ?;`;
+export const GET_PATIENT_ALLERGIES = `SELECT a.allergyID, a.allergen, a.severity, a.reaction FROM allergy a INNER JOIN patient p ON a.patientID = p.patientID WHERE p.patientID = ?;`;
 
 export const GET_PATIENT_SURGERIES = `SELECT s.surgeryID, s.surgeryType, s.surgeryDateTime, CONCAT(d.firstName, ' ' , d.lastName) AS doctorFullName, sp.specialtyName , o.officeName FROM surgery s LEFT JOIN doctor d ON s.doctorID = d.doctorID LEFT JOIN specialty sp ON d.specialtyID = sp.specialtyID INNER JOIN office o ON d.officeID = o.officeID INNER JOIN patient p ON s.patientID = p.patientID WHERE p.patientID = ?;`;
 
@@ -139,4 +139,6 @@ export const GET_PATIENT_DISABILITIES = `SELECT d.disabilityID, d.disabilityType
 export const GET_PATIENT_VACCINE = `SELECT v.vaccineID, v.vaccineName, v.dateAdministered AS date, CONCAT(d.firstName, ' ', d.lastName) AS doctorFullName, o.officeName FROM vaccine v LEFT JOIN doctor d ON v.doctorID = d.doctorID INNER JOIN office o ON d.officeID = o.officeID INNER JOIN patient p ON v.patientID = p.patientID WHERE p.patientID = ?;`;
 
 export const GET_PATIENT_FAMILY_HISTORY =
-  "SELECT fh.`condition`, fh.familyHistoryID FROM family_history fh INNER JOIN patient p ON fh.patientID = p.patientID WHERE p.patientID = ?;";
+  "SELECT fh.`condition`, fh.familyHistoryID, fh.notes FROM family_history fh INNER JOIN patient p ON fh.patientID = p.patientID WHERE p.patientID = ?;";
+
+export const GET_PATIENT_APPOINTMENT_INFO = `SELECT a.appointmentDateTime, a.reason, o.officeName, o.officeID, s.serviceName, s.serviceID FROM appointment a INNER JOIN office o ON a.officeID = o.officeID INNER JOIN service s ON a.serviceID = s.serviceID INNER JOIN patient p ON a.patientID = p.patientID INNER JOIN doctor d ON a.doctorID = d.doctorID WHERE a.appointmentID = ? AND p.patientID = ? AND d.doctorID = ?;`;
