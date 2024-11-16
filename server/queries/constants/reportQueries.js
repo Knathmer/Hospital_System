@@ -48,3 +48,8 @@ export const REFILL_REPORT_QUERY = `SELECT
                                 
 
                                 ;`;
+
+// export const PRESCRIPTION_FILTERS_QUERY = `SELECT
+//                                                 p.medicationName
+//                                             FROM
+//                                                 prescription AS p`

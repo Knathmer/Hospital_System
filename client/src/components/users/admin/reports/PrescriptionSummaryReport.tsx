@@ -14,6 +14,8 @@ type Prescription = {
   [key: string]: string | undefined;
 };
 
+import "../../../../select-styles.css";
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 // import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -38,6 +40,8 @@ import Label from "../../../ui/Label";
 import Input from "../../../ui/Input";
 import Select from "../../../ui/select/Select";
 
+import { default as SelectComplete } from "react-select";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../ui/Tabs";
 import {
   PillIcon,
@@ -53,6 +57,7 @@ export default function PrescriptionSummaryReport() {
   const [filteredPrescriptions, setFilteredPrescriptions] = useState<
     Prescription[]
   >([]);
+  const [filterOptions, setFilterOptions] = useState<Prescription[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("prescriptions");
   const [filters, setFilters] = useState({
@@ -90,7 +95,9 @@ export default function PrescriptionSummaryReport() {
             },
           }
         );
+
         console.log("response pres report: ", response.data.data);
+        setFilterOptions(response.data.data);
         setPrescriptions(response.data.data);
         setFilteredPrescriptions(response.data.data);
         setLoading(false);
@@ -134,15 +141,74 @@ export default function PrescriptionSummaryReport() {
     }));
   };
 
+  const handleFilterOptionChange =
+    (
+      key: string // key is passed in dynamically
+    ) =>
+    (selectedOption: any) => {
+      // If selectedOption is null (e.g., user cleared the selection), we set the value to null
+      const value = selectedOption ? selectedOption.value : "";
+
+      // Update the filters state dynamically based on the key
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        [activeTab]: {
+          ...(prevFilters[activeTab as keyof typeof filters] as Record<
+            string,
+            string
+          >),
+          [key]: value, // Set the selected value for the filter key
+        },
+      }));
+    };
+
   const renderFilters = () => {
     console.log("activeTab: ", activeTab);
     const activeFilters = filters[activeTab as keyof typeof filters] as Record<
       string,
       string
     >;
+
+    // Function to generate Select options based on the key
+    const generateOptions = (key: string) => {
+      const uniqueOptions = [
+        ...new Set(filterOptions.map((option) => option[key])),
+      ];
+
+      return uniqueOptions.map((option) => ({
+        label: option,
+        value: option,
+      }));
+    };
+
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Object.entries(activeFilters).map(([key, value]: [string, string]) => {
+          if (key === "status") {
+            return (
+              <div key={key}>
+                <Label
+                  htmlFor={`${key}-filter`}
+                  className="text-pink-600 capitalize"
+                >
+                  {key}
+                </Label>
+                <Select
+                  id={`${key}-filter`}
+                  name={key}
+                  value={value}
+                  onChange={handleFilterChange}
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-pink-200 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md"
+                >
+                  <SelectItem value="">Select Status</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Accepted">Accepted</SelectItem>
+                  <SelectItem value="Denied">Denied</SelectItem>
+                </Select>
+              </div>
+            );
+          }
+
           if (key === "refillFrequency") {
             return (
               <div key={key}>
@@ -166,6 +232,38 @@ export default function PrescriptionSummaryReport() {
               </div>
             );
           }
+
+          const customStyles = {
+            control: (provided) => ({
+              ...provided,
+              borderColor: "#fbbf24", // Tailwind's border-pink-200
+              focusRing: "2px solid #ec4899", // Tailwind's focus:ring-pink-500
+              borderRadius: "0.375rem", // Tailwind's rounded-lg
+              padding: "0.5rem", // Tailwind's p-2
+            }),
+            option: (provided, state) => ({
+              ...provided,
+              padding: "1rem", // Tailwind's py-4 px-6
+              backgroundColor: state.isSelected
+                ? "#ec4899" // Tailwind's pink-500
+                : state.isFocused
+                ? "#f3f4f6" // Tailwind's gray-100
+                : "white",
+              color: state.isSelected ? "white" : "black",
+            }),
+            menu: (provided) => ({
+              ...provided,
+              backgroundColor: "white",
+              borderRadius: "0.375rem", // Tailwind's rounded-lg
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Tailwind's shadow-lg
+            }),
+            singleValue: (provided) => ({
+              ...provided,
+              color: "#333", // Tailwind's text-gray-800
+              fontWeight: "600", // Tailwind's font-semibold
+            }),
+          };
+
           return (
             <div key={key}>
               <Label
@@ -174,13 +272,23 @@ export default function PrescriptionSummaryReport() {
               >
                 {key}
               </Label>
-              <Input
+              {/* <Input
                 id={`${key}-filter`}
                 name={key}
                 value={value}
                 onChange={handleFilterChange}
                 placeholder={`Filter by ${key}`}
                 className="mt-1 border-pink-200 focus:ring-pink-500 focus:border-pink-500"
+              /> */}
+              <SelectComplete
+                id={`${key}-filter`}
+                options={generateOptions(key)}
+                placeholder={`filter by ${key}`}
+                onChange={handleFilterOptionChange(key)}
+                isSearchable={true}
+                isClearable
+                className="mt-1 border-pink-200 focus:ring-pink-500 focus:border-pink-500"
+                classNamePrefix="react-select"
               />
             </div>
           );
@@ -327,7 +435,9 @@ export default function PrescriptionSummaryReport() {
                       <TableHead className="text-pink-700">
                         Medication
                       </TableHead>
-                      <TableHead className="text-pink-700">Refill #</TableHead>
+                      <TableHead className="text-pink-700">
+                        Refill Count
+                      </TableHead>
                       <TableHead className="text-pink-700">Provider</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -338,13 +448,13 @@ export default function PrescriptionSummaryReport() {
                         <TableCell>{prescription.medication}</TableCell>
                         <TableCell>
                           {filters.refills.refillFrequency !== ""
-                            ? `${prescription.refillNumber} /
+                            ? `${prescription.refillNumber} Per
                           ${
                             filters.refills.refillFrequency === "monthly"
-                              ? "month"
-                              : "year"
+                              ? "Month"
+                              : "Year"
                           }`
-                            : "No Frequency Selected"}
+                            : `${prescription.refillNumber} Total Refills`}
                         </TableCell>
                         <TableCell>{prescription.provider}</TableCell>
                       </TableRow>

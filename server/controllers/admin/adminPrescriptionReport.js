@@ -4,6 +4,33 @@ import {
   REFILL_REPORT_QUERY,
 } from "../../queries/constants/reportQueries.js";
 
+const groupRequestsByPatientAndMedication = (rows) => {
+  return rows.reduce(
+    (acc, { patientID, firstName, lastName, medicationName, requestDate }) => {
+      // Create a unique key based on patientID, firstName, lastName, and medicationName
+      const groupKey = `${patientID}-${firstName}-${lastName}-${medicationName}`;
+
+      // Initialize the group if it doesn't exist in the accumulator
+      if (!acc[groupKey]) {
+        acc[groupKey] = {
+          patientID,
+          firstName,
+          lastName,
+          medicationName,
+          requestCount: 0,
+        };
+      }
+
+      // Increment the request count for this group
+      acc[groupKey].requestCount += 1;
+
+      // Return the accumulator
+      return acc;
+    },
+    {}
+  );
+};
+
 const groupRequestsByYear = (rows) => {
   return rows.reduce(
     (acc, { patientID, firstName, lastName, medicationName, requestDate }) => {
@@ -205,8 +232,10 @@ export async function getPrescriptionReport(req, res) {
       // Group and count by patientID, firstName, lastName, medicationName, and month
       if (rows.refillFrequency === "monthly" && rows.requestDate !== "") {
         groupedRequests = groupRequestsByMonth(rows);
-      } else if (rows.requestDate !== "") {
+      } else if (rows.refillFrequency === "yearly" && rows.requestDate !== "") {
         groupedRequests = groupRequestsByYear(rows);
+      } else if (rows.requestDate !== "") {
+        groupedRequests = groupRequestsByPatientAndMedication(rows);
       }
 
       // Convert the grouped object back into an array

@@ -1,0 +1,35 @@
+/* Using Tailwind's @apply to style internal parts of react-select */
+.react-select__control {
+  @apply border-pink-200 focus:ring-pink-500 focus:border-pink-500 rounded-lg !important;
+}
+
+.react-select__control:focus {
+  outline: none !important; /* Ensure no outline is applied */
+  box-shadow: none !important; /* Custom focus ring (pink with some opacity) */
+}
+
+.react-select__control.react-select__control--is-focused {
+  box-shadow: 0 0 0 0.5px #ec4899 !important; /* Custom pink focus ring */
+}
+
+.react-select__menu {
+  @apply bg-white border border-gray-300 rounded-lg shadow-lg !important;
+  max-height: 200px; /* Limit the dropdown menu height */
+  overflow-y: hidden;
+}
+
+.react-select__option {
+  @apply py-2 px-4 text-gray-800 hover:bg-pink-100 !important;
+}
+
+.react-select__option--is-selected {
+  @apply bg-pink-500 text-white !important;
+}
+
+.react-select__option--is-focused {
+  @apply bg-pink-100 !important;
+}
+
+.react-select__single-value {
+  @apply text-sm text-gray-700 !important;
+}
