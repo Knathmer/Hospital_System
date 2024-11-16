@@ -7,12 +7,10 @@ type Prescription = {
   insurance: string;
   issued: string;
   status: string;
-  patientId: string;
-  patientName: string;
-  condition: string;
-  nextAppointment: string;
+  patientID: string;
+  refillFrequnecy: string;
   refillNumber: string;
-  adherenceRate: string;
+
   [key: string]: string | undefined;
 };
 
@@ -69,8 +67,9 @@ export default function PrescriptionSummaryReport() {
       status: "",
     },
     refills: {
-      patientId: "",
+      patientID: "",
       medication: "",
+      refillNumber: "",
       refillFrequency: "",
       provider: "",
     },
@@ -85,7 +84,7 @@ export default function PrescriptionSummaryReport() {
           "http://localhost:3000/auth/admin/get-prescription-report",
 
           {
-            params: filters,
+            params: [filters, activeTab],
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -101,12 +100,13 @@ export default function PrescriptionSummaryReport() {
       }
     };
     fetchPrescriptions();
-  }, [activeTab === "prescriptions" && filters]);
+  }, [activeTab && filters]);
 
   useEffect(() => {
     const filtered = prescriptions.filter((prescription) => {
       const activeFilters = filters[activeTab as keyof typeof filters];
       return Object.entries(activeFilters).every(([key, filterValue]) => {
+        if (key === "refillFrequency") return true;
         if (!filterValue) return true;
         const prescriptionValue = prescription[key as keyof Prescription];
         return (
@@ -334,13 +334,17 @@ export default function PrescriptionSummaryReport() {
                   <TableBody>
                     {filteredPrescriptions.map((prescription, index) => (
                       <TableRow key={index} className="hover:bg-pink-50">
-                        <TableCell>{prescription.patientId}</TableCell>
+                        <TableCell>{prescription.patientID}</TableCell>
                         <TableCell>{prescription.medication}</TableCell>
                         <TableCell>
-                          {prescription.refillNumber}/
-                          {filters.refills.refillFrequency === "monthly"
-                            ? "month"
-                            : "year"}
+                          {filters.refills.refillFrequency !== ""
+                            ? `${prescription.refillNumber} /
+                          ${
+                            filters.refills.refillFrequency === "monthly"
+                              ? "month"
+                              : "year"
+                          }`
+                            : "No Frequency Selected"}
                         </TableCell>
                         <TableCell>{prescription.provider}</TableCell>
                       </TableRow>

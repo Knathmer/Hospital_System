@@ -30,13 +30,21 @@ export const PRESCRIPTION_REPORT_QUERY = `SELECT
                                          
                                      `;
 
-const REFILL_REPORT_QUERY = `SELECT
+export const REFILL_REPORT_QUERY = `SELECT
                                 pres.patientID,
                                 pres.medicationName,
-                                refill,
-                                doctorName
+                                r.requestDate,
+                                d.firstName,
+                                d.lastName
                             FROM 
                                 prescription pres
                             JOIN
+                                refill AS r ON pres.prescriptionID = r.prescriptionID
+                            JOIN 
+                                doctor AS d ON r.doctorID = d.doctorID
+                            WHERE
+                                pres.patientID LIKE ?
+                                AND pres.medicationName LIKE ?
+                                
 
                                 ;`;
