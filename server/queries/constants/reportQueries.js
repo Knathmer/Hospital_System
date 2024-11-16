@@ -2,10 +2,12 @@ export const PRESCRIPTION_REPORT_QUERY = `SELECT
                                         p.prescriptionID, 
                                         p.medicationName, 
                                         p.dosage, 
-                                        p.quantity, 
+                                        p.quantity,
+                                        p.dateIssued, 
                                         d.firstName, 
                                         d.lastName, 
-                                        i.providerName
+                                        i.providerName,
+                                        ia.approvalStatus
                                     FROM 
                                         prescription AS p
                                     JOIN
@@ -14,6 +16,8 @@ export const PRESCRIPTION_REPORT_QUERY = `SELECT
                                         patient AS pat ON p.patientID = pat.patientID
                                     JOIN
                                         insurance AS i ON pat.patientID = i.patientID
+                                    JOIN 
+                                        insurance_approval AS ia ON p.prescriptionID = ia.prescriptionID
                                     WHERE 
                                         p.prescriptionID IS NOT NULL 
                                         AND p.activeStatus = 'Active'
@@ -21,7 +25,8 @@ export const PRESCRIPTION_REPORT_QUERY = `SELECT
                                         AND p.dosage LIKE ?
                                         AND p.quantity LIKE ?
                                         AND i.providerName LIKE ?
-                                        AND p.medicationName LIKE ?;
+                                        AND p.medicationName LIKE ?
+                                        AND ia.approvalStatus LIKE ?;
                                          
                                      `;
 

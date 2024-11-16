@@ -14,6 +14,7 @@ export async function getPrescriptionReport(req, res) {
       `%${prescriptions.quantity}%`,
       `%${prescriptions.insurance}%`,
       `%${prescriptions.medication}%`,
+      `%${prescriptions.status}%`,
     ]);
 
     // Process the rows
@@ -27,6 +28,17 @@ export async function getPrescriptionReport(req, res) {
     });
 
     const renameKeys = (obj) => {
+      // Convert the dateIssued field into a formatted date and time
+      const dateIssued = new Date(obj.dateIssued);
+
+      // Format the date to "YYYY-MM-DD"
+      const formattedDate = dateIssued.toISOString().split("T")[0];
+
+      // Format the time to "HH:mm"
+      const formattedTime = dateIssued
+        .toTimeString()
+        .split(" ")[0]
+        .substring(0, 5);
       return {
         prescriptionID: String(obj.prescriptionID),
         medication: obj.medicationName,
@@ -34,6 +46,8 @@ export async function getPrescriptionReport(req, res) {
         quantity: String(obj.quantity),
         provider: `${obj.firstName} ${obj.lastName}`,
         insurance: obj.providerName,
+        issued: `${formattedDate} ${formattedTime}`,
+        status: obj.approvalStatus,
       };
     };
 

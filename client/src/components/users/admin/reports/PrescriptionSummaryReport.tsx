@@ -5,6 +5,7 @@ type Prescription = {
   quantity: string;
   provider: string;
   insurance: string;
+  issued: string;
   status: string;
   patientId: string;
   patientName: string;
@@ -64,6 +65,7 @@ export default function PrescriptionSummaryReport() {
       quantity: "",
       provider: "",
       insurance: "",
+      issued: "",
       status: "",
     },
     refills: {
@@ -269,6 +271,7 @@ export default function PrescriptionSummaryReport() {
                       <TableHead className="text-pink-700">Quantity</TableHead>
                       <TableHead className="text-pink-700">Provider</TableHead>
                       <TableHead className="text-pink-700">Insurance</TableHead>
+                      <TableHead className="text-pink-700">Issued</TableHead>
                       <TableHead className="text-pink-700">Status</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -281,7 +284,26 @@ export default function PrescriptionSummaryReport() {
                         <TableCell>{prescription.quantity}</TableCell>
                         <TableCell>{prescription.provider}</TableCell>
                         <TableCell>{prescription.insurance}</TableCell>
-                        <TableCell>{prescription.status}</TableCell>
+                        <TableCell>{prescription.issued}</TableCell>
+                        <TableCell>
+                          <button
+                            className={`px-4 py-2 rounded-full ${
+                              prescription.status === "Pending"
+                                ? "bg-yellow-200 text-yellow-600"
+                                : ""
+                            }${
+                              prescription.status === "Approved"
+                                ? "bg-green-200 text-green-600"
+                                : ""
+                            }${
+                              prescription.status === "Denied"
+                                ? "bg-red-200 text-red-600"
+                                : ""
+                            }`}
+                          >
+                            {prescription.status}
+                          </button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
