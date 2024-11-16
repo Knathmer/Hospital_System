@@ -8,6 +8,7 @@ import {
   getLocations,
   getDoctorAppointments,
   updateAppointment,
+  getPatientAppointments,
 } from "../controllers/appointmentController.js";
 
 import { verifyToken } from "../middleware/auth.js";
@@ -22,5 +23,6 @@ router.post("/book", verifyToken, bookAppointment);
 router.get("/appointments", getAppointmentsByDoctorAndDate);
 router.get("/doctorAppointments", verifyToken, getDoctorAppointments);
 router.put("/updateAppointment", verifyToken, updateAppointment);
+router.get("/my-appointments", verifyToken, getPatientAppointments);
 
 export default router;

@@ -1,6 +1,81 @@
 import { query } from "../database.js"; // Import query function
 import pool from "../database.js"; // Import pool for transactions
 
+export async function getPatientAppointments(req, res) {
+  const patientID = req.user.patientID; // Get patientID from the verified JWT
+
+  if (!patientID) {
+    return res.status(401).json({ error: "Patient must be logged in" });
+  }
+
+  try {
+    const appointments = await query(
+      `SELECT 
+          a.appointmentID, 
+          a.appointmentDateTime, 
+          a.reason, 
+          a.status, 
+          a.visitType, 
+          s.serviceName AS service,
+          d.firstName AS doctorFirstName, 
+          d.lastName AS doctorLastName,
+          d.workEmail AS doctorEmail,       -- Updated
+          d.workPhoneNumber AS doctorPhone, -- Updated
+          o.officeName AS officeName,
+          CONCAT(addr.addrStreet, ', ', addr.addrcity, ', ', addr.addrstate, ' ', addr.addrzip) AS officeAddress
+        FROM appointment a
+        LEFT JOIN doctor d ON a.doctorID = d.doctorID
+        LEFT JOIN office o ON a.officeID = o.officeID
+        LEFT JOIN address addr ON o.addressID = addr.addressID
+        LEFT JOIN service s ON a.serviceID = s.serviceID
+        WHERE a.patientID = ?
+        ORDER BY a.appointmentDateTime DESC`,
+      [patientID]
+    );
+
+    // Categorize appointments
+    const categorizedAppointments = {
+      upcoming: [],
+      requested: [],
+      past: [],
+      other: []
+    };
+
+    const now = new Date();
+
+    appointments.forEach((appointment) => {
+      const appointmentDate = new Date(appointment.appointmentDateTime);
+      switch (appointment.status) {
+        case 'Scheduled':
+          if (appointmentDate >= now) {
+            categorizedAppointments.upcoming.push(appointment);
+          } else {
+            categorizedAppointments.past.push(appointment);
+          }
+          break;
+        case 'Requested':
+          categorizedAppointments.requested.push(appointment);
+          break;
+        case 'Completed':
+        case 'Missed':
+          categorizedAppointments.past.push(appointment);
+          break;
+        case 'Cancelled':
+        case 'Request Denied':
+          categorizedAppointments.other.push(appointment);
+          break;
+        default:
+          categorizedAppointments.other.push(appointment);
+      }
+    });
+
+    res.json(categorizedAppointments);
+  } catch (error) {
+    console.error("Error fetching patient appointments:", error);
+    res.status(500).json({ error: "Error fetching appointments" });
+  }
+}
+
 // Function to get specialties
 export async function getSpecialties(req, res) {
   try {
