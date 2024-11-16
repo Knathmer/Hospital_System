@@ -92,6 +92,13 @@ export const SELECT_RECENT_MED_REQ_DB = `SELECT status, requestDate FROM refill 
 
 export const SELECT_BILLING_DB = `SELECT dueDate, paidStatus FROM bill WHERE patientID = ?`;
 
+// Admin Dashboard DB Queries
+export const SELECT_TOTAL_DOC = 'SELECT COUNT(*) AS totalDoctors FROM doctor';
+export const SELECT_TOTAL_PATIENT = 'SELECT COUNT(*) as totalPatient FROM patient';
+export const SELECT_TOTAL_ADMIN = 'SELECT COUNT(*) as totalAdmin from admin';
+export const SELECT_TOTAL_APPOINTMENT = 'SELECT COUNT(*) AS totalAppointments FROM appointment';
+
+
 export const GET_CURRENT_PAST_BALANCE = `SELECT IFNULL(SUM(CASE WHEN paidStatus != 'Paid' THEN amount - paidAmount ELSE 0 END), 0) AS currentBalance, 
                                         IFNULL(SUM(CASE WHEN dueDate < CURDATE() AND paidStatus = 'Overdue' THEN amount - paidAmount ELSE 0 END), 0) AS pastDueBalance
                                         FROM bill 
