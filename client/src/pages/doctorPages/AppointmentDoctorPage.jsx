@@ -273,51 +273,61 @@ export default function AppointmentPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Appointment Details
           </h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Date and Time
-              </Label>
-              <p className="text-gray-900">
-                {new Date(
-                  appointmentInformation.appointmentDateTime
-                ).toLocaleDateString("en-US", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "numeric",
-                })}{" "}
-                at{" "}
-                {new Date(
-                  appointmentInformation.appointmentDateTime
-                ).toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
-                })}
+          <div>
+            {appointmentInformation.appointmentDateTime ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Date and Time
+                  </Label>
+                  <p className="text-gray-900">
+                    {new Date(
+                      appointmentInformation.appointmentDateTime
+                    ).toLocaleDateString("en-US", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}{" "}
+                    at{" "}
+                    {new Date(
+                      appointmentInformation.appointmentDateTime
+                    ).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Reason
+                  </Label>
+                  <p className="text-gray-900">
+                    {appointmentInformation.serviceName}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Office
+                  </Label>
+                  <p className="text-gray-900">
+                    {appointmentInformation.officeName}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Reason
+                  </Label>
+                  <p className="text-gray-900">
+                    {appointmentInformation.reason}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-center text-gray-400">
+                Appointment information does not exist!
               </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Reason
-              </Label>
-              <p className="text-gray-900">
-                {appointmentInformation.serviceName}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Office
-              </Label>
-              <p className="text-gray-900">
-                {appointmentInformation.officeName}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Reason
-              </Label>
-              <p className="text-gray-900">{appointmentInformation.reason}</p>
-            </div>
+            )}
           </div>
         </div>
 
@@ -325,44 +335,57 @@ export default function AppointmentPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Patient Information
           </h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm font-medium text-gray-700">Name</Label>
-              <p className="text-gray-900">
-                {patientInformation.patientFullName}
+          <div>
+            {patientInformation.patientFullName ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Name
+                  </Label>
+                  <p className="text-gray-900">
+                    {patientInformation.patientFullName}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Date of Birth
+                  </Label>
+                  <p className="text-gray-900">
+                    {new Date(
+                      patientInformation.dateOfBirth
+                    ).toLocaleDateString("en-US", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Phone
+                  </Label>
+                  <p className="text-gray-900">
+                    {patientInformation.phoneNumber
+                      ? patientInformation.phoneNumber.slice(0, 3) +
+                        "-" +
+                        patientInformation.phoneNumber.slice(3, 6) +
+                        "-" +
+                        patientInformation.phoneNumber.slice(6)
+                      : "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Email
+                  </Label>
+                  <p className="text-gray-900">{patientInformation.email}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-center text-gray-400">
+                Patient's information does not exist!
               </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Date of Birth
-              </Label>
-              <p className="text-gray-900">
-                {new Date(patientInformation.dateOfBirth).toLocaleDateString(
-                  "en-US",
-                  {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric",
-                  }
-                )}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">Phone</Label>
-              <p className="text-gray-900">
-                {patientInformation.phoneNumber
-                  ? patientInformation.phoneNumber.slice(0, 3) +
-                    "-" +
-                    patientInformation.phoneNumber.slice(3, 6) +
-                    "-" +
-                    patientInformation.phoneNumber.slice(6)
-                  : "N/A"}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">Email</Label>
-              <p className="text-gray-900">{patientInformation.email}</p>
-            </div>
+            )}
           </div>
         </div>
 
@@ -370,45 +393,54 @@ export default function AppointmentPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Insurance Information
           </h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Provider
-              </Label>
-              <p className="text-gray-900">
-                {insuranceInformation.providerName}
+          <div>
+            {insuranceInformation.providerName ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Provider
+                  </Label>
+                  <p className="text-gray-900">
+                    {insuranceInformation.providerName}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Policy Number
+                  </Label>
+                  <p className="text-gray-900">
+                    {insuranceInformation.policy_number}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Coverage Details
+                  </Label>
+                  <p className="text-gray-900">
+                    {insuranceInformation.coverageDetails}
+                  </p>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    Policy Expiration
+                  </Label>
+                  <p className="text-gray-900">
+                    {new Date(
+                      insuranceInformation.coverage_expiration_date
+                    ).toLocaleDateString("en-US", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-center text-gray-400">
+                Patient does not have insurance coverage.
               </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Policy Number
-              </Label>
-              <p className="text-gray-900">
-                {insuranceInformation.policy_number}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Coverage Details
-              </Label>
-              <p className="text-gray-900">
-                {insuranceInformation.coverageDetails}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Policy Expiration
-              </Label>
-              <p className="text-gray-900">
-                {new Date(
-                  insuranceInformation.coverage_expiration_date
-                ).toLocaleDateString("en-US", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "numeric",
-                })}
-              </p>
-            </div>
+            )}
           </div>
         </div>
 
@@ -447,101 +479,136 @@ export default function AppointmentPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Previous Appointments
           </h2>
-          <div className="space-y-4">
-            {previousAppointments.map((appointment) => (
-              <div
-                key={appointment.appointmentID}
-                className="bg-gray-50 p-4 rounded-md"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="font-semibold text-gray-900">
-                    {new Date(appointment.date).toLocaleDateString("en-US", {
-                      month: "2-digit",
-                      day: "2-digit",
-                      year: "numeric",
-                    })}
-                  </h4>
-                  <span className="text-sm text-gray-600">
-                    Dr. {appointment.doctorFullName}
-                  </span>
-                </div>
-                <p className="text-gray-700">
-                  Service: {appointment.serviceName}
-                </p>
-                <p className="text-gray-700">
-                  Notes: {appointment.afterAppointmentNotes}
-                </p>
-                <p className="text-gray-700">
-                  {appointment.officeName} at {appointment.officeAddress}
-                </p>
+          <div>
+            {previousAppointments.appointmentID ? (
+              <div className="space-y-4">
+                {previousAppointments.map((appointment) => (
+                  <div
+                    key={appointment.appointmentID}
+                    className="bg-gray-50 p-4 rounded-md"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-semibold text-gray-900">
+                        {new Date(appointment.date).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "2-digit",
+                            day: "2-digit",
+                            year: "numeric",
+                          }
+                        )}
+                      </h4>
+                      <span className="text-sm text-gray-600">
+                        Dr. {appointment.doctorFullName}
+                      </span>
+                    </div>
+                    <p className="text-gray-700">
+                      Service: {appointment.serviceName}
+                    </p>
+                    <p className="text-gray-700">
+                      Notes: {appointment.afterAppointmentNotes}
+                    </p>
+                    <p className="text-gray-700">
+                      {appointment.officeName} at {appointment.officeAddress}
+                    </p>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <p className="text-center text-gray-400">
+                Patient does not have any previous clinic visits.
+              </p>
+            )}
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Medications</h2>
-          <div className="space-y-4 mb-6">
-            {medication.map((med) => (
-              <div
-                key={med.prescriptionID}
-                className="flex items-center justify-between bg-gray-50 p-4 rounded-md"
-              >
-                <div>
-                  <p className="font-semibold text-gray-800">
-                    {med.medicationName}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {med.dosage} - {med.frequency}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Refills: {med.refillCount}/{med.refillsRemaining}
-                  </p>
+          <div>
+            {medication && medication.length > 0 ? (
+              <>
+                <div className="space-y-4 mb-6">
+                  {medication.map((med) => (
+                    <div
+                      key={med.prescriptionID}
+                      className="flex items-center justify-between bg-gray-50 p-4 rounded-md"
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-800">
+                          {med.medicationName}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {med.dosage} - {med.frequency}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Refills: {med.refillCount}/{med.refillsRemaining}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveMedication(med.id)}
+                        className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                      >
+                        <X className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
+                <div className="space-y-4">
+                  <Input
+                    placeholder="Medication name"
+                    value={newMedication.name}
+                    onChange={(e) =>
+                      setNewMedication({
+                        ...newMedication,
+                        name: e.target.value,
+                      })
+                    }
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      placeholder="Dosage"
+                      value={newMedication.dosage}
+                      onChange={(e) =>
+                        setNewMedication({
+                          ...newMedication,
+                          dosage: e.target.value,
+                        })
+                      }
+                    />
+                    <Input
+                      placeholder="Frequency"
+                      value={newMedication.frequency}
+                      onChange={(e) =>
+                        setNewMedication({
+                          ...newMedication,
+                          frequency: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <Button
+                    onClick={handleAddMedication}
+                    className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                  >
+                    <Plus className="mr-2 h-5 w-5" /> Add Medication
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div>
+                <p className="text-center text-gray-400 mb-5">
+                  Patient has not been prescribed any medications.
+                </p>
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveMedication(med.id)}
-                  className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                  onClick={handleAddMedication}
+                  className="w-full bg-pink-600 hover:bg-pink-700 text-white"
                 >
-                  <X className="h-5 w-5" />
+                  <Plus className="mr-2 h-5 w-5" /> Prescribe New Medication
                 </Button>
               </div>
-            ))}
-          </div>
-          <div className="space-y-4">
-            <Input
-              placeholder="Medication name"
-              value={newMedication.name}
-              onChange={(e) =>
-                setNewMedication({ ...newMedication, name: e.target.value })
-              }
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                placeholder="Dosage"
-                value={newMedication.dosage}
-                onChange={(e) =>
-                  setNewMedication({ ...newMedication, dosage: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Frequency"
-                value={newMedication.frequency}
-                onChange={(e) =>
-                  setNewMedication({
-                    ...newMedication,
-                    frequency: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <Button
-              onClick={handleAddMedication}
-              className="w-full bg-pink-600 hover:bg-pink-700 text-white"
-            >
-              <Plus className="mr-2 h-5 w-5" /> Add Medication
-            </Button>
+            )}
           </div>
         </div>
 
