@@ -4,19 +4,17 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 // Utility function to format phone numbers
-const formatPhoneNumber = (phoneNumber) => {
-  const cleaned = ("" + phoneNumber).replace(/\D/g, "");
-  if (cleaned.length === 10) {
-    const part1 = cleaned.slice(0, 3);
-    const part2 = cleaned.slice(3, 6);
-    const part3 = cleaned.slice(6);
-    return `(${part1}) ${part2}-${part3}`;
+const formatPhoneNumber = (phoneNumberString) => {
+  const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return `(${match[1]}) ${match[2]}-${match[3]}`;
   }
-  return phoneNumber;
+  return phoneNumberString; // Return the original string if it doesn't match
 };
 
 // Utility function to sort appointments in descending order
-const sortAppointmentsAscending = (appointmentsList) => {
+const sortAppointmentsDescending = (appointmentsList) => {
   return [...appointmentsList].sort((a, b) => new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime));
 };
 
@@ -156,7 +154,7 @@ function AppointmentOverview() {
     const shouldSortDescending = title === "Upcoming Appointments" || title === "Requested Appointments";
     
     // Sort the list if necessary
-    const sortedList = shouldSortDescending ? sortAppointmentsAscending(list) : list;
+    const sortedList = shouldSortDescending ? sortAppointmentsDescending(list) : list;
 
     return (
       <div className="mb-8">
@@ -179,10 +177,13 @@ function AppointmentOverview() {
                     <p className="text-gray-600">Reason: {appointment.reason || "N/A"}</p>
                     <p className="text-gray-600">Status: {appointment.status}</p>
                     <p className="text-gray-600">
-                      Doctor: Dr. {appointment.doctorFirstName} {appointment.doctorLastName}
-                    </p>
                     <p className="text-gray-600">
                       Service: {appointment.service || "N/A"}
+                    </p>
+                    <p>
+                      Visit Type: {appointment.visitType || "N/A"}
+                    </p>
+                      Doctor: Dr. {appointment.doctorFirstName} {appointment.doctorLastName}
                     </p>
                     <p className="text-gray-600">
                       Doctor's Email: {appointment.doctorEmail || "N/A"}
@@ -300,19 +301,19 @@ function AppointmentOverview() {
               {new Date(selectedAppointment.appointmentDateTime).toLocaleString()}
             </p>
             <p>
-              <strong>Doctor:</strong> Dr. {selectedAppointment.doctorFirstName} {selectedAppointment.doctorLastName}
-            </p>
-            <p>
-              <strong>Service:</strong> {selectedAppointment.service || "N/A"}
-            </p>
-            <p>
               <strong>Reason:</strong> {selectedAppointment.reason || "N/A"}
             </p>
             <p>
               <strong>Status:</strong> {selectedAppointment.status}
             </p>
             <p>
-              <strong>Location:</strong> {selectedAppointment.officeName}, {selectedAppointment.officeAddress}
+              <strong>Service:</strong> {selectedAppointment.service || "N/A"}
+            </p>
+            <p>
+              <strong>Visit Type:</strong> {selectedAppointment.visitType || "N/A"}
+            </p>
+            <p>
+              <strong>Doctor:</strong> Dr. {selectedAppointment.doctorFirstName} {selectedAppointment.doctorLastName}
             </p>
             <p>
               <strong>Doctor's Email:</strong> {selectedAppointment.doctorEmail || "N/A"}
@@ -320,6 +321,9 @@ function AppointmentOverview() {
             <p>
               <strong>Doctor's Phone:</strong>{" "}
               {selectedAppointment.doctorPhone ? formatPhoneNumber(selectedAppointment.doctorPhone) : "N/A"}
+            </p>
+            <p>
+              <strong>Location:</strong> {selectedAppointment.officeName}, {selectedAppointment.officeAddress}
             </p>
             {/* Add more details as needed */}
             <div className="flex justify-end mt-6">

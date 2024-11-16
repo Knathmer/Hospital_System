@@ -253,9 +253,10 @@ export async function getDoctorsBySpecialty(req, res) {
 
 // Function to book an appointment
 export async function bookAppointment(req, res) {
-  const { appointmentDateTime, reason, doctorID, officeID, serviceID, visitType } = req.body;
+  const { appointmentDateTime, reason, doctorID, serviceID, visitType } = req.body;
   const patientID = req.user.patientID; // Get the patientID from the verified JWT
 
+  // Validation Checks
   if (!patientID) {
     return res
       .status(401)
@@ -298,12 +299,12 @@ export async function bookAppointment(req, res) {
       return res.status(400).json({ message: "Time slot is already booked" });
     }
 
-    // Book the appointment
+    // Book the appointment without officeID and visitTypeID
     await connection.query(
       `INSERT INTO appointment 
-           (appointmentDateTime, reason, status, patientID, doctorID, officeID, serviceID, visitType)
-           VALUES (?, ?, 'Requested', ?, ?, ?, ?, ?)`,
-      [appointmentDateTime, reason, patientID, doctorID, officeID, serviceID, visitType]
+           (appointmentDateTime, reason, status, patientID, doctorID, serviceID, visitType)
+           VALUES (?, ?, 'Requested', ?, ?, ?, ?)`,
+      [appointmentDateTime, reason, patientID, doctorID, serviceID, visitType]
     );
 
     await connection.commit();
@@ -320,6 +321,7 @@ export async function bookAppointment(req, res) {
     }
   }
 }
+
 
 // Function to get appointments for a doctor on a specific date
 export async function getAppointmentsByDoctorAndDate(req, res) {

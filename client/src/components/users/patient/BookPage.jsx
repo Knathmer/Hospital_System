@@ -210,51 +210,47 @@ function BookPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validation Checks
     if (!selectedDoctor) {
       setMessage("Please select a doctor.");
       return;
     }
-  
+
     if (!selectedService) {
       setMessage("Please select a service.");
       return;
     }
-  
+
     if (!selectedVisitType) {
       setMessage("Please select a visit type.");
       return;
     }
-  
-    if (!selectedOffice) { // New Validation for Office Selection
-      setMessage("Please select an office location.");
-      return;
-    }
-  
+
     if (isWeekend(date)) {
       setMessage("Weekends are not available for appointments.");
       return;
     }
-  
+
     try {
       const token = localStorage.getItem("token");
       const formattedTime = convertTo24HourFormat(time); // Convert to 24-hour format
-  
-      // Parse officeID to integer
-      const parsedOfficeID = parseInt(selectedOffice, 10);
-      if (isNaN(parsedOfficeID)) {
-        setMessage("Invalid office selected.");
-        return;
-      }
-  
+
+      // Debugging: Log the data being sent
+      console.log({
+        appointmentDateTime: `${date}T${formattedTime}:00`,
+        reason,
+        doctorID: selectedDoctor.doctorID,
+        serviceID: selectedService,
+        visitType: selectedVisitType,
+      });
+
       await axios.post(
         "http://localhost:3000/appointment/book",
         {
           appointmentDateTime: `${date}T${formattedTime}:00`,
           reason,
           doctorID: selectedDoctor.doctorID,
-          officeID: parsedOfficeID, // Send as integer
           serviceID: selectedService, // Include the selected service ID
           visitType: selectedVisitType, // Include the selected visit type as a string
         },
@@ -263,7 +259,7 @@ function BookPage() {
         }
       );
       setMessage("Appointment booked successfully!");
-  
+
       // Reset form fields
       setSpecialty("");
       setGender("");
@@ -399,7 +395,7 @@ function BookPage() {
                     </div>
                   )}
 
-                  {/* Office Location Dropdown */}
+                  {/* Office Location Dropdown for Filtering Doctors */}
                   {offices.length > 0 && (
                     <div>
                       <label
@@ -610,7 +606,9 @@ function BookPage() {
                   <button
                     type="submit"
                     className={`w-full py-2 px-4 bg-pink-600 text-white font-semibold rounded-md shadow-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 transition ${
-                      !time || isWeekend(date) || !selectedVisitType ? "opacity-50 cursor-not-allowed" : ""
+                      !time || isWeekend(date) || !selectedVisitType
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
                     }`}
                     disabled={!time || isWeekend(date) || !selectedVisitType}
                   >

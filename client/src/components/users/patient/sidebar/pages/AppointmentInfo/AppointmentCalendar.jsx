@@ -26,15 +26,13 @@ const localizer = dateFnsLocalizer({
 const DnDCalendar = withDragAndDrop(Calendar);
 
 // Utility function to format phone numbers
-const formatPhoneNumber = (phoneNumber) => {
-  const cleaned = ("" + phoneNumber).replace(/\D/g, "");
-  if (cleaned.length === 10) {
-    const part1 = cleaned.slice(0, 3);
-    const part2 = cleaned.slice(3, 6);
-    const part3 = cleaned.slice(6);
-    return `(${part1}) ${part2}-${part3}`;
+const formatPhoneNumber = (phoneNumberString) => {
+  const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return `(${match[1]}) ${match[2]}-${match[3]}`;
   }
-  return phoneNumber;
+  return phoneNumberString; // Return the original string if it doesn't match
 };
 
 function AppointmentCalendar() {
@@ -317,19 +315,19 @@ function AppointmentCalendar() {
               {new Date(selectedAppointmentModal.appointmentDateTime).toLocaleString()}
             </p>
             <p>
-              <strong>Doctor:</strong> Dr. {selectedAppointmentModal.doctorFirstName} {selectedAppointmentModal.doctorLastName}
-            </p>
-            <p>
-              <strong>Service:</strong> {selectedAppointmentModal.service || "N/A"}
-            </p>
-            <p>
               <strong>Reason:</strong> {selectedAppointmentModal.reason || "N/A"}
             </p>
             <p>
               <strong>Status:</strong> {selectedAppointmentModal.status}
             </p>
             <p>
-              <strong>Location:</strong> {selectedAppointmentModal.officeName}, {selectedAppointmentModal.officeAddress}
+              <strong>Service:</strong> {selectedAppointmentModal.service || "N/A"}
+            </p>
+            <p>
+              <strong>Visit Type:</strong> {selectedAppointmentModal.visitType || "N/A"}
+            </p>
+            <p>
+              <strong>Doctor:</strong> Dr. {selectedAppointmentModal.doctorFirstName} {selectedAppointmentModal.doctorLastName}
             </p>
             <p>
               <strong>Doctor's Email:</strong> {selectedAppointmentModal.doctorEmail || "N/A"}
@@ -337,6 +335,9 @@ function AppointmentCalendar() {
             <p>
               <strong>Doctor's Phone:</strong>{" "}
               {selectedAppointmentModal.doctorPhone ? formatPhoneNumber(selectedAppointmentModal.doctorPhone) : "N/A"}
+            </p>
+            <p>
+              <strong>Location:</strong> {selectedAppointmentModal.officeName}, {selectedAppointmentModal.officeAddress}
             </p>
             {/* Add more details as needed */}
             <div className="flex justify-end mt-6">
