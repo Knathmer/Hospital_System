@@ -30,6 +30,7 @@ import MedicalHistoryPage from "../users/patient/sidebar/pages/medical-history/M
 import PersonalInfoForm from "../users/patient/sidebar/pages/personal-info/PersonalInfoForm.tsx";
 import ManagePharmaciesPage from "../../pages/patientPages/ManagePharmaciesPage.jsx";
 import PrescriptionPage from "../../pages/patientPages/PatientMedicationPage.jsx";
+import AppointmentsPage from "../users/patient/AppointmentsPage.jsx";
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -43,6 +44,7 @@ export default function PatientSidebar() {
     "Patient Services": [
       { id: "dashboard", label: "Dashboard", icon: Heart },
       { id: "appointments", label: "Appointments", icon: Calendar },
+      { id: "visits", label: "Visits", icon: Calendar },
       { id: "medical-records", label: "Medical Records", icon: FileText },
       { id: "medications", label: "Medications", icon: PillBottle },
       //{ id: "personal-info", label: "Personal Info", icon: User },
@@ -141,6 +143,11 @@ export default function PatientSidebar() {
         {activeTab === "appointments" && (
           <div>
             <BookPage />
+          </div>
+        )}
+        {activeTab === "visits" && (
+          <div>
+            <AppointmentsPage />
           </div>
         )}
         {activeTab === "insurance" && (
