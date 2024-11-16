@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import AppointmentModal from "./AppointmentModal";
 
 // Utility function to format phone numbers
 const formatPhoneNumber = (phoneNumberString) => {
@@ -9,6 +10,22 @@ const formatPhoneNumber = (phoneNumberString) => {
     return `(${match[1]}) ${match[2]}-${match[3]}`;
   }
   return phoneNumberString; // Return the original string if it doesn't match
+};
+
+// Function to calculate age from date of birth
+const calculateAge = (dob) => {
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference =
+    today.getMonth() - birthDate.getMonth();
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+  return age;
 };
 
 // Utility function to sort appointments in descending order
@@ -182,7 +199,7 @@ function DocAppointmentOverview() {
     setSelectedAppointment(null);
   };
 
-  // Handle accept/reject appointment
+  // Handle accept/reject/cancel appointment
   const handleUpdateAppointment = async (appointmentID, status) => {
     try {
       const token = localStorage.getItem("token");
@@ -263,7 +280,9 @@ function DocAppointmentOverview() {
       title === "Upcoming Appointments" || title === "Requested Appointments";
 
     // Sort the list if necessary
-    const sortedList = shouldSortDescending ? sortAppointmentsDescending(list) : list;
+    const sortedList = shouldSortDescending
+      ? sortAppointmentsDescending(list)
+      : list;
 
     return (
       <div className="mb-8">
@@ -275,38 +294,88 @@ function DocAppointmentOverview() {
             {sortedList.map((appointment) => (
               <li
                 key={appointment.appointmentID}
-                className="bg-white shadow-md rounded-lg p-4 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSelectEvent(appointment)}
+                className="bg-white shadow-md rounded-lg p-4"
               >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-xl font-bold">
-                      {new Date(appointment.appointmentDateTime).toLocaleString()}
-                    </p>
-                    <p className="text-gray-600">
-                      Reason: {appointment.reason || "N/A"}
-                    </p>
-                    <p className="text-gray-600">Status: {appointment.status}</p>
-                    <p className="text-gray-600">
-                      Patient: {appointment.patientFirstName}{" "}
-                      {appointment.patientLastName}
-                    </p>
-                    <p className="text-gray-600">
-                      Patient's Email: {appointment.patientEmail || "N/A"}
-                    </p>
-                    <p className="text-gray-600">
-                      Patient's Phone:{" "}
-                      {appointment.patientPhoneNumber
-                        ? formatPhoneNumber(appointment.patientPhoneNumber)
-                        : "N/A"}
-                    </p>
-                    <p className="text-gray-600">
-                      Patient's DOB:{" "}
-                      {appointment.patientDOB
-                        ? new Date(appointment.patientDOB).toLocaleDateString()
-                        : "N/A"}
-                    </p>
-                  </div>
+                <div>
+                  <p>
+                    <strong>Reason:</strong> {appointment.reason || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {appointment.status}
+                  </p>
+                  <p>
+                    <strong>Service:</strong> {appointment.serviceName || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Visit Type:</strong> {appointment.visitType || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Date & Time:</strong>{" "}
+                    {new Date(
+                      appointment.appointmentDateTime
+                    ).toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Patient:</strong> {appointment.patientFirstName}{" "}
+                    {appointment.patientLastName}
+                  </p>
+                  <p>
+                    <strong>Patient's Email:</strong>{" "}
+                    {appointment.patientEmail || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Patient's Phone:</strong>{" "}
+                    {appointment.patientPhoneNumber
+                      ? formatPhoneNumber(appointment.patientPhoneNumber)
+                      : "N/A"}
+                  </p>
+                  <p>
+                    <strong>Patient's DOB:</strong>{" "}
+                    {appointment.patientDOB
+                      ? new Date(
+                          appointment.patientDOB
+                        ).toLocaleDateString()
+                      : "N/A"}{" "}
+                    {appointment.patientDOB
+                      ? `(Age: ${calculateAge(appointment.patientDOB)})`
+                      : ""}
+                  </p>
+                </div>
+                <div className="flex justify-end mt-4 space-x-2">
+                  {appointment.status === "Requested" && (
+                    <>
+                      <button
+                        onClick={() =>
+                          handleUpdateAppointment(
+                            appointment.appointmentID,
+                            "Scheduled"
+                          )
+                        }
+                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleUpdateAppointment(
+                            appointment.appointmentID,
+                            "Request Denied"
+                          )
+                        }
+                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
+                  {appointment.status === "Scheduled" && (
+                    <button
+                      onClick={() => handleSelectEvent(appointment)}
+                      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
+                    >
+                      Cancel Appointment
+                    </button>
+                  )}
                 </div>
               </li>
             ))}
@@ -412,96 +481,17 @@ function DocAppointmentOverview() {
         "Upcoming Appointments",
         filteredAppointments.upcoming
       )}
-      {renderAppointmentList(
-        "Past Appointments",
-        filteredAppointments.past
-      )}
+      {renderAppointmentList("Past Appointments", filteredAppointments.past)}
       {renderAppointmentList("Other Appointments", filteredAppointments.other)}
 
-      {/* Custom Modal for Appointment Details */}
+      {/* Appointment Modal */}
       {isModalOpen && selectedAppointment && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3 p-6 relative">
-            <button
-              onClick={closeModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-            >
-              &#10005;
-            </button>
-            <h2 className="text-2xl font-bold mb-4">Appointment Details</h2>
-            <p>
-              <strong>Date & Time:</strong>{" "}
-              {new Date(
-                selectedAppointment.appointmentDateTime
-              ).toLocaleString()}
-            </p>
-            <p>
-              <strong>Reason:</strong> {selectedAppointment.reason || "N/A"}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedAppointment.status}
-            </p>
-            <p>
-              <strong>Visit Type:</strong>{" "}
-              {selectedAppointment.visitType || "N/A"}
-            </p>
-            <p>
-              <strong>Patient:</strong> {selectedAppointment.patientFirstName}{" "}
-              {selectedAppointment.patientLastName}
-            </p>
-            <p>
-              <strong>Patient's Email:</strong>{" "}
-              {selectedAppointment.patientEmail || "N/A"}
-            </p>
-            <p>
-              <strong>Patient's Phone:</strong>{" "}
-              {selectedAppointment.patientPhoneNumber
-                ? formatPhoneNumber(selectedAppointment.patientPhoneNumber)
-                : "N/A"}
-            </p>
-            <p>
-              <strong>Patient's DOB:</strong>{" "}
-              {selectedAppointment.patientDOB
-                ? new Date(selectedAppointment.patientDOB).toLocaleDateString()
-                : "N/A"}
-            </p>
-            {/* Add more details as needed */}
-            <div className="flex justify-end mt-6 space-x-2">
-              {selectedAppointment.status === "Requested" && (
-                <>
-                  <button
-                    onClick={() =>
-                      handleUpdateAppointment(
-                        selectedAppointment.appointmentID,
-                        "Scheduled"
-                      )
-                    }
-                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleUpdateAppointment(
-                        selectedAppointment.appointmentID,
-                        "Request Denied"
-                      )
-                    }
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
-                  >
-                    Reject
-                  </button>
-                </>
-              )}
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+        <AppointmentModal
+          appointment={selectedAppointment}
+          onClose={closeModal}
+          onUpdateStatus={handleUpdateAppointment}
+          showCancelOption={true}
+        />
       )}
     </div>
   );

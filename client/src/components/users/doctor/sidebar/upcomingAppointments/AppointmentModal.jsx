@@ -1,0 +1,152 @@
+import React, { useState } from "react";
+
+// Utility function to format phone numbers
+const formatPhoneNumber = (phoneNumberString) => {
+  const cleaned = ("" + phoneNumberString).replace(/\D/g, "");
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return `(${match[1]}) ${match[2]}-${match[3]}`;
+  }
+  return phoneNumberString; // Return the original string if it doesn't match
+};
+
+// Function to calculate age from date of birth
+const calculateAge = (dob) => {
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference =
+    today.getMonth() - birthDate.getMonth();
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+  return age;
+};
+
+function AppointmentModal({
+  appointment,
+  onClose,
+  onUpdateStatus,
+  showCancelOption,
+}) {
+  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3 p-6 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+        >
+          &#10005;
+        </button>
+        <h2 className="text-2xl font-bold mb-4">Appointment Details</h2>
+        <p>
+          <strong>Reason:</strong> {appointment.reason || "N/A"}
+        </p>
+        <p>
+          <strong>Status:</strong> {appointment.status}
+        </p>
+        <p>
+          <strong>Service:</strong> {appointment.serviceName || "N/A"}
+        </p>
+        <p>
+          <strong>Visit Type:</strong> {appointment.visitType || "N/A"}
+        </p>
+        <p>
+          <strong>Date & Time:</strong>{" "}
+          {new Date(appointment.appointmentDateTime).toLocaleString()}
+        </p>
+        <p>
+          <strong>Patient:</strong> {appointment.patientFirstName}{" "}
+          {appointment.patientLastName}
+        </p>
+        <p>
+          <strong>Patient's Email:</strong>{" "}
+          {appointment.patientEmail || "N/A"}
+        </p>
+        <p>
+          <strong>Patient's Phone:</strong>{" "}
+          {appointment.patientPhoneNumber
+            ? formatPhoneNumber(appointment.patientPhoneNumber)
+            : "N/A"}
+        </p>
+        <p>
+          <strong>Patient's DOB:</strong>{" "}
+          {appointment.patientDOB
+            ? new Date(appointment.patientDOB).toLocaleDateString()
+            : "N/A"}{" "}
+          {appointment.patientDOB
+            ? `(Age: ${calculateAge(appointment.patientDOB)})`
+            : ""}
+        </p>
+        {/* Add more details as needed */}
+        <div className="flex justify-end mt-6 space-x-2">
+          {showConfirmCancel && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <p>Are you sure you want to cancel this appointment?</p>
+                <div className="flex justify-end mt-4 space-x-2">
+                  <button
+                    onClick={() => {
+                      onUpdateStatus(appointment.appointmentID, "Cancelled");
+                      setShowConfirmCancel(false);
+                    }}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
+                  >
+                    Yes, Cancel
+                  </button>
+                  <button
+                    onClick={() => setShowConfirmCancel(false)}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none"
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {appointment.status === "Requested" && (
+            <>
+              <button
+                onClick={() =>
+                  onUpdateStatus(appointment.appointmentID, "Scheduled")
+                }
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none"
+              >
+                Accept
+              </button>
+              <button
+                onClick={() =>
+                  onUpdateStatus(appointment.appointmentID, "Request Denied")
+                }
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
+              >
+                Reject
+              </button>
+            </>
+          )}
+          {appointment.status === "Scheduled" && showCancelOption && (
+            <button
+              onClick={() => setShowConfirmCancel(true)}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
+            >
+              Cancel Appointment
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default AppointmentModal;

@@ -203,15 +203,17 @@ export async function getDoctorAppointments(req, res) {
   try {
     const appointments = await query(
       `SELECT appointment.*, 
-                    patient.firstName as patientFirstName, 
-                    patient.lastName as patientLastName,
-                    patient.dateOfBirth as patientDOB,
-                    patient.gender as patientGender,
-                    patient.phoneNumber as patientPhoneNumber,
-                    patient.email as patientEmail
-             FROM appointment
-             JOIN patient ON appointment.patientID = patient.patientID
-             WHERE appointment.doctorID = ?`,
+        patient.firstName as patientFirstName, 
+        patient.lastName as patientLastName,
+        patient.dateOfBirth as patientDOB,
+        patient.gender as patientGender,
+        patient.phoneNumber as patientPhoneNumber,
+        patient.email as patientEmail,
+        service.serviceName
+      FROM appointment
+      JOIN patient ON appointment.patientID = patient.patientID
+      LEFT JOIN service ON appointment.serviceID = service.serviceID
+      WHERE appointment.doctorID = ?`,
       [doctorID]
     );
 
