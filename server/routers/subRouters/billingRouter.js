@@ -11,6 +11,8 @@ import {
   getPaymentsYTD,
   getPaymentsLastYear,
   getPaymentsDateRange,
+  getOutstandingBills,
+  postPayment,
 } from "../../controllers/patient/patientBillingController.js";
 const billingRouter = express.Router();
 
@@ -31,4 +33,7 @@ billingRouter.get("/payments/ytd", getPaymentsYTD);
 billingRouter.get("/payments/last-year", getPaymentsLastYear);
 billingRouter.get("/payments/date-range", getPaymentsDateRange);
 
+//Make a Payment
+billingRouter.get("/outstanding-bills", getOutstandingBills);
+billingRouter.post("/make-payment", postPayment);
 export default billingRouter;
