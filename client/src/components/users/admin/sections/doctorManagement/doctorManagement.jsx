@@ -44,7 +44,7 @@ const DoctorManagement = () => {
           placeholder="Search doctors by name, email, or phone"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border p-2 rounded w-64 mr-4"
+          className="border p-2 rounded w-80 mr-4"
         />
         <label className="flex items-center">
           <input
