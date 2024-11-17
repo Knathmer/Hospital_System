@@ -13,6 +13,7 @@ import {
   getSpecialties,
   getServices,
 } from "../../controllers/admin/appointmentAnalytics.js";
+import adminDoctorRouter from "../subRouters/AdminDoctorRouter.js";
 import {
   getAllDoctors,
   inactivateDoctor,
@@ -38,6 +39,7 @@ router.get("/statuses", getAppointmentStatuses);
 router.get("/visitTypes", getVisitTypes);
 router.get("/specialties", getSpecialties);
 router.get("/services", getServices);
+router.use("/adminDoctorReport", adminDoctorRouter);
 
 router.get('/doctorManagement', getAllDoctors);
 router.put('/doctors/:doctorID/inactivate', inactivateDoctor);
