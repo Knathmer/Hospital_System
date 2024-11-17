@@ -76,6 +76,8 @@ export default function AppointmentPage() {
 
   const [chargesSaved, setChargesSaved] = useState(false);
 
+  const [isEditingCharges, setIsEditingCharges] = useState(true); // Start in edit mode
+
   const fetchPatientInformation = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -533,14 +535,6 @@ export default function AppointmentPage() {
         serviceID: appointmentInformation.serviceID,
       };
 
-      if (
-        data.selectedAdditionalCharges.length === 0 &&
-        data.customCharges.length === 0
-      ) {
-        alert("No charges to save. Please add charges before saving.");
-        return;
-      }
-
       await axios.post(
         "http://localhost:3000/auth/doctor/schedule/save-charges",
         data,
@@ -551,6 +545,7 @@ export default function AppointmentPage() {
 
       alert("Charges saved successfully!");
       setChargesSaved(true);
+      setIsEditingCharges(false);
     } catch (error) {
       console.error("Error saving charges:", error);
       alert("An error occurred while saving charges. Please try again.");
@@ -571,6 +566,38 @@ export default function AppointmentPage() {
 
     return basePrice > 0 || hasAdditionalCharges || hasCustomCharges;
   };
+
+  const renderSummaryOfCharges = () => (
+    <div>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        Summary of Charges
+      </h3>
+      <ul className="space-y-2 text-gray-700">
+        <li className="flex justify-between">
+          <span>Base Service:</span>
+          <span>${parseFloat(baseServicePrice).toFixed(2)}</span>
+        </li>
+        {Object.values(selectedCharges)
+          .filter(Boolean)
+          .map((charge) => (
+            <li key={charge.ACTID} className="flex justify-between">
+              <span>{charge.name}:</span>
+              <span>${parseFloat(charge.price).toFixed(2)}</span>
+            </li>
+          ))}
+        {customCharges.map((customCharge, index) => (
+          <li key={`custom-${index}`} className="flex justify-between">
+            <span>{customCharge.description}:</span>
+            <span>${parseFloat(customCharge.amount || 0).toFixed(2)}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 text-xl font-bold text-gray-900 flex justify-between">
+        <span>Total Amount:</span>
+        <span>${calculateTotalCharges()}</span>
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     if (isPrescribeModalOpen) {
@@ -1405,160 +1432,146 @@ export default function AppointmentPage() {
         </div>
 
         {/* Charges Section       /ti */}
+        {/* Charges Section */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Charges</h2>
           <div className="space-y-4">
-            {/* Additional Charges */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Additional Charges
-              </h3>
-              <div className="space-y-2">
-                {additionalCharges.length > 0 ? (
-                  additionalCharges.map((charge) => (
-                    <div key={charge.ACTID} className="flex items-center">
-                      <Checkbox
-                        id={`charge-${charge.ACTID}`}
-                        checked={!!selectedCharges[charge.ACTID]}
-                        onChange={(e) => {
-                          const checked = e.target.checked;
-                          setSelectedCharges((prev) => ({
-                            ...prev,
-                            [charge.ACTID]: checked ? charge : undefined,
-                          }));
-                        }}
-                      />
-                      <label
-                        htmlFor={`charge-${charge.ACTID}`}
-                        className="ml-2 text-gray-700"
+            {isEditingCharges ? (
+              <>
+                {/* Additional Charges */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Additional Charges
+                  </h3>
+                  <div className="space-y-2">
+                    {additionalCharges.length > 0 ? (
+                      additionalCharges.map((charge) => (
+                        <div key={charge.ACTID} className="flex items-center">
+                          <Checkbox
+                            id={`charge-${charge.ACTID}`}
+                            checked={!!selectedCharges[charge.ACTID]}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setSelectedCharges((prev) => ({
+                                ...prev,
+                                [charge.ACTID]: checked ? charge : undefined,
+                              }));
+                            }}
+                          />
+                          <label
+                            htmlFor={`charge-${charge.ACTID}`}
+                            className="ml-2 text-gray-700"
+                          >
+                            {charge.name} - $
+                            {parseFloat(charge.price).toFixed(2)}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">
+                        No additional charges available for this specialty.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Custom Charges */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Custom Charges
+                  </h3>
+                  {customCharges.map((customCharge, index) => (
+                    <div key={index} className="flex space-x-4 mb-2">
+                      <div className="flex-grow">
+                        <Label htmlFor={`customChargeDescription-${index}`}>
+                          Description
+                        </Label>
+                        <Input
+                          id={`customChargeDescription-${index}`}
+                          value={customCharge.description}
+                          onChange={(e) => {
+                            const updatedDescription = e.target.value;
+                            setCustomCharges((prev) => {
+                              const newCharges = [...prev];
+                              newCharges[index].description =
+                                updatedDescription;
+                              return newCharges;
+                            });
+                          }}
+                          placeholder="Enter description"
+                          required
+                        />
+                      </div>
+                      <div className="w-1/3">
+                        <Label htmlFor={`customChargeAmount-${index}`}>
+                          Amount
+                        </Label>
+                        <Input
+                          id={`customChargeAmount-${index}`}
+                          type="number"
+                          value={customCharge.amount}
+                          onChange={(e) => {
+                            const updatedAmount = e.target.value;
+                            setCustomCharges((prev) => {
+                              const newCharges = [...prev];
+                              newCharges[index].amount = updatedAmount;
+                              return newCharges;
+                            });
+                          }}
+                          placeholder="0.00"
+                          min="0.01"
+                          step="0.01"
+                          required
+                        />
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveCustomCharge(index)}
+                        className="text-red-600 hover:text-red-700 mt-6"
                       >
-                        {charge.name} - ${parseFloat(charge.price).toFixed(2)}
-                      </label>
+                        Remove
+                      </Button>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500">
-                    No additional charges available for this specialty.
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Custom Charges */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Custom Charges
-              </h3>
-              {customCharges.map((customCharge, index) => (
-                <div key={index} className="flex space-x-4 mb-2">
-                  <div className="flex-grow">
-                    <Label htmlFor={`customChargeDescription-${index}`}>
-                      Description
-                    </Label>
-                    <Input
-                      id={`customChargeDescription-${index}`}
-                      value={customCharge.description}
-                      onChange={(e) => {
-                        const updatedDescription = e.target.value;
-                        setCustomCharges((prev) => {
-                          const newCharges = [...prev];
-                          newCharges[index].description = updatedDescription;
-                          return newCharges;
-                        });
-                      }}
-                      placeholder="Enter description"
-                      required
-                    />
-                  </div>
-                  <div className="w-1/3">
-                    <Label htmlFor={`customChargeAmount-${index}`}>
-                      Amount
-                    </Label>
-                    <Input
-                      id={`customChargeAmount-${index}`}
-                      type="number"
-                      value={customCharge.amount}
-                      onChange={(e) => {
-                        const updatedAmount = e.target.value;
-                        setCustomCharges((prev) => {
-                          const newCharges = [...prev];
-                          newCharges[index].amount = updatedAmount;
-                          return newCharges;
-                        });
-                      }}
-                      placeholder="0.00"
-                      min="0.01"
-                      step="0.01"
-                      required
-                    />
-                  </div>
+                  ))}
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleRemoveCustomCharge(index)}
-                    className="text-red-600 hover:text-red-700 mt-6"
+                    onClick={handleAddCustomCharge}
+                    className="text-pink-600 hover:text-pink-700"
                   >
-                    Remove
+                    + Add Custom Charge
                   </Button>
                 </div>
-              ))}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleAddCustomCharge}
-                className="text-pink-600 hover:text-pink-700"
-              >
-                + Add Custom Charge
-              </Button>
-            </div>
 
-            <Separator />
+                <Separator />
 
-            {/* Summary of Charges */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Summary of Charges
-              </h3>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex justify-between">
-                  <span>Base Service:</span>{" "}
-                  <span>${parseFloat(baseServicePrice).toFixed(2)}</span>
-                </li>
-                {Object.values(selectedCharges)
-                  .filter(Boolean)
-                  .map((charge) => (
-                    <li
-                      key={charge.additionalChargeTypeID}
-                      className="flex justify-between"
-                    >
-                      <span>{charge.name}:</span>{" "}
-                      <span>${parseFloat(charge.price).toFixed(2)}</span>
-                    </li>
-                  ))}
-                {customCharges.map((customCharge, index) => (
-                  <li key={`custom-${index}`} className="flex justify-between">
-                    <span>{customCharge.description}:</span>{" "}
-                    <span>
-                      ${parseFloat(customCharge.amount || 0).toFixed(2)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 text-xl font-bold text-gray-900 flex justify-between">
-                <span>Total Amount:</span>
-                <span>${calculateTotalCharges()}</span>
-              </div>
-            </div>
+                {/* Summary of Charges */}
+                {renderSummaryOfCharges()}
 
-            <Button
-              onClick={handleSaveCharges}
-              className="w-full bg-pink-600 hover:bg-pink-700 text-white"
-              disabled={!hasCharges()}
-            >
-              Save Charges
-            </Button>
+                <Button
+                  onClick={handleSaveCharges}
+                  className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                  disabled={!hasCharges()}
+                >
+                  Save Charges
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* Summary of Charges */}
+                {renderSummaryOfCharges()}
+
+                <Button
+                  onClick={() => setIsEditingCharges(true)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Edit Charges
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
