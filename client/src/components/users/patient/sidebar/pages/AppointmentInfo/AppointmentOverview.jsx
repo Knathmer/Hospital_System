@@ -199,7 +199,7 @@ function AppointmentOverview() {
                     <p className="text-gray-600">
                       Status: {appointment.status}
                     </p>
-                    <p>
+                    <p className="text-gray-600">
                       Visit Type: {appointment.visitType || "N/A"}
                     </p>
                     <p className="text-gray-600">
