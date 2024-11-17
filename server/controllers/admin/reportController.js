@@ -24,7 +24,7 @@ export const getSpecialties = async (req, res) => {
 // Fetch States
 export const getStates = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT DISTINCT addrstate AS value FROM address');
+    const [rows] = await pool.query('SELECT DISTINCT addrstate AS value FROM address JOIN office o ON address.addressID = o.addressID');
     res.json(rows.map((row) => ({ value: row.value, label: row.value })));
   } catch (error) {
     res.status(500).send('Error fetching states');
@@ -34,7 +34,7 @@ export const getStates = async (req, res) => {
 // Fetch Cities
 export const getCities = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT DISTINCT addrcity AS value FROM address');
+    const [rows] = await pool.query('SELECT DISTINCT addrcity AS value FROM address JOIN office o ON address.addressID = o.addressID');
     res.json(rows.map((row) => ({ value: row.value, label: row.value })));
   } catch (error) {
     res.status(500).send('Error fetching cities');
