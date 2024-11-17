@@ -161,7 +161,7 @@ const UpcomingAppointmentsDashboard = () => {
 
       {/* Fixed button */}
       <NavButton
-        to="/book"
+        to="/patient/dashboard?tab=appointments"
         className="mt-4 bg-pink-500 text-white hover:bg-pink-600"
       >
         Schedule Appointment
