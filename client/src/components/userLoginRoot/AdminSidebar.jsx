@@ -126,7 +126,6 @@ export default function AdminSidebar() {
             <PrescriptionSummaryReport />
           </div>
         )}
-        {activeTab === "appointment-data" && <div>appointdick</div>}
 
         {activeTab === "appointment-data" && <AppointmentAnalytics />}
       </main>
