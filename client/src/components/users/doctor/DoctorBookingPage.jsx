@@ -1,71 +1,83 @@
-import React, { useState, useEffect } from 'react'; // Updated import
-import { format } from 'date-fns';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react"; // Updated import
+import { format } from "date-fns";
+import { Link } from "react-router-dom";
+
+import envConfig from "../../../envConfig";
 
 const DoctorBookingPage = () => {
   const [appointments, setAppointments] = useState([]);
-  const [sortStatus, setSortStatus] = useState('All');
-  const [searchName, setSearchName] = useState('');
-  const [sortField, setSortField] = useState('appointmentDateTime');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortStatus, setSortStatus] = useState("All");
+  const [searchName, setSearchName] = useState("");
+  const [sortField, setSortField] = useState("appointmentDateTime");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [editingStatus, setEditingStatus] = useState(null);
 
   const fetchAppointments = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/appointment/doctorAppointments', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${envConfig.apiUrl}/appointment/doctorAppointments`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         setAppointments(data);
       } else {
-        console.error('Failed to fetch appointments');
+        console.error("Failed to fetch appointments");
       }
     } catch (error) {
-      console.error('Error fetching appointments:', error);
+      console.error("Error fetching appointments:", error);
     }
   };
 
   const handleStatusChange = async (appointmentID, newStatus) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/appointment/updateAppointment', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ appointmentID, status: newStatus }),
-      });
-  
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${envConfig.apiUrl}/appointment/updateAppointment`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ appointmentID, status: newStatus }),
+        }
+      );
+
       if (response.ok) {
         // Update the status locally after successful backend update
         setAppointments((prevAppointments) =>
           prevAppointments.map((app) =>
-            app.appointmentID === appointmentID ? { ...app, status: newStatus } : app
+            app.appointmentID === appointmentID
+              ? { ...app, status: newStatus }
+              : app
           )
         );
         setEditingStatus(null); // Exit editing mode
       } else {
         const errorData = await response.json();
-        console.error('Failed to update status:', errorData.error || 'Unknown error');
-        alert('Failed to update status. Please try again.');
+        console.error(
+          "Failed to update status:",
+          errorData.error || "Unknown error"
+        );
+        alert("Failed to update status. Please try again.");
       }
     } catch (error) {
-      console.error('Error updating status:', error);
-      alert('An error occurred while updating the status. Please try again.');
+      console.error("Error updating status:", error);
+      alert("An error occurred while updating the status. Please try again.");
     }
   };
-  
 
   const filteredAndSortedAppointments = appointments
     .filter((app) => {
-      const matchesStatus = sortStatus === 'All' || app.status === sortStatus;
+      const matchesStatus = sortStatus === "All" || app.status === sortStatus;
       const matchesName =
-        searchName === '' ||
+        searchName === "" ||
         `${app.patientFirstName} ${app.patientLastName}`
           .toLowerCase()
           .includes(searchName.toLowerCase());
@@ -74,14 +86,13 @@ const DoctorBookingPage = () => {
     .sort((a, b) => {
       const dateA = new Date(a[sortField]);
       const dateB = new Date(b[sortField]);
-      if (sortOrder === 'asc') return dateA - dateB;
+      if (sortOrder === "asc") return dateA - dateB;
       return dateB - dateA;
     });
 
   useEffect(() => {
     fetchAppointments();
   }, []);
-  
 
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
@@ -137,22 +148,43 @@ const DoctorBookingPage = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-pink-100">
-                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">Requested Date</th>
-                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">Time</th>
-                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">Patient Name</th>
-                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">Reason</th>
-                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">Status</th>
-                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">Created Date</th>
+                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">
+                    Requested Date
+                  </th>
+                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">
+                    Time
+                  </th>
+                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">
+                    Patient Name
+                  </th>
+                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">
+                    Reason
+                  </th>
+                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">
+                    Status
+                  </th>
+                  <th className="text-left p-2 bg-pink-50 text-pink-600 font-semibold">
+                    Created Date
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {filteredAndSortedAppointments.map((appointment) => (
-                  <tr key={appointment.appointmentID} className="hover:bg-pink-50">
+                  <tr
+                    key={appointment.appointmentID}
+                    className="hover:bg-pink-50"
+                  >
                     <td className="p-2">
-                      {format(new Date(appointment.appointmentDateTime), 'MMM dd, yyyy')}
+                      {format(
+                        new Date(appointment.appointmentDateTime),
+                        "MMM dd, yyyy"
+                      )}
                     </td>
                     <td className="p-2">
-                      {format(new Date(appointment.appointmentDateTime), 'HH:mm')}
+                      {format(
+                        new Date(appointment.appointmentDateTime),
+                        "HH:mm"
+                      )}
                     </td>
                     <td className="p-2">
                       <Link
@@ -169,7 +201,10 @@ const DoctorBookingPage = () => {
                           className="border-2 border-pink-200 rounded-md px-2 h-10"
                           value={appointment.status}
                           onChange={(e) =>
-                            handleStatusChange(appointment.appointmentID, e.target.value)
+                            handleStatusChange(
+                              appointment.appointmentID,
+                              e.target.value
+                            )
                           }
                         >
                           <option value="Requested">Requested</option>
@@ -180,14 +215,16 @@ const DoctorBookingPage = () => {
                       ) : (
                         <span
                           className="cursor-pointer text-pink-500 hover:underline"
-                          onClick={() => setEditingStatus(appointment.appointmentID)}
+                          onClick={() =>
+                            setEditingStatus(appointment.appointmentID)
+                          }
                         >
                           {appointment.status}
                         </span>
                       )}
                     </td>
                     <td className="p-2">
-                      {format(new Date(appointment.createdAt), 'MMM dd, yyyy')}
+                      {format(new Date(appointment.createdAt), "MMM dd, yyyy")}
                     </td>
                   </tr>
                 ))}

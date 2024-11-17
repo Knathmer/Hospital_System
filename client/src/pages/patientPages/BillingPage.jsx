@@ -27,6 +27,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+import envConfig from "../../envConfig";
+
 export default function BillingPage() {
   const [currentAndPastDueBalance, setCurrentAndPastDueBalance] = useState({
     currentBalance: 0,
@@ -56,11 +58,11 @@ export default function BillingPage() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/billing/current-balance",
+        `${envConfig.apiUrl}/auth/patient/billing/current-balance`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const lastPaymentResponse = await axios.get(
-        "http://localhost:3000/auth/patient/billing/last-payment-summary",
+        `${envConfig.apiUrl}/auth/patient/billing/last-payment-summary`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -92,7 +94,7 @@ export default function BillingPage() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/billing/patient-information",
+        `${envConfig.apiUrl}/auth/patient/billing/patient-information`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -106,7 +108,7 @@ export default function BillingPage() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/billing/office-information",
+        `${envConfig.apiUrl}/auth/patient/billing/office-information`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -121,7 +123,7 @@ export default function BillingPage() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/billing/recent-payments",
+        `${envConfig.apiUrl}/auth/patient/billing/recent-payments`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.recentPayments.length === 0) {
@@ -144,11 +146,11 @@ export default function BillingPage() {
 
       switch (selectedFilter) {
         case "yearToDate":
-          url = "http://localhost:3000/auth/patient/billing/details/ytd";
+          url = `${envConfig.apiUrl}/auth/patient/billing/details/ytd`;
           dataKey = "detailsYTD";
           break;
         case "lastYear":
-          url = "http://localhost:3000/auth/patient/billing/details/last-year";
+          url = `${envConfig.apiUrl}/auth/patient/billing/details/last-year`;
           dataKey = "detailsLastYear";
           break;
         case "dateRange":
@@ -156,11 +158,11 @@ export default function BillingPage() {
             // Do not fetch if dates are not set
             return;
           }
-          url = `http://localhost:3000/auth/patient/billing/details/date-range?startDate=${startDate}&endDate=${endDate}`;
+          url = `${envConfig.apiUrl}/auth/patient/billing/details/date-range?startDate=${startDate}&endDate=${endDate}`;
           dataKey = "detailsDateRange";
           break;
         default:
-          url = "http://localhost:3000/auth/patient/billing/details/ytd";
+          url = `${envConfig.apiUrl}/auth/patient/billing/details/ytd`;
       }
 
       const response = await axios.get(url, {
@@ -219,11 +221,11 @@ export default function BillingPage() {
 
       switch (paymentsFilter) {
         case "yearToDate":
-          url = "http://localhost:3000/auth/patient/billing/payments/ytd";
+          url = `${envConfig.apiUrl}/auth/patient/billing/payments/ytd`;
           dataKey = "paymentsYTD";
           break;
         case "lastYear":
-          url = "http://localhost:3000/auth/patient/billing/payments/last-year";
+          url = `${envConfig.apiUrl}/auth/patient/billing/payments/last-year`;
           dataKey = "paymentsLastYear";
           break;
         case "dateRange":
@@ -231,11 +233,11 @@ export default function BillingPage() {
             // Do not fetch if dates are not set
             return;
           }
-          url = `http://localhost:3000/auth/patient/billing/payments/date-range?startDate=${startDate}&endDate=${endDate}`;
+          url = `${envConfig.apiUrl}/auth/patient/billing/payments/date-range?startDate=${startDate}&endDate=${endDate}`;
           dataKey = "paymentsDateRange";
           break;
         default:
-          url = "http://localhost:3000/auth/patient/billing/payments/ytd";
+          url = `${envConfig.apiUrl}/auth/patient/billing/payments/ytd`;
       }
 
       const response = await axios.get(url, {
@@ -263,7 +265,7 @@ export default function BillingPage() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/billing/outstanding-bills",
+        `${envConfig.apiUrl}/auth/patient/billing/outstanding-bills`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -291,7 +293,7 @@ export default function BillingPage() {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:3000/auth/patient/billing/make-payment",
+        `"${envConfig.apiUrl}/auth/patient/billing/make-payment`,
         {
           billID: selectedBill.billID,
           amount: amountToPay,

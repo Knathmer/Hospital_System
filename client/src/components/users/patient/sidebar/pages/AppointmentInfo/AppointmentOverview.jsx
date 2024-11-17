@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+
+import envConfig from "../../../../../../envConfig";
 import MultiSelectInput from './MultiSelectInput'; // Adjust the path as necessary
 
 // Utility function to format phone numbers
 const formatPhoneNumber = (phoneNumberString) => {
-  const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+  const cleaned = ("" + phoneNumberString).replace(/\D/g, "");
   const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
   if (match) {
     return `(${match[1]}) ${match[2]}-${match[3]}`;
@@ -16,7 +18,7 @@ const formatPhoneNumber = (phoneNumberString) => {
 
 // Utility function to sort appointments in descending order
 const sortAppointmentsDescending = (appointmentsList) => {
-  return [...appointmentsList].sort((a, b) => new Date(b.appointmentDateTime) - new Date(a.appointmentDateTime));
+  return [...appointmentsList].sort((a, b) => new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime));
 };
 
 function AppointmentOverview() {
@@ -24,13 +26,13 @@ function AppointmentOverview() {
     upcoming: [],
     requested: [],
     past: [],
-    other: []
+    other: [],
   });
   const [filteredAppointments, setFilteredAppointments] = useState({
     upcoming: [],
     requested: [],
     past: [],
-    other: []
+    other: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -52,9 +54,12 @@ function AppointmentOverview() {
     const fetchAppointments = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/appointment/my-appointments", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          `${envConfig.apiUrl}/appointment/my-appointments`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setAppointments(response.data);
         setFilteredAppointments(response.data);
         setLoading(false);
@@ -63,8 +68,8 @@ function AppointmentOverview() {
         const doctors = new Set();
         const locations = new Set();
 
-        Object.values(response.data).forEach(category => {
-          category.forEach(app => {
+        Object.values(response.data).forEach((category) => {
+          category.forEach((app) => {
             const doctorName = `Dr. ${app.doctorFirstName} ${app.doctorLastName}`;
             doctors.add(doctorName);
             locations.add(app.officeName);
@@ -93,7 +98,7 @@ function AppointmentOverview() {
     const { upcoming, requested, past, other } = appointments;
 
     const filterList = (list) => {
-      return list.filter(app => {
+      return list.filter((app) => {
         // Doctor Filter
         if (selectedDoctors.length > 0) {
           const doctorNames = selectedDoctors.map(doctor => doctor.value);
@@ -128,7 +133,7 @@ function AppointmentOverview() {
       upcoming: filterList(upcoming),
       requested: filterList(requested),
       past: filterList(past),
-      other: filterList(other)
+      other: filterList(other),
     });
   };
 
@@ -165,10 +170,13 @@ function AppointmentOverview() {
 
   const renderAppointmentList = (title, list) => {
     // Determine if the current list should be sorted in descending order
-    const shouldSortDescending = title === "Upcoming Appointments" || title === "Requested Appointments";
-    
+    const shouldSortDescending =
+      title === "Upcoming Appointments" || title === "Requested Appointments";
+
     // Sort the list if necessary
-    const sortedList = shouldSortDescending ? sortAppointmentsDescending(list) : list;
+    const sortedList = shouldSortDescending
+      ? sortAppointmentsDescending(list)
+      : list;
 
     return (
       <div className="mb-8">
@@ -186,24 +194,31 @@ function AppointmentOverview() {
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-xl font-bold">
-                      {new Date(appointment.appointmentDateTime).toLocaleString()}
+                      {new Date(
+                        appointment.appointmentDateTime
+                      ).toLocaleString()}
                     </p>
-                    <p className="text-gray-600">Reason: {appointment.reason || "N/A"}</p>
-                    <p className="text-gray-600">Status: {appointment.status}</p>
                     <p className="text-gray-600">
+                    <p className="text-gray-600">
+                      Status: {appointment.status}
+                    </p>
+                    <p>
+                      Visit Type: {appointment.visitType || "N/A"}
+                    </p>
                       Doctor: Dr. {appointment.doctorFirstName} {appointment.doctorLastName}
-                    </p>
-                    <p className="text-gray-600">
-                      Service: {appointment.service || "N/A"}
                     </p>
                     <p className="text-gray-600">
                       Doctor's Email: {appointment.doctorEmail || "N/A"}
                     </p>
                     <p className="text-gray-600">
-                      Doctor's Phone: {appointment.doctorPhone ? formatPhoneNumber(appointment.doctorPhone) : "N/A"}
+                      Doctor's Phone:{" "}
+                      {appointment.doctorPhone
+                        ? formatPhoneNumber(appointment.doctorPhone)
+                        : "N/A"}
                     </p>
                     <p className="text-gray-600">
-                      Location: {appointment.officeName}, {appointment.officeAddress}
+                      Location: {appointment.officeName},{" "}
+                      {appointment.officeAddress}
                     </p>
                   </div>
                 </div>
@@ -223,23 +238,37 @@ function AppointmentOverview() {
       <div className="mb-8 bg-white shadow-md rounded-lg p-4">
         <h2 className="text-2xl font-semibold mb-4">Filter Appointments</h2>
         <div className="flex flex-col md:flex-row md:space-x-4">
-          {/* Doctor Multi-Select */}
-          <MultiSelectInput
-            label="Doctor:"
-            options={doctorOptions}
-            selectedValues={selectedDoctors}
-            setSelectedValues={setSelectedDoctors}
-            placeholder="Select Doctors..."
-          />
+          {/* Doctor Filter */}
+          <div className="mb-4 md:mb-0">
+            <label htmlFor="doctor" className="block text-gray-700 mb-2">Doctor:</label>
+            <select
+              id="doctor"
+              value={doctorFilter}
+              onChange={(e) => setDoctorFilter(e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-2"
+            >
+              <option value="">All Doctors</option>
+              {uniqueDoctors.map((doctor, index) => (
+                <option key={index} value={doctor}>{doctor}</option>
+              ))}
+            </select>
+          </div>
 
-          {/* Location Multi-Select */}
-          <MultiSelectInput
-            label="Location:"
-            options={locationOptions}
-            selectedValues={selectedLocations}
-            setSelectedValues={setSelectedLocations}
-            placeholder="Select Locations..."
-          />
+          {/* Location Filter */}
+          <div className="mb-4 md:mb-0">
+            <label htmlFor="location" className="block text-gray-700 mb-2">Location:</label>
+            <select
+              id="location"
+              value={locationFilter}
+              onChange={(e) => setLocationFilter(e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-2"
+            >
+              <option value="">All Locations</option>
+              {uniqueLocations.map((location, index) => (
+                <option key={index} value={location}>{location}</option>
+              ))}
+            </select>
+          </div>
 
           {/* Date Filter */}
           <div className="flex-1">
@@ -248,13 +277,17 @@ function AppointmentOverview() {
               <input
                 type="date"
                 value={dateFilter.start}
-                onChange={(e) => setDateFilter(prev => ({ ...prev, start: e.target.value }))}
+                onChange={(e) =>
+                  setDateFilter((prev) => ({ ...prev, start: e.target.value }))
+                }
                 className="w-1/2 border border-gray-300 rounded-md p-2"
               />
               <input
                 type="date"
                 value={dateFilter.end}
-                onChange={(e) => setDateFilter(prev => ({ ...prev, end: e.target.value }))}
+                onChange={(e) =>
+                  setDateFilter((prev) => ({ ...prev, end: e.target.value }))
+                }
                 className="w-1/2 border border-gray-300 rounded-md p-2"
               />
             </div>
@@ -277,8 +310,14 @@ function AppointmentOverview() {
       </div>
 
       {/* Render Categorized Appointments */}
-      {renderAppointmentList("Upcoming Appointments", filteredAppointments.upcoming)}
-      {renderAppointmentList("Requested Appointments", filteredAppointments.requested)}
+      {renderAppointmentList(
+        "Upcoming Appointments",
+        filteredAppointments.upcoming
+      )}
+      {renderAppointmentList(
+        "Requested Appointments",
+        filteredAppointments.requested
+      )}
       {renderAppointmentList("Past Appointments", filteredAppointments.past)}
       {renderAppointmentList("Other Appointments", filteredAppointments.other)}
 
@@ -295,7 +334,9 @@ function AppointmentOverview() {
             <h2 className="text-2xl font-bold mb-4">Appointment Details</h2>
             <p>
               <strong>Date & Time:</strong>{" "}
-              {new Date(selectedAppointment.appointmentDateTime).toLocaleString()}
+              {new Date(
+                selectedAppointment.appointmentDateTime
+              ).toLocaleString()}
             </p>
             <p>
               <strong>Doctor:</strong> Dr. {selectedAppointment.doctorFirstName} {selectedAppointment.doctorLastName}
@@ -307,20 +348,24 @@ function AppointmentOverview() {
               <strong>Reason:</strong> {selectedAppointment.reason || "N/A"}
             </p>
             <p>
-              <strong>Visit Type:</strong> {selectedAppointment.visitType || "N/A"}
+              <strong>Visit Type:</strong>{" "}
+              {selectedAppointment.visitType || "N/A"}
             </p>
             <p>
-              <strong>Status:</strong> {selectedAppointment.status}
+              <strong>Doctor:</strong> Dr. {selectedAppointment.doctorFirstName} {selectedAppointment.doctorLastName}
             </p>
             <p>
-              <strong>Location:</strong> {selectedAppointment.officeName}, {selectedAppointment.officeAddress}
-            </p>
-            <p>
-              <strong>Doctor's Email:</strong> {selectedAppointment.doctorEmail || "N/A"}
+              <strong>Doctor's Email:</strong>{" "}
+              {selectedAppointment.doctorEmail || "N/A"}
             </p>
             <p>
               <strong>Doctor's Phone:</strong>{" "}
-              {selectedAppointment.doctorPhone ? formatPhoneNumber(selectedAppointment.doctorPhone) : "N/A"}
+              {selectedAppointment.doctorPhone
+                ? formatPhoneNumber(selectedAppointment.doctorPhone)
+                : "N/A"}
+            </p>
+            <p>
+              <strong>Location:</strong> {selectedAppointment.officeName}, {selectedAppointment.officeAddress}
             </p>
             {/* Add more details as needed */}
             <div className="flex justify-end mt-6">

@@ -3,6 +3,8 @@ import axios from "axios";
 import EditInsuranceForm from "./EditInsuranceForm";
 import InsuranceForm from "./InsuranceForm";
 
+import envConfig from "../../../../../../envConfig";
+
 export default function InsurancePage() {
   const [insuranceInfo, setInsuranceInfo] = useState(null); // State to store the insurance data
   const [loading, setLoading] = useState(true); // State to manage loading state
@@ -19,7 +21,7 @@ export default function InsurancePage() {
 
         // Fetch insurance information from the server
         const response = await axios.get(
-          "http://localhost:3000/auth/patient/insurance-info",
+          `${envConfig.apiUrl}/auth/patient/insurance-info`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

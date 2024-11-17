@@ -6,6 +6,8 @@ import { dateFnsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+
+import envConfig from "../../../../../../envConfig";
 import MultiSelectInput from "./MultiSelectInput";
 
 // Localization setup
@@ -26,7 +28,7 @@ const DnDCalendar = withDragAndDrop(Calendar);
 
 // Utility function to format phone numbers
 const formatPhoneNumber = (phoneNumberString) => {
-  const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+  const cleaned = ("" + phoneNumberString).replace(/\D/g, "");
   const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
   if (match) {
     return `(${match[1]}) ${match[2]}-${match[3]}`;
@@ -52,26 +54,30 @@ function AppointmentCalendar() {
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAppointmentModal, setSelectedAppointmentModal] = useState(null);
+  const [selectedAppointmentModal, setSelectedAppointmentModal] =
+    useState(null);
 
   // Define the status-to-color mapping
   const statusColors = {
-    Scheduled: "#28a745",        // Green
-    Requested: "#ffc107",        // Yellow
-    Completed: "#17a2b8",        // Teal
-    Cancelled: "#dc3545",        // Red
-    Missed: "#fd7e14",            // Orange
+    Scheduled: "#28a745", // Green
+    Requested: "#ffc107", // Yellow
+    Completed: "#17a2b8", // Teal
+    Cancelled: "#dc3545", // Red
+    Missed: "#fd7e14", // Orange
     "Request Denied": "#6f42c1", // Dark Red
-    Other: "#6c757d",             // Gray
+    Other: "#6c757d", // Gray
   };
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/appointment/my-appointments", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          `${envConfig.apiUrl}/appointment/my-appointments`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         const { upcoming, requested, past, other } = response.data;
 
@@ -98,9 +104,13 @@ function AppointmentCalendar() {
 
         // Map combined appointments to calendar events
         const events = combinedAppointments.map((app) => ({
-          title: `Dr. ${app.doctorFirstName} ${app.doctorLastName} - ${app.reason || "No Reason"}`,
+          title: `Dr. ${app.doctorFirstName} ${app.doctorLastName} - ${
+            app.reason || "No Reason"
+          }`,
           start: new Date(app.appointmentDateTime),
-          end: new Date(new Date(app.appointmentDateTime).getTime() + 30 * 60000), // Assuming 30 mins duration
+          end: new Date(
+            new Date(app.appointmentDateTime).getTime() + 30 * 60000
+          ), // Assuming 30 mins duration
           allDay: false,
           resource: app, // Attach the entire appointment object
         }));
@@ -137,9 +147,8 @@ function AppointmentCalendar() {
     }
 
     // Location Filter
-    if (selectedLocations.length > 0) {
-      const locationNames = selectedLocations.map(location => location.value);
-      filtered = filtered.filter((app) => locationNames.includes(app.resource.officeName));
+    if (locationFilter) {
+      filtered = filtered.filter((app) => app.resource.officeName === locationFilter);
     }
 
     // Date Filter
@@ -180,7 +189,8 @@ function AppointmentCalendar() {
   // Custom styles for events based on status
   const eventStyleGetter = (event, start, end, isSelected) => {
     // Correctly access the status from event.resource
-    const backgroundColor = statusColors[event.resource.status] || statusColors.Other;
+    const backgroundColor =
+      statusColors[event.resource.status] || statusColors.Other;
 
     const style = {
       backgroundColor,
@@ -216,7 +226,9 @@ function AppointmentCalendar() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">Appointments Calendar</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Appointments Calendar
+      </h1>
 
       {/* Filters Section */}
       <div className="mb-6 bg-white shadow-md rounded-lg p-4">
@@ -247,13 +259,17 @@ function AppointmentCalendar() {
               <input
                 type="date"
                 value={dateFilter.start}
-                onChange={(e) => setDateFilter(prev => ({ ...prev, start: e.target.value }))}
+                onChange={(e) =>
+                  setDateFilter((prev) => ({ ...prev, start: e.target.value }))
+                }
                 className="w-1/2 border border-gray-300 rounded-md p-2"
               />
               <input
                 type="date"
                 value={dateFilter.end}
-                onChange={(e) => setDateFilter(prev => ({ ...prev, end: e.target.value }))}
+                onChange={(e) =>
+                  setDateFilter((prev) => ({ ...prev, end: e.target.value }))
+                }
                 className="w-1/2 border border-gray-300 rounded-md p-2"
               />
             </div>
@@ -302,32 +318,42 @@ function AppointmentCalendar() {
             <h2 className="text-2xl font-bold mb-4">Appointment Details</h2>
             <p>
               <strong>Date & Time:</strong>{" "}
-              {new Date(selectedAppointmentModal.appointmentDateTime).toLocaleString()}
-            </p>
-            <p>
-              <strong>Doctor:</strong> Dr. {selectedAppointmentModal.doctorFirstName} {selectedAppointmentModal.doctorLastName}
-            </p>
-            <p>
-              <strong>Service:</strong> {selectedAppointmentModal.service || "N/A"}
+              {new Date(
+                selectedAppointmentModal.appointmentDateTime
+              ).toLocaleString()}
             </p>
             <p>
               <strong>Reason:</strong> {selectedAppointmentModal.reason || "N/A"}
             </p>
             <p>
-              <strong>Visit Type:</strong> {selectedAppointmentModal.visitType || "N/A"}
-            </p>
-            <p>
               <strong>Status:</strong> {selectedAppointmentModal.status}
             </p>
             <p>
-              <strong>Location:</strong> {selectedAppointmentModal.officeName}, {selectedAppointmentModal.officeAddress}
+              <strong>Service:</strong>{" "}
+              {selectedAppointmentModal.service || "N/A"}
             </p>
             <p>
-              <strong>Doctor's Email:</strong> {selectedAppointmentModal.doctorEmail || "N/A"}
+              <strong>Reason:</strong> {selectedAppointmentModal.reason || "N/A"}
+            </p>
+            <p>
+              <strong>Visit Type:</strong>{" "}
+              {selectedAppointmentModal.visitType || "N/A"}
+            </p>
+            <p>
+              <strong>Doctor:</strong> Dr. {selectedAppointmentModal.doctorFirstName} {selectedAppointmentModal.doctorLastName}
+            </p>
+            <p>
+              <strong>Doctor's Email:</strong>{" "}
+              {selectedAppointmentModal.doctorEmail || "N/A"}
             </p>
             <p>
               <strong>Doctor's Phone:</strong>{" "}
-              {selectedAppointmentModal.doctorPhone ? formatPhoneNumber(selectedAppointmentModal.doctorPhone) : "N/A"}
+              {selectedAppointmentModal.doctorPhone
+                ? formatPhoneNumber(selectedAppointmentModal.doctorPhone)
+                : "N/A"}
+            </p>
+            <p>
+              <strong>Location:</strong> {selectedAppointmentModal.officeName}, {selectedAppointmentModal.officeAddress}
             </p>
             {/* Add more details as needed */}
             <div className="flex justify-end mt-6">
