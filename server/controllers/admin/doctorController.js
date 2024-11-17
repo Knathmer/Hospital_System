@@ -1,42 +1,29 @@
-// server/controllers/admin/doctorController.js
-
-import { query } from '../../database.js';
-
-// Fetch all doctors with optional search and filters
 export async function getAllDoctors(req, res) {
   try {
-    const searchQuery = req.query.search || '';
-    const specialtyFilter = req.query.specialty || '';
-    const inactiveFilter = req.query.inactive || '';
-
-    let sql = `
-      SELECT d.doctorID, d.firstName, d.lastName, d.workEmail, d.workPhoneNumber, d.Inactive,
-          sp.specialtyName, 
-          CONCAT(addr.addrStreet, ', ', addr.addrcity, ', ', addr.addrstate, ' ', addr.addrzip) AS officeAddress
+    const doctors = await query(`
+      SELECT 
+        d.doctorID,
+        d.firstName,
+        d.lastName,
+        d.gender,
+        d.dateOfBirth,
+        d.workPhoneNumber,
+        d.workEmail,
+        d.personalPhoneNumber,
+        d.personalEmail,
+        d.officeID,
+        d.addressID,
+        d.specialtyID,
+        s.specialtyName,
+        d.Inactive
       FROM doctor d
-      LEFT JOIN specialty sp ON d.specialtyID = sp.specialtyID
-      LEFT JOIN office o ON d.officeID = o.officeID
-      LEFT JOIN address addr ON o.addressID = addr.addressID
-      WHERE CONCAT(d.firstName, ' ', d.lastName) LIKE ?
-    `;
-    const params = [`%${searchQuery}%`];
-
-    if (specialtyFilter) {
-      sql += ' AND sp.specialtyName = ?';
-      params.push(specialtyFilter);
-    }
-
-    if (inactiveFilter) {
-      sql += ' AND d.Inactive = ?';
-      params.push(inactiveFilter);
-    }
-
-    const doctors = await query(sql, params);
+      LEFT JOIN specialty s ON d.specialtyID = s.specialtyID
+    `);
 
     res.status(200).json({ doctors });
   } catch (error) {
-    console.error('Error fetching doctors:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching doctors:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 }
 
@@ -56,50 +43,57 @@ export async function addDoctor(req, res) {
       officeID,
       addressID,
       specialtyID,
-      Inactive,
     } = req.body;
 
-    // Hash the password (implement hashing in your actual code)
-    const hashedPassword = password; // Replace with actual hashing
-
-    const sql = `
+    // Store the password directly (Note: In production, always hash passwords)
+    const result = await query(
+      `
       INSERT INTO doctor (
-        firstName, lastName, gender, dateOfBirth, workPhoneNumber, workEmail, password,
-        personalPhoneNumber, personalEmail, officeID, addressID, specialtyID, Inactive, createdBy, updatedBy
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        workPhoneNumber,
+        workEmail,
+        password,
+        personalPhoneNumber,
+        personalEmail,
+        officeID,
+        addressID,
+        specialtyID,
+        createdBy,
+        updatedBy
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+      [
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        workPhoneNumber,
+        workEmail,
+        password,
+        personalPhoneNumber,
+        personalEmail,
+        officeID || null,
+        addressID || null,
+        specialtyID || null,
+        req.user.email, // Assuming you have user info in req.user
+        req.user.email,
+      ]
+    );
 
-    const params = [
-      firstName,
-      lastName,
-      gender,
-      dateOfBirth,
-      workPhoneNumber,
-      workEmail,
-      hashedPassword,
-      personalPhoneNumber,
-      personalEmail,
-      officeID,
-      addressID,
-      specialtyID,
-      Inactive,
-      req.user.email || 'system', // Assuming you have user info
-      req.user.email || 'system',
-    ];
-
-    await query(sql, params);
-
-    res.status(201).json({ message: 'Doctor added successfully' });
+    res.status(201).json({ message: "Doctor added successfully", doctorID: result.insertId });
   } catch (error) {
-    console.error('Error adding doctor:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error adding doctor:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 }
 
 // Update an existing doctor
 export async function updateDoctor(req, res) {
   try {
-    const doctorID = req.params.doctorID;
+    const { doctorID } = req.params;
     const {
       firstName,
       lastName,
@@ -115,7 +109,8 @@ export async function updateDoctor(req, res) {
       Inactive,
     } = req.body;
 
-    const sql = `
+    await query(
+      `
       UPDATE doctor SET
         firstName = ?,
         lastName = ?,
@@ -131,47 +126,42 @@ export async function updateDoctor(req, res) {
         Inactive = ?,
         updatedBy = ?
       WHERE doctorID = ?
-    `;
+    `,
+      [
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        workPhoneNumber,
+        workEmail,
+        personalPhoneNumber,
+        personalEmail,
+        officeID || null,
+        addressID || null,
+        specialtyID || null,
+        Inactive ? 1 : 0,
+        req.user.email,
+        doctorID,
+      ]
+    );
 
-    const params = [
-      firstName,
-      lastName,
-      gender,
-      dateOfBirth,
-      workPhoneNumber,
-      workEmail,
-      personalPhoneNumber,
-      personalEmail,
-      officeID,
-      addressID,
-      specialtyID,
-      Inactive,
-      req.user.email || 'system',
-      doctorID,
-    ];
-
-    await query(sql, params);
-
-    res.status(200).json({ message: 'Doctor updated successfully' });
+    res.status(200).json({ message: "Doctor updated successfully" });
   } catch (error) {
-    console.error('Error updating doctor:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error updating doctor:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 }
 
 // Delete a doctor
 export async function deleteDoctor(req, res) {
   try {
-    const doctorID = req.params.doctorID;
+    const { doctorID } = req.params;
 
-    const sql = `DELETE FROM doctor WHERE doctorID = ?`;
-    const params = [doctorID];
+    await query(`DELETE FROM doctor WHERE doctorID = ?`, [doctorID]);
 
-    await query(sql, params);
-
-    res.status(200).json({ message: 'Doctor deleted successfully' });
+    res.status(200).json({ message: "Doctor deleted successfully" });
   } catch (error) {
-    console.error('Error deleting doctor:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error deleting doctor:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 }

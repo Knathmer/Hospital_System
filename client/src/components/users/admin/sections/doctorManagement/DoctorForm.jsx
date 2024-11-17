@@ -1,255 +1,242 @@
-import React, { useState, useEffect } from 'react';
+// client/src/components/users/admin/sections/DoctorForm.jsx
 
-const DoctorForm = ({ doctor, onSubmit, onClose }) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    gender: 'Male',
-    dateOfBirth: '',
-    workPhoneNumber: '',
-    workEmail: '',
-    password: '',
-    personalPhoneNumber: '',
-    personalEmail: '',
-    officeID: '',
-    addressID: '',
-    specialtyID: '',
-    Inactive: false,
-  });
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-  const [errors, setErrors] = useState({});
+const DoctorForm = ({ token, doctor, onClose, onSubmit }) => {
+  const isEditing = Boolean(doctor);
+
+  const [firstName, setFirstName] = useState(doctor?.firstName || "");
+  const [lastName, setLastName] = useState(doctor?.lastName || "");
+  const [gender, setGender] = useState(doctor?.gender || "");
+  const [dateOfBirth, setDateOfBirth] = useState(
+    doctor ? doctor.dateOfBirth.split("T")[0] : ""
+  );
+  const [workPhoneNumber, setWorkPhoneNumber] = useState(doctor?.workPhoneNumber || "");
+  const [workEmail, setWorkEmail] = useState(doctor?.workEmail || "");
+  const [password, setPassword] = useState("");
+  const [personalPhoneNumber, setPersonalPhoneNumber] = useState(
+    doctor?.personalPhoneNumber || ""
+  );
+  const [personalEmail, setPersonalEmail] = useState(doctor?.personalEmail || "");
+  const [specialtyID, setSpecialtyID] = useState(doctor?.specialtyID || "");
+  const [specialties, setSpecialties] = useState([]);
+  const [inactive, setInactive] = useState(doctor?.Inactive || false);
 
   useEffect(() => {
-    if (doctor) {
-      setFormData({
-        firstName: doctor.firstName || '',
-        lastName: doctor.lastName || '',
-        gender: doctor.gender || 'Male',
-        dateOfBirth: doctor.dateOfBirth ? doctor.dateOfBirth.split('T')[0] : '',
-        workPhoneNumber: doctor.workPhoneNumber || '',
-        workEmail: doctor.workEmail || '',
-        password: '', // For security, do not pre-fill password
-        personalPhoneNumber: doctor.personalPhoneNumber || '',
-        personalEmail: doctor.personalEmail || '',
-        officeID: doctor.officeID || '',
-        addressID: doctor.addressID || '',
-        specialtyID: doctor.specialtyID || '',
-        Inactive: doctor.Inactive || false,
+    fetchSpecialties();
+  }, []);
+
+  const fetchSpecialties = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/auth/admin/specialties", {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      setSpecialties(res.data.specialties);
+    } catch (error) {
+      console.error("Error fetching specialties:", error);
     }
-  }, [doctor]);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
   };
 
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required.';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required.';
-    if (!formData.workEmail.trim()) newErrors.workEmail = 'Work email is required.';
-    // Add more validations as needed
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
-    onSubmit(formData);
+
+    const doctorData = {
+      firstName,
+      lastName,
+      gender,
+      dateOfBirth,
+      workPhoneNumber,
+      workEmail,
+      personalPhoneNumber,
+      personalEmail,
+      specialtyID,
+      Inactive: inactive,
+    };
+
+    if (!isEditing) {
+      doctorData.password = password;
+    }
+
+    try {
+      if (isEditing) {
+        await axios.put(
+          `http://localhost:3000/auth/admin/doctors/${doctor.doctorID}`,
+          doctorData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } else {
+        await axios.post("http://localhost:3000/auth/admin/doctors", doctorData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+      onSubmit();
+      onClose();
+    } catch (error) {
+      console.error("Error submitting doctor data:", error);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2 className="text-2xl font-bold mb-4">{doctor ? 'Edit Doctor' : 'Add Doctor'}</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* First Name */}
-        <div>
-          <label className="block mb-1 font-semibold">First Name</label>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className={`border rounded p-2 w-full ${errors.firstName ? 'border-red-500' : ''}`}
-          />
-          {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
-        </div>
-
-        {/* Last Name */}
-        <div>
-          <label className="block mb-1 font-semibold">Last Name</label>
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className={`border rounded p-2 w-full ${errors.lastName ? 'border-red-500' : ''}`}
-          />
-          {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
-        </div>
-
-        {/* Gender */}
-        <div>
-          <label className="block mb-1 font-semibold">Gender</label>
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          >
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-            <option value="Prefer not to say">Prefer not to say</option>
-          </select>
-        </div>
-
-        {/* Date of Birth */}
-        <div>
-          <label className="block mb-1 font-semibold">Date of Birth</label>
-          <input
-            type="date"
-            name="dateOfBirth"
-            value={formData.dateOfBirth}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          />
-        </div>
-
-        {/* Work Phone Number */}
-        <div>
-          <label className="block mb-1 font-semibold">Work Phone Number</label>
-          <input
-            type="text"
-            name="workPhoneNumber"
-            value={formData.workPhoneNumber}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          />
-        </div>
-
-        {/* Work Email */}
-        <div>
-          <label className="block mb-1 font-semibold">Work Email</label>
-          <input
-            type="email"
-            name="workEmail"
-            value={formData.workEmail}
-            onChange={handleChange}
-            className={`border rounded p-2 w-full ${errors.workEmail ? 'border-red-500' : ''}`}
-          />
-          {errors.workEmail && <p className="text-red-500 text-sm">{errors.workEmail}</p>}
-        </div>
-
-        {/* Password */}
-        <div>
-          <label className="block mb-1 font-semibold">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className={`border rounded p-2 w-full ${!doctor && !formData.password ? 'border-red-500' : ''}`}
-            required={!doctor} // Required only for adding
-          />
-          {!doctor && !formData.password && <p className="text-red-500 text-sm">Password is required.</p>}
-        </div>
-
-        {/* Personal Phone Number */}
-        <div>
-          <label className="block mb-1 font-semibold">Personal Phone Number</label>
-          <input
-            type="text"
-            name="personalPhoneNumber"
-            value={formData.personalPhoneNumber}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          />
-        </div>
-
-        {/* Personal Email */}
-        <div>
-          <label className="block mb-1 font-semibold">Personal Email</label>
-          <input
-            type="email"
-            name="personalEmail"
-            value={formData.personalEmail}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          />
-        </div>
-
-        {/* Office ID */}
-        <div>
-          <label className="block mb-1 font-semibold">Office ID</label>
-          <input
-            type="number"
-            name="officeID"
-            value={formData.officeID}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          />
-        </div>
-
-        {/* Address ID */}
-        <div>
-          <label className="block mb-1 font-semibold">Address ID</label>
-          <input
-            type="number"
-            name="addressID"
-            value={formData.addressID}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          />
-        </div>
-
-        {/* Specialty ID */}
-        <div>
-          <label className="block mb-1 font-semibold">Specialty ID</label>
-          <input
-            type="number"
-            name="specialtyID"
-            value={formData.specialtyID}
-            onChange={handleChange}
-            className="border rounded p-2 w-full"
-          />
-        </div>
-
-        {/* Inactive */}
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            name="Inactive"
-            checked={formData.Inactive}
-            onChange={handleChange}
-            className="mr-2"
-          />
-          <label className="font-semibold">Inactive</label>
-        </div>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded shadow w-full max-w-lg">
+        <h2 className="text-xl font-bold mb-4">
+          {isEditing ? "Edit Doctor" : "Add Doctor"}
+        </h2>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* First Name */}
+            <div>
+              <label className="block mb-1">First Name</label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="border rounded w-full p-2"
+                required
+              />
+            </div>
+            {/* Last Name */}
+            <div>
+              <label className="block mb-1">Last Name</label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="border rounded w-full p-2"
+                required
+              />
+            </div>
+            {/* Gender */}
+            <div>
+              <label className="block mb-1">Gender</label>
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="border rounded w-full p-2"
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </div>
+            {/* Date of Birth */}
+            <div>
+              <label className="block mb-1">Date of Birth</label>
+              <input
+                type="date"
+                value={dateOfBirth}
+                onChange={(e) => setDateOfBirth(e.target.value)}
+                className="border rounded w-full p-2"
+                required
+              />
+            </div>
+            {/* Work Phone Number */}
+            <div>
+              <label className="block mb-1">Work Phone Number</label>
+              <input
+                type="text"
+                value={workPhoneNumber}
+                onChange={(e) => setWorkPhoneNumber(e.target.value)}
+                className="border rounded w-full p-2"
+                required
+              />
+            </div>
+            {/* Work Email */}
+            <div>
+              <label className="block mb-1">Work Email</label>
+              <input
+                type="email"
+                value={workEmail}
+                onChange={(e) => setWorkEmail(e.target.value)}
+                className="border rounded w-full p-2"
+                required
+              />
+            </div>
+            {/* Password (only for adding) */}
+            {!isEditing && (
+              <div>
+                <label className="block mb-1">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="border rounded w-full p-2"
+                  required
+                />
+              </div>
+            )}
+            {/* Personal Phone Number */}
+            <div>
+              <label className="block mb-1">Personal Phone Number</label>
+              <input
+                type="text"
+                value={personalPhoneNumber}
+                onChange={(e) => setPersonalPhoneNumber(e.target.value)}
+                className="border rounded w-full p-2"
+              />
+            </div>
+            {/* Personal Email */}
+            <div>
+              <label className="block mb-1">Personal Email</label>
+              <input
+                type="email"
+                value={personalEmail}
+                onChange={(e) => setPersonalEmail(e.target.value)}
+                className="border rounded w-full p-2"
+              />
+            </div>
+            {/* Specialty */}
+            <div>
+              <label className="block mb-1">Specialty</label>
+              <select
+                value={specialtyID}
+                onChange={(e) => setSpecialtyID(e.target.value)}
+                className="border rounded w-full p-2"
+              >
+                <option value="">Select Specialty</option>
+                {specialties.map((spec) => (
+                  <option key={spec.specialtyID} value={spec.specialtyID}>
+                    {spec.specialtyName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Inactive */}
+            {isEditing && (
+              <div className="flex items-center mt-4">
+                <input
+                  type="checkbox"
+                  checked={inactive}
+                  onChange={(e) => setInactive(e.target.checked)}
+                  className="mr-2"
+                />
+                <label>Inactive</label>
+              </div>
+            )}
+          </div>
+          {/* Buttons */}
+          <div className="mt-6 flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              {isEditing ? "Update" : "Add"}
+            </button>
+          </div>
+        </form>
       </div>
-
-      <div className="mt-6 flex justify-end">
-        <button
-          type="button"
-          onClick={onClose}
-          className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-600"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          {doctor ? 'Update' : 'Add'}
-        </button>
-      </div>
-    </form>
+    </div>
   );
 };
 

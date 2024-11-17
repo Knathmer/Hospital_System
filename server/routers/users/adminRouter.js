@@ -14,11 +14,11 @@ import {
   getServices,
 } from "../../controllers/admin/appointmentAnalytics.js";
 import {
-    getAllDoctors,
-    addDoctor,
-    updateDoctor,
-    deleteDoctor,
-  } from '../../controllers/admin/doctorController.js';
+  getAllDoctors,
+  addDoctor,
+  updateDoctor,
+  deleteDoctor,
+} from "../../controllers/admin/doctorController.js";
 
 const router = express.Router();
 
