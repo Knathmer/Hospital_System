@@ -74,6 +74,8 @@ export default function AppointmentPage() {
   //State for the base price, which is based off the service that the appointment is on.
   const [baseServicePrice, setBaseServicePrice] = useState(0);
 
+  const [chargesSaved, setChargesSaved] = useState(false);
+
   const fetchPatientInformation = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -477,6 +479,30 @@ export default function AppointmentPage() {
 
   const handleSaveCharges = async () => {
     try {
+      if (chargesSaved) {
+        const confirmOverwrite = window.confirm(
+          "Charges have already been saved. Do you want to overwrite the existing charges?"
+        );
+        if (!confirmOverwrite) {
+          return;
+        }
+      }
+      const invalidCustomCharges = customCharges.some((charge) => {
+        return (
+          !charge.description ||
+          !charge.description.trim() ||
+          !charge.amount ||
+          isNaN(charge.amount) ||
+          parseFloat(charge.amount) <= 0
+        );
+      });
+
+      if (invalidCustomCharges) {
+        alert(
+          "Please ensure all custom charges have a description and a valid amount greater than zero."
+        );
+        return;
+      }
       const token = localStorage.getItem("token");
 
       // Validate and sanitize data
@@ -524,10 +550,26 @@ export default function AppointmentPage() {
       );
 
       alert("Charges saved successfully!");
+      setChargesSaved(true);
     } catch (error) {
       console.error("Error saving charges:", error);
       alert("An error occurred while saving charges. Please try again.");
     }
+  };
+
+  const hasCharges = () => {
+    const basePrice = parseFloat(baseServicePrice) || 0;
+
+    const hasAdditionalCharges =
+      Object.values(selectedCharges).filter(Boolean).length > 0;
+
+    const hasCustomCharges =
+      customCharges.length > 0 &&
+      customCharges.some(
+        (charge) => charge.description && parseFloat(charge.amount) > 0
+      );
+
+    return basePrice > 0 || hasAdditionalCharges || hasCustomCharges;
   };
 
   useEffect(() => {
@@ -1427,6 +1469,7 @@ export default function AppointmentPage() {
                         });
                       }}
                       placeholder="Enter description"
+                      required
                     />
                   </div>
                   <div className="w-1/3">
@@ -1446,8 +1489,9 @@ export default function AppointmentPage() {
                         });
                       }}
                       placeholder="0.00"
-                      min="0"
+                      min="0.01"
                       step="0.01"
+                      required
                     />
                   </div>
                   <Button
@@ -1511,6 +1555,7 @@ export default function AppointmentPage() {
             <Button
               onClick={handleSaveCharges}
               className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+              disabled={!hasCharges()}
             >
               Save Charges
             </Button>
