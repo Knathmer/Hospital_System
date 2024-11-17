@@ -1,3 +1,5 @@
+// client/src/components/users/patient/sidebar/pages/AppointmentInfo/AppointmentCalendar.jsx
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Calendar, Views } from "react-big-calendar";
@@ -8,7 +10,7 @@ import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 
 import envConfig from "../../../../../../envConfig";
-import MultiSelectInput from "./MultiSelectInput";
+import MultiSelectInput from "./MultiSelectInput"; // Adjust the path as necessary
 
 // Localization setup
 const locales = {
@@ -139,7 +141,7 @@ function AppointmentCalendar() {
 
     // Doctor Filter
     if (selectedDoctors.length > 0) {
-      const doctorNames = selectedDoctors.map(doctor => doctor.value);
+      const doctorNames = selectedDoctors.map((doctor) => doctor.value);
       filtered = filtered.filter((app) => {
         const appDoctorName = `Dr. ${app.resource.doctorFirstName} ${app.resource.doctorLastName}`;
         return doctorNames.includes(appDoctorName);
@@ -147,8 +149,11 @@ function AppointmentCalendar() {
     }
 
     // Location Filter
-    if (locationFilter) {
-      filtered = filtered.filter((app) => app.resource.officeName === locationFilter);
+    if (selectedLocations.length > 0) {
+      const locationNames = selectedLocations.map((location) => location.value);
+      filtered = filtered.filter((app) =>
+        locationNames.includes(app.resource.officeName)
+      );
     }
 
     // Date Filter
@@ -331,9 +336,6 @@ function AppointmentCalendar() {
             <p>
               <strong>Service:</strong>{" "}
               {selectedAppointmentModal.service || "N/A"}
-            </p>
-            <p>
-              <strong>Reason:</strong> {selectedAppointmentModal.reason || "N/A"}
             </p>
             <p>
               <strong>Visit Type:</strong>{" "}

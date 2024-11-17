@@ -1,10 +1,8 @@
-// client/src/components/users/patient/AppointmentOverview.jsx
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import envConfig from "../../../../../../envConfig";
-import MultiSelectInput from './MultiSelectInput'; // Adjust the path as necessary
+import MultiSelectInput from './MultiSelectInput'; // Ensure the path is correct
 
 // Utility function to format phone numbers
 const formatPhoneNumber = (phoneNumberString) => {
@@ -18,7 +16,7 @@ const formatPhoneNumber = (phoneNumberString) => {
 
 // Utility function to sort appointments in descending order
 const sortAppointmentsDescending = (appointmentsList) => {
-  return [...appointmentsList].sort((a, b) => new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime));
+  return [...appointmentsList].sort((a, b) => new Date(b.appointmentDateTime) - new Date(a.appointmentDateTime));
 };
 
 function AppointmentOverview() {
@@ -199,12 +197,12 @@ function AppointmentOverview() {
                       ).toLocaleString()}
                     </p>
                     <p className="text-gray-600">
-                    <p className="text-gray-600">
                       Status: {appointment.status}
                     </p>
                     <p>
                       Visit Type: {appointment.visitType || "N/A"}
                     </p>
+                    <p className="text-gray-600">
                       Doctor: Dr. {appointment.doctorFirstName} {appointment.doctorLastName}
                     </p>
                     <p className="text-gray-600">
@@ -238,37 +236,23 @@ function AppointmentOverview() {
       <div className="mb-8 bg-white shadow-md rounded-lg p-4">
         <h2 className="text-2xl font-semibold mb-4">Filter Appointments</h2>
         <div className="flex flex-col md:flex-row md:space-x-4">
-          {/* Doctor Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="doctor" className="block text-gray-700 mb-2">Doctor:</label>
-            <select
-              id="doctor"
-              value={doctorFilter}
-              onChange={(e) => setDoctorFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Doctors</option>
-              {uniqueDoctors.map((doctor, index) => (
-                <option key={index} value={doctor}>{doctor}</option>
-              ))}
-            </select>
-          </div>
+          {/* Doctor Multi-Select */}
+          <MultiSelectInput
+            label="Doctor:"
+            options={doctorOptions}
+            selectedValues={selectedDoctors}
+            setSelectedValues={setSelectedDoctors}
+            placeholder="Select Doctors..."
+          />
 
-          {/* Location Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="location" className="block text-gray-700 mb-2">Location:</label>
-            <select
-              id="location"
-              value={locationFilter}
-              onChange={(e) => setLocationFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Locations</option>
-              {uniqueLocations.map((location, index) => (
-                <option key={index} value={location}>{location}</option>
-              ))}
-            </select>
-          </div>
+          {/* Location Multi-Select */}
+          <MultiSelectInput
+            label="Location:"
+            options={locationOptions}
+            selectedValues={selectedLocations}
+            setSelectedValues={setSelectedLocations}
+            placeholder="Select Locations..."
+          />
 
           {/* Date Filter */}
           <div className="flex-1">
@@ -350,9 +334,6 @@ function AppointmentOverview() {
             <p>
               <strong>Visit Type:</strong>{" "}
               {selectedAppointment.visitType || "N/A"}
-            </p>
-            <p>
-              <strong>Doctor:</strong> Dr. {selectedAppointment.doctorFirstName} {selectedAppointment.doctorLastName}
             </p>
             <p>
               <strong>Doctor's Email:</strong>{" "}
