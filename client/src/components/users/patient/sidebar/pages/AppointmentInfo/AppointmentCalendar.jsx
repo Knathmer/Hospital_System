@@ -6,6 +6,7 @@ import { dateFnsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import MultiSelectInput from "./MultiSelectInput";
 
 // Localization setup
 const locales = {
@@ -41,8 +42,8 @@ function AppointmentCalendar() {
   const [selectedEvent, setSelectedEvent] = useState(null); // For modal
 
   // Filter States
-  const [doctorFilter, setDoctorFilter] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
+  const [selectedDoctors, setSelectedDoctors] = useState([]); // Array of { value, label }
+  const [selectedLocations, setSelectedLocations] = useState([]); // Array of { value, label }
   const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
 
   // Unique Doctors and Locations for Filters
@@ -121,22 +122,24 @@ function AppointmentCalendar() {
     // Apply Filters whenever filter states change
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doctorFilter, locationFilter, dateFilter, appointments]);
+  }, [selectedDoctors, selectedLocations, dateFilter, appointments]);
 
   const applyFilters = () => {
     let filtered = appointments;
 
     // Doctor Filter
-    if (doctorFilter) {
+    if (selectedDoctors.length > 0) {
+      const doctorNames = selectedDoctors.map(doctor => doctor.value);
       filtered = filtered.filter((app) => {
-        const doctorName = `Dr. ${app.resource.doctorFirstName} ${app.resource.doctorLastName}`;
-        return doctorName === doctorFilter;
+        const appDoctorName = `Dr. ${app.resource.doctorFirstName} ${app.resource.doctorLastName}`;
+        return doctorNames.includes(appDoctorName);
       });
     }
 
     // Location Filter
-    if (locationFilter) {
-      filtered = filtered.filter((app) => app.resource.officeName === locationFilter);
+    if (selectedLocations.length > 0) {
+      const locationNames = selectedLocations.map(location => location.value);
+      filtered = filtered.filter((app) => locationNames.includes(app.resource.officeName));
     }
 
     // Date Filter
@@ -200,6 +203,17 @@ function AppointmentCalendar() {
     return <p className="text-center text-red-500">{error}</p>;
   }
 
+  // Transform uniqueDoctors and uniqueLocations for react-select
+  const doctorOptions = uniqueDoctors.map((doctor) => ({
+    value: doctor,
+    label: doctor,
+  }));
+
+  const locationOptions = uniqueLocations.map((location) => ({
+    value: location,
+    label: location,
+  }));
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Appointments Calendar</h1>
@@ -208,45 +222,23 @@ function AppointmentCalendar() {
       <div className="mb-6 bg-white shadow-md rounded-lg p-4">
         <h2 className="text-2xl font-semibold mb-4">Filter Appointments</h2>
         <div className="flex flex-col md:flex-row md:space-x-4">
-          {/* Doctor Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="doctor" className="block text-gray-700 mb-2">
-              Doctor:
-            </label>
-            <select
-              id="doctor"
-              value={doctorFilter}
-              onChange={(e) => setDoctorFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Doctors</option>
-              {uniqueDoctors.map((doctor, index) => (
-                <option key={index} value={doctor}>
-                  {doctor}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Doctor Multi-Select */}
+          <MultiSelectInput
+            label="Doctor:"
+            options={doctorOptions}
+            selectedValues={selectedDoctors}
+            setSelectedValues={setSelectedDoctors}
+            placeholder="Select Doctors..."
+          />
 
-          {/* Location Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="location" className="block text-gray-700 mb-2">
-              Location:
-            </label>
-            <select
-              id="location"
-              value={locationFilter}
-              onChange={(e) => setLocationFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Locations</option>
-              {uniqueLocations.map((location, index) => (
-                <option key={index} value={location}>
-                  {location}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Location Multi-Select */}
+          <MultiSelectInput
+            label="Location:"
+            options={locationOptions}
+            selectedValues={selectedLocations}
+            setSelectedValues={setSelectedLocations}
+            placeholder="Select Locations..."
+          />
 
           {/* Date Filter */}
           <div className="flex-1">
@@ -272,8 +264,8 @@ function AppointmentCalendar() {
         <div className="mt-4">
           <button
             onClick={() => {
-              setDoctorFilter("");
-              setLocationFilter("");
+              setSelectedDoctors([]);
+              setSelectedLocations([]);
               setDateFilter({ start: "", end: "" });
             }}
             className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none"
@@ -313,19 +305,22 @@ function AppointmentCalendar() {
               {new Date(selectedAppointmentModal.appointmentDateTime).toLocaleString()}
             </p>
             <p>
-              <strong>Reason:</strong> {selectedAppointmentModal.reason || "N/A"}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedAppointmentModal.status}
+              <strong>Doctor:</strong> Dr. {selectedAppointmentModal.doctorFirstName} {selectedAppointmentModal.doctorLastName}
             </p>
             <p>
               <strong>Service:</strong> {selectedAppointmentModal.service || "N/A"}
             </p>
             <p>
+              <strong>Reason:</strong> {selectedAppointmentModal.reason || "N/A"}
+            </p>
+            <p>
               <strong>Visit Type:</strong> {selectedAppointmentModal.visitType || "N/A"}
             </p>
             <p>
-              <strong>Doctor:</strong> Dr. {selectedAppointmentModal.doctorFirstName} {selectedAppointmentModal.doctorLastName}
+              <strong>Status:</strong> {selectedAppointmentModal.status}
+            </p>
+            <p>
+              <strong>Location:</strong> {selectedAppointmentModal.officeName}, {selectedAppointmentModal.officeAddress}
             </p>
             <p>
               <strong>Doctor's Email:</strong> {selectedAppointmentModal.doctorEmail || "N/A"}
@@ -333,9 +328,6 @@ function AppointmentCalendar() {
             <p>
               <strong>Doctor's Phone:</strong>{" "}
               {selectedAppointmentModal.doctorPhone ? formatPhoneNumber(selectedAppointmentModal.doctorPhone) : "N/A"}
-            </p>
-            <p>
-              <strong>Location:</strong> {selectedAppointmentModal.officeName}, {selectedAppointmentModal.officeAddress}
             </p>
             {/* Add more details as needed */}
             <div className="flex justify-end mt-6">
