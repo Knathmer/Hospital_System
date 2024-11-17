@@ -46,7 +46,11 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError("Invalid email or password");
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred during login. Please try again.");
+      }
     }
   };
 

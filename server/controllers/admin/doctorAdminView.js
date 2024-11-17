@@ -31,8 +31,14 @@ export async function getAllDoctors(req, res) {
     const params = [];
 
     if (searchTerm) {
-      sql += ` AND (d.firstName LIKE ? OR d.lastName LIKE ?)`;
-      params.push(`%${searchTerm}%`, `%${searchTerm}%`);
+      sql += ` AND (
+        d.firstName LIKE ? OR
+        d.lastName LIKE ? OR
+        d.workEmail LIKE ? OR
+        d.workPhoneNumber LIKE ?
+      )`;
+      const likeTerm = `%${searchTerm}%`;
+      params.push(likeTerm, likeTerm, likeTerm, likeTerm);
     }
 
     if (!includeInactive || includeInactive === 'false') {
@@ -46,6 +52,7 @@ export async function getAllDoctors(req, res) {
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
 
 export async function inactivateDoctor(req, res) {
   try {

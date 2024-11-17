@@ -1,5 +1,3 @@
-// server/controllers/admin/patientAdminView.js
-
 import { query } from "../../database.js";
 
 export async function getAllPatients(req, res) {

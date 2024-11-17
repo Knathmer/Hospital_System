@@ -41,7 +41,7 @@ const DoctorManagement = () => {
       <div className="mb-4 flex items-center">
         <input
           type="text"
-          placeholder="Search doctors by name"
+          placeholder="Search doctors by name, email, or phone"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border p-2 rounded w-64 mr-4"

@@ -64,6 +64,12 @@ export async function login(req, res) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    if (user.Inactive === 1) {
+      return res.status(403).json({
+        message: "Your account is inactive. Please contact the administrator.",
+      });
+    }
+
     const userID = user[userIDField];
     let tokenPayload;
 
