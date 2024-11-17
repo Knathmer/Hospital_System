@@ -24,6 +24,8 @@ import DefaultButton from "../../../../../ui/buttons/DefaultButton";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
 
 import axios from "axios";
+
+import envConfig from "../../../../../../envConfig";
 // import Link from "next/link"
 
 const fetchPersonalInfoData = async () => {
@@ -35,7 +37,7 @@ const fetchPersonalInfoData = async () => {
     }
     // Fetch insurance information
     const response = await axios.get(
-      "http://localhost:3000/auth/patient/personal-info",
+      `${envConfig.apiUrl}/auth/patient/personal-info`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,7 +149,7 @@ export default function PersonalInfoForm() {
       }
 
       const response = await axios.put(
-        "http://localhost:3000/auth/patient/update-personal-info",
+        `${envConfig.apiUrl}/auth/patient/update-personal-info`,
         formData,
         {
           headers: {

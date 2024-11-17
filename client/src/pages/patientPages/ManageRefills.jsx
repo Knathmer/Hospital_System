@@ -9,6 +9,8 @@ import axios from "axios";
 import RequestRefills from "../../components/patientComponents/RequestRefills";
 import RefillHistory from "../../components/patientComponents/RefillHistory";
 
+import envConfig from "../../envConfig";
+
 export default function ManageRefillsPage() {
   // State Management
   const [patientsCurrentPrescriptions, setPatientsCurrentPrescriptions] =
@@ -44,7 +46,7 @@ export default function ManageRefillsPage() {
       }
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/medications",
+        `${envConfig.apiUrl}/auth/patient/medications`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -73,7 +75,7 @@ export default function ManageRefillsPage() {
       }
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/medications/refill-history",
+        `${envConfig.apiUrl}/auth/patient/medications/refill-history`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -117,7 +119,7 @@ export default function ManageRefillsPage() {
       }
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/medications/pending-requests",
+        `${envConfig.apiUrl}/auth/patient/medications/pending-requests`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -160,7 +162,7 @@ export default function ManageRefillsPage() {
       );
 
       const response = await axios.post(
-        "http://localhost:3000/auth/patient/medications/refill",
+        `${envConfig.apiUrl}/auth/patient/medications/refill`,
         { prescriptionIDs },
         { headers: { Authorization: `Bearer ${token}` } }
       );

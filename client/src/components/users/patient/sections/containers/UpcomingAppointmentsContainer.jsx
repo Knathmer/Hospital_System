@@ -6,23 +6,23 @@
 // import NavButton from "../../../../ui/buttons/NavButton.jsx";
 
 // const UpcomingAppointmentsDashboard = () => {
-//   const [appointments, setAppointments] = useState([]); 
-//   const [loading, setLoading] = useState(true); 
-//   const [error, setError] = useState(null); 
+//   const [appointments, setAppointments] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
 
 //   useEffect(() => {
 //     const fetchAppointments = async () => {
 //       try {
-//         const token = localStorage.getItem("token"); 
-//         const response = await axios.get("http://localhost:3000/dataFetch/get-appointment-dashboard", {
+//         const token = localStorage.getItem("token");
+//         const response = await axios.get("http://dataFetch/get-appointment-dashboard", {
 //           headers: {
-//             Authorization: `Bearer ${token}`, 
+//             Authorization: `Bearer ${token}`,
 //           },
 //         });
-//         setAppointments(response.data); 
+//         setAppointments(response.data);
 //       } catch (error) {
 //         console.error("Error fetching appointments:", error);
-//         setError("Failed to fetch appointments"); 
+//         setError("Failed to fetch appointments");
 //       } finally {
 //         setLoading(false);
 //       }
@@ -93,24 +93,29 @@ import axios from "axios";
 import GenericContainer from "./GenericContainer.jsx";
 import NavButton from "../../../../ui/buttons/NavButton.jsx";
 
+import envConfig from "../../../../../envConfig.js";
+
 const UpcomingAppointmentsDashboard = () => {
-  const [appointments, setAppointments] = useState([]); 
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(null); 
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const token = localStorage.getItem("token"); 
-        const response = await axios.get("http://localhost:3000/dataFetch/get-appointment-dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`, 
-          },
-        });
-        setAppointments(response.data); 
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `${envConfig.apiUrl}/dataFetch/get-appointment-dashboard`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setAppointments(response.data);
       } catch (error) {
         console.error("Error fetching appointments:", error);
-        setError("Failed to fetch appointments"); 
+        setError("Failed to fetch appointments");
       } finally {
         setLoading(false);
       }
@@ -128,7 +133,9 @@ const UpcomingAppointmentsDashboard = () => {
       </h2>
 
       {/* Appointment Queries, scroll feature*/}
-      <div className="overflow-y-auto" style={{ maxHeight: "150px" }}> {/* Adjust maxHeight as needed */}
+      <div className="overflow-y-auto" style={{ maxHeight: "150px" }}>
+        {" "}
+        {/* Adjust maxHeight as needed */}
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
@@ -140,7 +147,9 @@ const UpcomingAppointmentsDashboard = () => {
                 <span className="font-medium">{appointment.status}</span>
                 <br />
                 <span className="text-sm text-gray-500">
-                  {new Date(appointment.appointmentDateTime).toLocaleString()} with Dr. {appointment.doctorFirstName} {appointment.doctorLastName}
+                  {new Date(appointment.appointmentDateTime).toLocaleString()}{" "}
+                  with Dr. {appointment.doctorFirstName}{" "}
+                  {appointment.doctorLastName}
                 </span>
               </li>
             ))}
@@ -151,7 +160,10 @@ const UpcomingAppointmentsDashboard = () => {
       </div>
 
       {/* Fixed button */}
-      <NavButton to="/book" className="mt-4 bg-pink-500 text-white hover:bg-pink-600">
+      <NavButton
+        to="/book"
+        className="mt-4 bg-pink-500 text-white hover:bg-pink-600"
+      >
         Schedule Appointment
       </NavButton>
     </GenericContainer>

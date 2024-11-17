@@ -40,12 +40,13 @@
 
 // export default UpcomingAppointments;
 
-import React, { useEffect, useState } from 'react';
-import { Card } from '../../../../patientComponents/BillingCards/Card';
-import { CardHeader } from '../../../../patientComponents/BillingCards/CardHeader';
-import { CardTitle } from '../../../../patientComponents/BillingCards/CardTitle';
-import { CardContent } from '../../../../patientComponents/BillingCards/CardContent';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Card } from "../../../../patientComponents/BillingCards/Card";
+import { CardHeader } from "../../../../patientComponents/BillingCards/CardHeader";
+import { CardTitle } from "../../../../patientComponents/BillingCards/CardTitle";
+import { CardContent } from "../../../../patientComponents/BillingCards/CardContent";
+import axios from "axios";
+import envConfig from "../../../../../envConfig";
 
 const UpcomingAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -53,13 +54,16 @@ const UpcomingAppointments = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const token = localStorage.getItem('token'); // Retrieve token from localStorage
-        const response = await axios.get('http://localhost:3000/dataFetch/get-upcoming-appointments', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const token = localStorage.getItem("token"); // Retrieve token from localStorage
+        const response = await axios.get(
+          `${envConfig.apiUrl}/dataFetch/get-upcoming-appointments`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setAppointments(response.data);
       } catch (error) {
-        console.error('Error fetching appointments:', error);
+        console.error("Error fetching appointments:", error);
       }
     };
 
@@ -74,10 +78,17 @@ const UpcomingAppointments = () => {
       <CardContent className="p-4 max-h-[300px] overflow-y-auto">
         <div className="space-y-4">
           {appointments.map((appointment, index) => (
-            <div key={index} className="flex items-center justify-between border-b pb-4">
+            <div
+              key={index}
+              className="flex items-center justify-between border-b pb-4"
+            >
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">{appointment.patient}</p>
-                <p className="text-sm text-gray-500">Dr. {appointment.doctor}</p>
+                <p className="text-sm font-medium leading-none">
+                  {appointment.patient}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Dr. {appointment.doctor}
+                </p>
               </div>
               <div>
                 <p className="text-sm font-medium">{appointment.date}</p>
