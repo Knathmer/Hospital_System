@@ -20,7 +20,7 @@ import AdminNameDisplay from "./sidebarItems/WelcomeAdminName";
 import AdminDashboard from "../users/admin/adminDashboard/AdminDashboard";
 import PrescriptionSummaryReport from "../users/admin/reports/PrescriptionSummaryReport";
 import AppointmentAnalytics from "../users/admin/sections/appointmentReport/appointmentAnalytics";
-import ManageDoctors from "../users/admin/sections/doctorManagement/manageDoctors";
+import DoctorManagement from "../users/admin/sections/doctorManagement/doctorManagement";
 
 export default function AdminSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -120,7 +120,7 @@ export default function AdminSidebar() {
       >
         {activeTab === "dashboard" && <AdminDashboard />}
         {activeTab === "manage-patients" && <div>Manage Patients Page</div>}
-        {activeTab === "manage-doctors" && <ManageDoctors />}
+        {activeTab === "manage-doctors" && <DoctorManagement />}
         {activeTab === "billing-data" && <div>bill stuff</div>}
         {activeTab === "prescription-analysis" && (
           <div>
