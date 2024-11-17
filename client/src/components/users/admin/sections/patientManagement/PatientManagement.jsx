@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import DoctorsTable from './DoctorsTable.jsx';
+import PatientsTable from './PatientsTable.jsx';
 
-const DoctorManagement = () => {
-  const [doctors, setDoctors] = useState([]);
+const PatientManagement = () => {
+  const [patients, setPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [includeInactive, setIncludeInactive] = useState(false);
 
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    fetchDoctors();
+    fetchPatients();
   }, [searchTerm, includeInactive]);
 
-  const fetchDoctors = async () => {
+  const fetchPatients = async () => {
     try {
       const params = {};
       if (searchTerm) {
@@ -21,27 +21,26 @@ const DoctorManagement = () => {
       }
       params.includeInactive = includeInactive;
 
-      const response = await axios.get('http://localhost:3000/auth/admin/doctorManagement', {
+      const response = await axios.get('http://localhost:3000/auth/admin/patientManagement', {
         headers: { Authorization: `Bearer ${token}` },
         params,
       });
-      console.log('Doctors data:', response.data.doctors);
-      setDoctors(response.data.doctors);
+      console.log('Patients data:', response.data.patients);
+      setPatients(response.data.patients);
     } catch (error) {
-      console.error('Error fetching doctors:', error);
+      console.error('Error fetching patients:', error);
     }
   };
 
-
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Doctor Management</h1>
+      <h1 className="text-2xl font-bold mb-4">Patient Management</h1>
 
       {/* Search and Filter */}
       <div className="mb-4 flex items-center">
         <input
           type="text"
-          placeholder="Search doctors by name"
+          placeholder="Search patients by name, email, or phone"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border p-2 rounded w-64 mr-4"
@@ -53,14 +52,14 @@ const DoctorManagement = () => {
             onChange={(e) => setIncludeInactive(e.target.checked)}
             className="mr-2"
           />
-          Include Inactive Doctors
+          Include Inactive Patients
         </label>
       </div>
 
-      {/* Doctors Table */}
-      <DoctorsTable doctors={doctors} fetchDoctors={fetchDoctors} token={token} />
+      {/* Patients Table */}
+      <PatientsTable patients={patients} fetchPatients={fetchPatients} token={token} />
     </div>
   );
 };
 
-export default DoctorManagement;
+export default PatientManagement;
