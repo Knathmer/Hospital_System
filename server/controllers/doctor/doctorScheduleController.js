@@ -1,4 +1,5 @@
 import { query } from "../../database.js";
+import pool from "../../database.js";
 import {
   GET_DOCTOR_SCHEDULE,
   GET_PATIENT_INFO_DOC_APPT,
@@ -456,5 +457,69 @@ export const refillMedication = async (req, res) => {
     res
       .status(500)
       .json({ error: "An error occured while updating the medicaiton" });
+  }
+};
+
+export const completeAppointment = async (req, res) => {
+  let connection;
+  try {
+    //Get information passed from the front end
+    const doctorID = req.user.doctorID;
+    const { appointmentID, patientID, notes } = req.body;
+
+    //Validate that you have the necessary information. You need all of these pieces of passed infomration
+    if (!appointmentID || !doctorID || !patientID || notes) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    //Get a connection from the pool
+    connection = await pool.getConnection();
+
+    //Start a transaction, these are use to update multiple tables at once
+    //If one fails, all of them fail. This is used to get consistent data and no mismatch
+    await connection.beginTransaction();
+
+    const insertVisitNotesQuery = `INSERT INTO visit_notes (appointmentID, patientID, doctorID, notes)
+      VALUES (?, ?, ?, ?)`;
+
+    const [visitNotesResult] = await connection.execute(insertVisitNotesQuery, [
+      appointmentID,
+      patientID,
+      doctorID,
+      notes,
+    ]);
+    const visitNotesID = visitNotesResult.insertId;
+
+    // Update appointment to reference visit_notes and set status to 'Completed'
+    //COME BACK TO THIS FIX THIS
+    //   const updateAppointmentQuery = `
+    //   UPDATE appointment
+    //   SET status = 'Completed', afterAppointmentNotes = ?, visitNotesID = ?
+    //   WHERE appointmentID = ?
+    // `;
+    //   await connection.execute(updateAppointmentQuery, [
+    //     notes,
+    //     visitNotesID,
+    //     appointmentID,
+    //   ]);
+
+    // Commit the transaction
+    await connection.commit();
+
+    res.status(200).json({ message: "Appointment completed successfully." });
+  } catch (error) {
+    if (connection) {
+      // Rollback the transaction in case of error
+      await connection.rollback();
+    }
+    console.error("Error completing appointment:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while completing the appointment." });
+  } finally {
+    if (connection) {
+      // Release the connection back to the pool
+      connection.release();
+    }
   }
 };

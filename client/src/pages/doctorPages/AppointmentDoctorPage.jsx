@@ -371,6 +371,50 @@ export default function AppointmentPage() {
     setUnsavedChanges(false);
   };
 
+  // /pp Notes Functions
+  const handleSaveNotes = () => {
+    if (!notes.trim()) {
+      alert("Please enter some notes before saving");
+      return;
+    }
+
+    setIsEditingNotes(false);
+  };
+
+  // /cdb Handle complete function
+  const handleCompleteAppointment = async () => {
+    try {
+      //Token is the doctor's payload
+      const token = localStorage.getItem("token");
+      const patientID = patientInformation.patientID; //Get patientID from the information we pulled originally.
+
+      //appointmentID is a param, we already have that. That will be the
+      //overall appointmentID for the entire appointment.
+
+      const payload = {
+        appointmentID,
+        patientID,
+        notes, // We will pass the notes the doctor puts, in here should be the information stored from the appointment notes part of the form.
+      };
+
+      //Passing an object : use req.body for it.
+      //Passing auth : thats the doctor's payload req.user.doctorID has the DID, can be used for queries.
+      await axios.post(
+        "http://localhost:3000/auth/doctor/schedule/complete-appointment",
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Appointment marked as complete.");
+      navigate("/doctor/schedule");
+    } catch (error) {
+      console.error("Error completing appointment:", error);
+      alert(
+        "An error occurred while completing the appointment. Please try again."
+      );
+    }
+  };
+
   useEffect(() => {
     if (isPrescribeModalOpen) {
       fetchAllPharmacies();
