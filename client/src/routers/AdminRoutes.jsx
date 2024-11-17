@@ -7,8 +7,6 @@ import ManagePatients from "../components/users/admin/sections/managePatients";
 import Settings from "../components/users/admin/sections/settings";
 import AppointmentAnalytics from "../components/users/admin/sections/appointmentReport/appointmentAnalytics";
 import AdminSidebar from "../components/userLoginRoot/AdminSidebar";
-import ManagePatients from "../components/users/admin/sections/ManagePatients";
-import ManageDoctors from "../components/users/admin/sections/ManageDoctors";
 
 const AdminRoutes = () => {
   return (
