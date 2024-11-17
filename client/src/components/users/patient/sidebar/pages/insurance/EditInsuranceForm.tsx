@@ -16,6 +16,8 @@ import Select from "react-select";
 
 import axios from "axios";
 
+import envConfig from "../../../../../../envConfig";
+
 const fetchInsuranceData = async () => {
   try {
     const token = localStorage.getItem("token");
@@ -25,7 +27,7 @@ const fetchInsuranceData = async () => {
     }
     // Fetch insurance information
     const response = await axios.get(
-      "http://localhost:3000/auth/patient/insurance-info",
+      `${envConfig.apiUrl}/auth/patient/insurance-info`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -177,7 +179,7 @@ export default function EditInsuranceForm() {
       }
 
       const response = await axios.put(
-        "http://localhost:3000/auth/patient/update-insurance",
+        `${envConfig.apiUrl}/auth/patient/update-insurance`,
         formData,
         {
           headers: {

@@ -52,6 +52,8 @@ import {
 } from "lucide-react";
 import SelectItem from "../../../ui/select/SelectItem";
 
+import envConfig from "../../../../envConfig";
+
 export default function PrescriptionSummaryReport() {
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [filteredPrescriptions, setFilteredPrescriptions] = useState<
@@ -86,7 +88,7 @@ export default function PrescriptionSummaryReport() {
         const token = localStorage.getItem("token");
         console.log("filters: ", filters);
         const response = await axios.get(
-          "http://localhost:3000/auth/admin/get-prescription-report",
+          `${envConfig.apiUrl}/auth/admin/get-prescription-report`,
 
           {
             params: [filters, activeTab],
@@ -107,7 +109,7 @@ export default function PrescriptionSummaryReport() {
       }
     };
     fetchPrescriptions();
-  }, [activeTab && filters]);
+  }, [activeTab, filters]);
 
   useEffect(() => {
     const filtered = prescriptions.filter((prescription) => {

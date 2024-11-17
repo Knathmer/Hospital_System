@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import DateRangePicker from './DateRangePicker.jsx';
-import MultiSelectInput from './MultiSelectInput.jsx';
-import AppointmentCharts from './AppointmentCharts.jsx';
-import AppointmentsTable from './AppointmentsTable.jsx';
-import ChartDisplayToggle from './ChartDisplayToggle.jsx';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import DateRangePicker from "./DateRangePicker.jsx";
+import MultiSelectInput from "./MultiSelectInput.jsx";
+import AppointmentCharts from "./AppointmentCharts.jsx";
+import AppointmentsTable from "./AppointmentsTable.jsx";
+import ChartDisplayToggle from "./ChartDisplayToggle.jsx";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+
+import envConfig from "../../../../../envConfig.js";
 
 const AppointmentAnalytics = () => {
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const [states, setStates] = useState([]);
   const [selectedStates, setSelectedStates] = useState([]);
@@ -67,7 +69,7 @@ const AppointmentAnalytics = () => {
     appointmentsOverTime: true,
   });
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     // Set default date range to one month ago until today
@@ -75,8 +77,8 @@ const AppointmentAnalytics = () => {
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(now.getMonth() - 1);
 
-    setStartDate(oneMonthAgo.toISOString().split('T')[0]);
-    setEndDate(now.toISOString().split('T')[0]);
+    setStartDate(oneMonthAgo.toISOString().split("T")[0]);
+    setEndDate(now.toISOString().split("T")[0]);
 
     // Fetch initial data for filters
     const fetchData = async () => {
@@ -91,14 +93,30 @@ const AppointmentAnalytics = () => {
           specialtiesRes,
           servicesRes,
         ] = await Promise.all([
-          axios.get('http://localhost:3000/auth/admin/states', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/cities', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/doctors', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/patients', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/statuses', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/visitTypes', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/specialties', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:3000/auth/admin/services', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${envConfig.apiUrl}/auth/admin/states`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${envConfig.apiUrl}/auth/admin/cities`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${envConfig.apiUrl}/auth/admin/doctors`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${envConfig.apiUrl}/auth/admin/patients`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${envConfig.apiUrl}/auth/admin/statuses`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${envConfig.apiUrl}/auth/admin/visitTypes`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${envConfig.apiUrl}/auth/admin/specialties`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${envConfig.apiUrl}/auth/admin/services`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
 
         setStates(statesRes.data.states);
@@ -113,26 +131,34 @@ const AppointmentAnalytics = () => {
         // Fetch offices after fetching states and cities
         fetchOffices(statesRes.data.states, citiesRes.data.cities);
       } catch (error) {
-        console.error('Error fetching filter data:', error);
+        console.error("Error fetching filter data:", error);
       }
     };
 
     fetchData();
   }, [token]);
 
-  const fetchOffices = async (states = selectedStates, cities = selectedCities) => {
+  const fetchOffices = async (
+    states = selectedStates,
+    cities = selectedCities
+  ) => {
     try {
       const params = {};
-      if (states.length > 0) params.states = states.map((s) => s.value).join(',');
-      if (cities.length > 0) params.cities = cities.map((c) => c.value).join(',');
+      if (states.length > 0)
+        params.states = states.map((s) => s.value).join(",");
+      if (cities.length > 0)
+        params.cities = cities.map((c) => c.value).join(",");
 
-      const officesRes = await axios.get('http://localhost:3000/auth/admin/offices', {
-        headers: { Authorization: `Bearer ${token}` },
-        params,
-      });
+      const officesRes = await axios.get(
+        `${envConfig.apiUrl}/auth/admin/offices`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params,
+        }
+      );
       setOffices(officesRes.data.offices);
     } catch (error) {
-      console.error('Error fetching offices:', error);
+      console.error("Error fetching offices:", error);
     }
   };
 
@@ -151,45 +177,48 @@ const AppointmentAnalytics = () => {
       }
 
       if (selectedStates.length > 0) {
-        params.states = selectedStates.map((s) => s.value).join(',');
+        params.states = selectedStates.map((s) => s.value).join(",");
       }
 
       if (selectedCities.length > 0) {
-        params.cities = selectedCities.map((c) => c.value).join(',');
+        params.cities = selectedCities.map((c) => c.value).join(",");
       }
 
       if (selectedOffices.length > 0) {
-        params.officeIDs = selectedOffices.map((o) => o.value).join(',');
+        params.officeIDs = selectedOffices.map((o) => o.value).join(",");
       }
 
       if (selectedDoctors.length > 0) {
-        params.doctorIDs = selectedDoctors.map((d) => d.value).join(',');
+        params.doctorIDs = selectedDoctors.map((d) => d.value).join(",");
       }
 
       if (selectedPatients.length > 0) {
-        params.patientIDs = selectedPatients.map((p) => p.value).join(',');
+        params.patientIDs = selectedPatients.map((p) => p.value).join(",");
       }
 
       if (selectedStatuses.length > 0) {
-        params.statuses = selectedStatuses.map((s) => s.value).join(',');
+        params.statuses = selectedStatuses.map((s) => s.value).join(",");
       }
 
       if (selectedVisitTypes.length > 0) {
-        params.visitTypes = selectedVisitTypes.map((v) => v.value).join(',');
+        params.visitTypes = selectedVisitTypes.map((v) => v.value).join(",");
       }
 
       if (selectedSpecialties.length > 0) {
-        params.specialtyIDs = selectedSpecialties.map((s) => s.value).join(',');
+        params.specialtyIDs = selectedSpecialties.map((s) => s.value).join(",");
       }
 
       if (selectedServices.length > 0) {
-        params.serviceIDs = selectedServices.map((s) => s.value).join(',');
+        params.serviceIDs = selectedServices.map((s) => s.value).join(",");
       }
 
-      const res = await axios.get('http://localhost:3000/auth/admin/appointmentAnalytics', {
-        headers: { Authorization: `Bearer ${token}` },
-        params,
-      });
+      const res = await axios.get(
+        `${envConfig.apiUrl}/auth/admin/appointmentAnalytics`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params,
+        }
+      );
 
       setAppointments(res.data.appointments);
       setTotalAppointments(res.data.totalAppointments);
@@ -204,7 +233,7 @@ const AppointmentAnalytics = () => {
       setDoctorCounts(res.data.doctorCounts);
       setPatientCounts(res.data.patientCounts);
     } catch (error) {
-      console.error('Error fetching appointments:', error);
+      console.error("Error fetching appointments:", error);
     }
   };
 
@@ -227,7 +256,10 @@ const AppointmentAnalytics = () => {
   // Prepare options for react-select
   const stateOptions = states.map((state) => ({ value: state, label: state }));
   const cityOptions = cities.map((city) => ({ value: city, label: city }));
-  const officeOptions = offices.map((office) => ({ value: office.officeID.toString(), label: office.officeName }));
+  const officeOptions = offices.map((office) => ({
+    value: office.officeID.toString(),
+    label: office.officeName,
+  }));
   const doctorOptions = doctors.map((doctor) => ({
     value: doctor.doctorID.toString(),
     label: `${doctor.firstName} ${doctor.lastName}`,
@@ -236,32 +268,41 @@ const AppointmentAnalytics = () => {
     value: patient.patientID.toString(),
     label: `${patient.firstName} ${patient.lastName}`,
   }));
-  const statusOptions = statuses.map((status) => ({ value: status, label: status }));
-  const visitTypeOptions = visitTypes.map((visitType) => ({ value: visitType, label: visitType }));
+  const statusOptions = statuses.map((status) => ({
+    value: status,
+    label: status,
+  }));
+  const visitTypeOptions = visitTypes.map((visitType) => ({
+    value: visitType,
+    label: visitType,
+  }));
   const specialtyOptions = specialties.map((specialty) => ({
     value: specialty.specialtyID.toString(),
     label: specialty.specialtyName,
   }));
-  const serviceOptions = services.map((service) => ({ value: service.serviceID.toString(), label: service.serviceName }));
+  const serviceOptions = services.map((service) => ({
+    value: service.serviceID.toString(),
+    label: service.serviceName,
+  }));
 
   const exportToPDF = () => {
-    const input = document.getElementById('report-content');
+    const input = document.getElementById("report-content");
     html2canvas(input, { scale: 2, useCORS: true })
       .then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL("image/png");
 
         const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'px',
+          orientation: "portrait",
+          unit: "px",
           format: [canvas.width, canvas.height],
         });
 
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
 
-        pdf.save('appointment-report.pdf');
+        pdf.save("appointment-report.pdf");
       })
       .catch((error) => {
-        console.error('Error exporting to PDF:', error);
+        console.error("Error exporting to PDF:", error);
       });
   };
 
@@ -279,7 +320,9 @@ const AppointmentAnalytics = () => {
 
       {/* Wrap the content you want to export */}
       <div id="report-content">
-        <h1 className="text-3xl font-bold text-center mb-6">Appointment Analytics</h1>
+        <h1 className="text-3xl font-bold text-center mb-6">
+          Appointment Analytics
+        </h1>
 
         {/* Filters Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -294,7 +337,10 @@ const AppointmentAnalytics = () => {
             label="Appointments Over Time"
             chartToggleState={chartDisplayOptions.appointmentsOverTime}
             setChartToggleState={(value) =>
-              setChartDisplayOptions((prev) => ({ ...prev, appointmentsOverTime: value }))
+              setChartDisplayOptions((prev) => ({
+                ...prev,
+                appointmentsOverTime: value,
+              }))
             }
           />
 

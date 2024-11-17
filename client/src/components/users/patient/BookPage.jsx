@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function BookPage() { 
+import envConfig from "../../../envConfig";
+
+function BookPage() {
   const [specialty, setSpecialty] = useState("");
   const [specialties, setSpecialties] = useState([]);
   const [services, setServices] = useState([]);
@@ -34,22 +36,22 @@ function BookPage() {
 
   // Define Visit-Type options directly
   const visitTypeOptions = [
-    'Telemedicine (Video)',
-    'Over-the-Phone',
-    'In-Person',
-    'Home Visit'
+    "Telemedicine (Video)",
+    "Over-the-Phone",
+    "In-Person",
+    "Home Visit",
   ];
 
   useEffect(() => {
     // Fetch specialties
     axios
-      .get("http://localhost:3000/appointment/specialties")
+      .get(`${envConfig.apiUrl}/appointment/specialties`)
       .then((response) => setSpecialties(response.data))
       .catch((error) => console.error("Error fetching specialties:", error));
 
     // Fetch states tied to offices
     axios
-      .get("http://localhost:3000/appointment/states")
+      .get(`${envConfig.apiUrl}/appointment/states`)
       .then((response) => setStates(response.data))
       .catch((error) => console.error("Error fetching states:", error));
   }, []);
@@ -58,7 +60,7 @@ function BookPage() {
     if (selectedState) {
       // Fetch cities based on selected state
       axios
-        .get("http://localhost:3000/appointment/cities", {
+        .get(`${envConfig.apiUrl}/appointment/cities`, {
           params: { state: selectedState },
         })
         .then((response) => setCities(response.data))
@@ -80,7 +82,7 @@ function BookPage() {
     if (selectedState && selectedCity) {
       // Fetch offices based on selected state and city
       axios
-        .get("http://localhost:3000/appointment/offices", {
+        .get(`${envConfig.apiUrl}/appointment/offices`, {
           params: { state: selectedState, city: selectedCity },
         })
         .then((response) => setOffices(response.data))
@@ -109,12 +111,19 @@ function BookPage() {
     }
 
     axios
-      .get("http://localhost:3000/appointment/doctors", {
+      .get(`${envConfig.apiUrl}/appointment/doctors`, {
         params,
       })
       .then((response) => setDoctors(response.data))
       .catch((error) => console.error("Error fetching doctors:", error));
-  }, [specialty, gender, selectedState, selectedCity, selectedOffice, selectedService]);
+  }, [
+    specialty,
+    gender,
+    selectedState,
+    selectedCity,
+    selectedOffice,
+    selectedService,
+  ]);
 
   useEffect(() => {
     // Fetch services
@@ -124,7 +133,7 @@ function BookPage() {
     }
 
     axios
-      .get("http://localhost:3000/appointment/services", {
+      .get(`${envConfig.apiUrl}/appointment/services`, {
         params,
       })
       .then((response) => setServices(response.data))
@@ -157,7 +166,7 @@ function BookPage() {
     if (date && selectedDoctor) {
       // Fetch booked times for the selected doctor and date
       axios
-        .get("http://localhost:3000/appointment/appointments", {
+        .get(`${envConfig.apiUrl}/appointment/appointments`, {
           params: { doctorID: selectedDoctor.doctorID, date },
         })
         .then((response) => {
@@ -246,7 +255,7 @@ function BookPage() {
       });
 
       await axios.post(
-        "http://localhost:3000/appointment/book",
+        `${envConfig.apiUrl}/appointment/book`,
         {
           appointmentDateTime: `${date}T${formattedTime}:00`,
           reason,
@@ -341,7 +350,9 @@ function BookPage() {
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                       <option value="Other">Other</option>
-                      <option value="Prefer not to say">Prefer not to say</option>
+                      <option value="Prefer not to say">
+                        Prefer not to say
+                      </option>
                     </select>
                   </div>
 
@@ -566,7 +577,10 @@ function BookPage() {
                     >
                       <option value="">Select a service</option>
                       {services.map((service) => (
-                        <option key={service.serviceID} value={service.serviceID}>
+                        <option
+                          key={service.serviceID}
+                          value={service.serviceID}
+                        >
                           {service.serviceName} - ${service.price}
                         </option>
                       ))}

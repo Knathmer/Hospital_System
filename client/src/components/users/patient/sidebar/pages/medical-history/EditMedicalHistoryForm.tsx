@@ -23,6 +23,8 @@ import SelectItem from "../../../../../ui/select/SelectItem";
 import Select from "../../../../../ui/select/Select";
 import axios from "axios";
 
+import envConfig from "../../../../../../envConfig";
+
 import {
   useAllergyState,
   useMedicationState,
@@ -162,7 +164,7 @@ export default function EditMedicalHistoryForm() {
       }
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/medical-history-info",
+        `${envConfig.apiUrl}/auth/patient/medical-history-info`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -213,7 +215,7 @@ export default function EditMedicalHistoryForm() {
       }
 
       const response = await axios.delete(
-        "http://localhost:3000/auth/patient/remove-medical-history",
+        `${envConfig.apiUrl}/auth/patient/remove-medical-history`,
 
         {
           data: formDataRemoved,
@@ -317,7 +319,7 @@ export default function EditMedicalHistoryForm() {
       //setFormData(filteredFormData);
 
       const response = await axios.post(
-        "http://localhost:3000/auth/patient/update-medical-history",
+        `${envConfig.apiUrl}/auth/patient/update-medical-history`,
         filteredFormData,
         {
           headers: {
