@@ -13,6 +13,7 @@ import {
   getSpecialties,
   getServices,
 } from "../../controllers/admin/appointmentAnalytics.js";
+import adminDoctorRouter from "../subRouters/AdminDoctorRouter.js";
 
 const router = express.Router();
 
@@ -29,5 +30,6 @@ router.get("/statuses", getAppointmentStatuses);
 router.get("/visitTypes", getVisitTypes);
 router.get("/specialties", getSpecialties);
 router.get("/services", getServices);
+router.use("/adminDoctorReport", adminDoctorRouter);
 
 export default router;

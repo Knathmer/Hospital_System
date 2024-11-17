@@ -7,6 +7,7 @@ import {
   PillBottle,
   CreditCard,
   Tablets,
+  BookOpen,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -20,6 +21,7 @@ import AdminNameDisplay from "./sidebarItems/WelcomeAdminName";
 import AdminDashboard from "../users/admin/adminDashboard/AdminDashboard";
 import PrescriptionSummaryReport from "../users/admin/reports/PrescriptionSummaryReport";
 import AppointmentAnalytics from "../users/admin/sections/appointmentReport/appointmentAnalytics";
+import DoctorReports from "../users/admin/reports/adminDoctorReport";
 
 export default function AdminSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -46,6 +48,7 @@ export default function AdminSidebar() {
         label: "Appointment Metrics",
         icon: CalendarSearch,
       },
+      { id: "doctor-data", label: "Doctor Reports", icon: BookOpen}, //Icon is currently placeholder
     ],
   };
 
@@ -129,6 +132,9 @@ export default function AdminSidebar() {
         {activeTab === "appointment-data" && <div>appointdick</div>}
 
         {activeTab === "appointment-data" && <AppointmentAnalytics />}
+        
+        {activeTab === "doctor-data" && <DoctorReports />}
+        
       </main>
     </div>
   );
