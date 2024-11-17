@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import AdminDashboard from "../components/users/admin/AdminDashboard";
+import AdminDashboard from "../components/users/admin/adminDashboard/AdminDashboard";
 import RegisterDoctor from "../components/users/admin/sections/doctorRegistration";
 import ManageDoctors from "../components/users/admin/sections/manageDoctors";
 import ManagePatients from "../components/users/admin/sections/managePatients";
