@@ -1,6 +1,6 @@
-import { query } from "../database.js";
-import pool from "../database.js";
-import { SELECT_TOTAL_PATIENT, SELECT_TOTAL_DOC, SELECT_TOTAL_ADMIN, SELECT_TOTAL_APPOINTMENT, SELECT_UPCOMING_APPOINTMENTS_ADMIN, SELECT_DOCTORS_WITH_SPECIALTY} from "../queries/constants/selectQueries.js";
+import { query } from "../../database.js";
+import pool from "../../database.js";
+import { SELECT_TOTAL_PATIENT, SELECT_TOTAL_DOC, SELECT_TOTAL_ADMIN, SELECT_TOTAL_APPOINTMENT, SELECT_UPCOMING_APPOINTMENTS_ADMIN, SELECT_DOCTORS_WITH_SPECIALTY} from "../../queries/constants/selectQueries.js";
 
 // total users  
 export async function totalPatients(req,res){

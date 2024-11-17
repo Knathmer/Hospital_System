@@ -1,6 +1,6 @@
-import { query } from "../database.js";
-import pool from "../database.js"
-import { SELECT_ADMIN_NAMES } from "../queries/constants/selectQueries.js";
+import { query } from "../../database.js";
+import pool from "../../database.js"
+import { SELECT_ADMIN_NAMES } from "../../queries/constants/selectQueries.js";
 
 export async function welcomeAdminName(req, res) {
     const adminID = req.user.adminID;

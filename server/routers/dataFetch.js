@@ -3,9 +3,9 @@ import { verifyToken } from '../middleware/auth.js';
 import { getOfficeLocations } from '../controllers/officeController.js';
 import { welcomePatientName } from '../controllers/patient/patientNameInSidebarController.js';
 import { welcomeDocName } from '../controllers/doctor/docNameInSidebar.js';
-import { welcomeAdminName } from '../controllers/adminNameInSidebar.js';
+import { welcomeAdminName } from '../controllers/admin/adminNameInSidebar.js';
 import { getAppointmentsDashboard, getBillDashboard, getMedsResultsDashboard } from '../controllers/patient/patientDashboard.js';
-import { getUpcomingAppointmentAdmin, listOfDocAdmin, totalAdmins, totalAppointments, totalDoctors, totalPatients } from '../controllers/adminDashboard.js';
+import { getUpcomingAppointmentAdmin, listOfDocAdmin, totalAdmins, totalAppointments, totalDoctors, totalPatients } from '../controllers/admin/adminDashboard.js';
 
 const router = express.Router();
 
