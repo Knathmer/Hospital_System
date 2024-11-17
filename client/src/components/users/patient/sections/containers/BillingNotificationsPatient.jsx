@@ -77,9 +77,9 @@ const BillingNotificationsPatientDashboard = () => {
         )}
       </div>
 
-      <NavButton variant="outline" className="mt-4">
-        View All Billing Statements
-      </NavButton>
+      <NavButton variant="outline" to="/patient/dashboard?tab=billing">
+          View All Billing Statements
+        </NavButton>
     </GenericContainer>
   );
 };

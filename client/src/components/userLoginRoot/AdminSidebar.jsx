@@ -8,6 +8,7 @@ import {
   CreditCard,
   Tablets,
   BookOpen,
+  NotebookPen
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -24,6 +25,7 @@ import AppointmentAnalytics from "../users/admin/sections/appointmentReport/appo
 import DoctorReports from "../users/admin/reports/adminDoctorReport";
 import DoctorManagement from "../users/admin/sections/doctorManagement/doctorManagement";
 import PatientManagement from "../users/admin/sections/patientManagement/patientManagement";
+import RegisterDoctor from "../users/admin/sections/doctorRegistration";
 
 export default function AdminSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -37,6 +39,7 @@ export default function AdminSidebar() {
     "Manage User": [
       { id: "manage-patients", label: "Patient Profiles", icon: FolderHeart },
       { id: "manage-doctors", label: "Doctor Profiles", icon: UserRoundSearch },
+      { id: "register-doctor", label: "Doctor Registration", icon: NotebookPen },
     ],
     "Data Reports": [
       { id: "billing-data", label: "Financial Overview", icon: CreditCard },
@@ -125,6 +128,7 @@ export default function AdminSidebar() {
         {activeTab === "dashboard" && <AdminDashboard />}
         {activeTab === "manage-patients" && <PatientManagement />}
         {activeTab === "manage-doctors" && <DoctorManagement />}
+        {activeTab === "register-doctor" && <RegisterDoctor />}
         {activeTab === "billing-data" && <div>bill stuff</div>}
         {activeTab === "prescription-analysis" && (
           <div>

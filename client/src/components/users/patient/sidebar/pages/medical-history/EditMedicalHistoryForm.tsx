@@ -361,13 +361,6 @@ export default function EditMedicalHistoryForm() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="p-6 sm:p-10">
-            <Link
-              to="/patient/dashboard?tab=dashboard"
-              className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Link>
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold">Medical History Form</h1>
               <DefaultButton

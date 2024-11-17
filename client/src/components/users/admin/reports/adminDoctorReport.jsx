@@ -230,11 +230,6 @@ const SystemReports = () => {
 
   return (
     <div className="min-h-screen bg-pink-50 flex flex-col">
-      <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
-        <div className="flex items-center justify-center">
-          <span className="ml-2 text-2xl font-bold text-gray-900">Doctor Appointment Data</span>
-        </div>
-      </header>
       <main className="flex-1 p-4">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="text-center">

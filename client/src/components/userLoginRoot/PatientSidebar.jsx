@@ -33,6 +33,7 @@ import PersonalInfoForm from "../users/patient/sidebar/pages/personal-info/Perso
 import ManagePharmaciesPage from "../../pages/patientPages/ManagePharmaciesPage.jsx";
 import PrescriptionPage from "../../pages/patientPages/PatientMedicationPage.jsx";
 import AppointmentsPage from "../users/patient/sidebar/pages/AppointmentInfo/AppointmentsPage.jsx";
+import BillingPage from "../../pages/patientPages/BillingPage.jsx";
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -166,6 +167,11 @@ export default function PatientSidebar() {
         {activeTab === "medications" && (
           <div>
             <PrescriptionPage />
+          </div>
+        )}
+        {activeTab === "billing" && (
+          <div>
+            <BillingPage />
           </div>
         )}
         {activeTab === "settings-personal-info" && (

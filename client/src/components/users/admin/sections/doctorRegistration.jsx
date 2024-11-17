@@ -96,14 +96,6 @@ const RegisterDoctor = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
-      <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
-        <Link className="flex items-center justify-center" to="/">
-          <Heart className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">
-            WomenWell Admin
-          </span>
-        </Link>
-      </header>
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-2xl space-y-8 bg-white p-8 rounded-lg shadow-xl">
           <div className="text-center">
