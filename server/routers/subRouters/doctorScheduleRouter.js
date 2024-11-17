@@ -19,6 +19,11 @@ import {
   refillMedication,
   getAdditionalCharges,
   saveCharges,
+  addAllergy,
+  addDisability,
+  addVaccine,
+  addSurgery,
+  addFamilyHistory,
 } from "../../controllers/doctor/doctorScheduleController.js";
 
 const doctorScheduleRouter = express.Router();
@@ -49,5 +54,10 @@ doctorScheduleRouter.put("/refill-medication", refillMedication);
 //Appointment Handler POST
 doctorScheduleRouter.post("/add-medication", postNewMedication);
 doctorScheduleRouter.post("/save-charges", saveCharges);
+doctorScheduleRouter.post("/add-allergy", addAllergy);
+doctorScheduleRouter.post("/add-disability", addDisability);
+doctorScheduleRouter.post("/add-vaccine", addVaccine);
+doctorScheduleRouter.post("/add-surgery", addSurgery);
+doctorScheduleRouter.post("/add-family-history", addFamilyHistory);
 
 export default doctorScheduleRouter;

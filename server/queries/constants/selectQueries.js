@@ -134,7 +134,7 @@ export const GET_PATIENT_ALLERGIES = `SELECT a.allergyID, a.allergen, a.severity
 
 export const GET_PATIENT_SURGERIES = `SELECT s.surgeryID, s.surgeryType, s.surgeryDateTime, CONCAT(d.firstName, ' ' , d.lastName) AS doctorFullName, sp.specialtyName , o.officeName FROM surgery s LEFT JOIN doctor d ON s.doctorID = d.doctorID LEFT JOIN specialty sp ON d.specialtyID = sp.specialtyID INNER JOIN office o ON d.officeID = o.officeID INNER JOIN patient p ON s.patientID = p.patientID WHERE p.patientID = ?;`;
 
-export const GET_PATIENT_DISABILITIES = `SELECT d.disabilityID, d.disabilityType FROM disability d WHERE d.patientID = ?;`;
+export const GET_PATIENT_DISABILITIES = `SELECT d.disabilityID, d.disabilityType, d.notes FROM disability d WHERE d.patientID = ?;`;
 
 export const GET_PATIENT_VACCINE = `SELECT v.vaccineID, v.vaccineName, v.dateAdministered AS date, CONCAT(d.firstName, ' ', d.lastName) AS doctorFullName, o.officeName FROM vaccine v LEFT JOIN doctor d ON v.doctorID = d.doctorID INNER JOIN office o ON d.officeID = o.officeID INNER JOIN patient p ON v.patientID = p.patientID WHERE p.patientID = ?;`;
 

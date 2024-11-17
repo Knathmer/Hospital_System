@@ -599,6 +599,126 @@ export default function AppointmentPage() {
     </div>
   );
 
+  const handleAddMedicalHistoryItem = async (type, item) => {
+    try {
+      const token = localStorage.getItem("token");
+      const patientID = patientInformation.patientID;
+
+      // Prepare payload for the backend
+      let payload = {
+        patientID,
+        ...item,
+      };
+
+      switch (type) {
+        case "Allergies":
+          // Validate severity
+          const validSeverities = ["Mild", "Moderate", "Severe"];
+          if (!validSeverities.includes(item.severity)) {
+            alert(
+              'Invalid severity value. Must be "Mild", "Moderate", or "Severe".'
+            );
+            return;
+          }
+          // Make API call
+          const allergyResponse = await axios.post(
+            "http://localhost:3000/auth/doctor/schedule/add-allergy",
+            payload,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          // Update the allergies state with the new item
+          setAllergies((prev) => [
+            ...prev,
+            { ...item, allergyID: allergyResponse.data.allergyID },
+          ]);
+          break;
+
+        case "Disabilities":
+          const disabilityResponse = await axios.post(
+            "http://localhost:3000/auth/doctor/schedule/add-disability",
+            payload,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setDisabilities((prev) => [
+            ...prev,
+            { ...item, disabilityID: disabilityResponse.data.disabilityID },
+          ]);
+          break;
+
+        case "Vaccines":
+          // Date handling
+          payload.dateAdministered = item.date;
+          delete payload.date; // Remove 'date' as backend expects 'dateAdministered'
+
+          const vaccineResponse = await axios.post(
+            "http://localhost:3000/auth/doctor/schedule/add-vaccine",
+            payload,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setVaccines((prev) => [
+            ...prev,
+            {
+              ...item,
+              vaccineID: vaccineResponse.data.vaccineID,
+              doctorFullName: "You",
+              officeName: appointmentInformation.officeName || "Your Office",
+            },
+          ]);
+          break;
+
+        case "Surgeries":
+          // Date handling
+          payload.surgeryDateTime = item.date;
+          delete payload.date; // Remove 'date' as backend expects 'surgeryDateTime'
+
+          const surgeryResponse = await axios.post(
+            "http://localhost:3000/auth/doctor/schedule/add-surgery",
+            payload,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setSurgeries((prev) => [
+            ...prev,
+            {
+              ...item,
+              surgeryID: surgeryResponse.data.surgeryID,
+              doctorFullName: "You",
+              specialtyName:
+                appointmentInformation.specialtyName || "Your Specialty",
+              officeName: appointmentInformation.officeName || "Your Office",
+            },
+          ]);
+          break;
+
+        case "Family History":
+          const familyHistoryResponse = await axios.post(
+            "http://localhost:3000/auth/doctor/schedule/add-family-history",
+            payload,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setFamilyHistory((prev) => [
+            ...prev,
+            {
+              ...item,
+              familyHistoryID: familyHistoryResponse.data.familyHistoryID,
+            },
+          ]);
+          break;
+
+        default:
+          console.error("Unknown medical history type:", type);
+      }
+
+      // Optionally, show a success message
+      await fetchPatientInformation();
+      alert(`${type.slice(0, -1)} added successfully.`);
+    } catch (error) {
+      console.error(`Error adding ${type.slice(0, -1)}:`, error);
+      alert(
+        `An error occurred while adding ${type.slice(0, -1)}. Please try again.`
+      );
+    }
+  };
+
   useEffect(() => {
     if (isPrescribeModalOpen) {
       fetchAllPharmacies();
@@ -798,27 +918,29 @@ export default function AppointmentPage() {
           <MedicalHistorySection
             title="Allergies"
             items={allergies}
-            onAdd={(item) => handleAddMedicalHistoryItem("allergies", item)}
+            onAdd={(item) => handleAddMedicalHistoryItem("Allergies", item)}
           />
           <MedicalHistorySection
             title="Disabilities"
             items={disabilities}
-            onAdd={(item) => handleAddMedicalHistoryItem("disabilities", item)}
+            onAdd={(item) => handleAddMedicalHistoryItem("Disabilities", item)}
           />
           <MedicalHistorySection
             title="Vaccines"
             items={vaccines}
-            onAdd={(item) => handleAddMedicalHistoryItem("vaccines", item)}
+            onAdd={(item) => handleAddMedicalHistoryItem("Vaccines", item)}
           />
           <MedicalHistorySection
             title="Surgeries"
             items={surgeries}
-            onAdd={(item) => handleAddMedicalHistoryItem("surgeries", item)}
+            onAdd={(item) => handleAddMedicalHistoryItem("Surgeries", item)}
           />
           <MedicalHistorySection
             title="Family History"
             items={familyHistory}
-            onAdd={(item) => handleAddMedicalHistoryItem("familyHistory", item)}
+            onAdd={(item) =>
+              handleAddMedicalHistoryItem("Family History", item)
+            }
           />
         </div>
 
@@ -1432,7 +1554,6 @@ export default function AppointmentPage() {
         </div>
 
         {/* Charges Section       /ti */}
-        {/* Charges Section */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Charges</h2>
           <div className="space-y-4">

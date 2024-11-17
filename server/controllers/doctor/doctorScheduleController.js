@@ -638,3 +638,169 @@ export const saveCharges = async (req, res) => {
     if (connection) connection.release();
   }
 };
+
+// Add Allergy
+export const addAllergy = async (req, res) => {
+  try {
+    const { patientID, allergen, reaction, severity, notes } = req.body;
+
+    // Validate required fields
+    if (!patientID || !allergen || !reaction || !severity) {
+      return res
+        .status(400)
+        .json({ error: "Please provide all required fields." });
+    }
+
+    // Validate severity enum
+    const validSeverities = ["Mild", "Moderate", "Severe"];
+    if (!validSeverities.includes(severity)) {
+      return res.status(400).json({
+        error:
+          'Invalid severity value. Must be "Mild", "Moderate", or "Severe".',
+      });
+    }
+
+    // Insert into database
+    const result = await query(
+      "INSERT INTO allergy (patientID, allergen, reaction, severity, notes) VALUES (?, ?, ?, ?, ?)",
+      [patientID, allergen, reaction, severity, notes || null]
+    );
+
+    // Return success response with the new allergyID
+    res.status(201).json({
+      message: "Allergy added successfully.",
+      allergyID: result.insertId,
+    });
+  } catch (error) {
+    console.error("Error adding allergy:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while adding the allergy." });
+  }
+};
+
+// Add Disability
+export const addDisability = async (req, res) => {
+  try {
+    const { patientID, disabilityType, notes } = req.body;
+
+    // Validate required fields
+    if (!patientID || !disabilityType) {
+      return res
+        .status(400)
+        .json({ error: "Please provide all required fields." });
+    }
+
+    // Insert into database
+    const result = await query(
+      "INSERT INTO disability (patientID, disabilityType, notes) VALUES (?, ?, ?)",
+      [patientID, disabilityType, notes || null]
+    );
+
+    // Return success response with the new disabilityID
+    res.status(201).json({
+      message: "Disability added successfully.",
+      disabilityID: result.insertId,
+    });
+  } catch (error) {
+    console.error("Error adding disability:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while adding the disability." });
+  }
+};
+
+// Add Family History
+export const addFamilyHistory = async (req, res) => {
+  try {
+    const { patientID, condition, notes } = req.body;
+
+    // Validate required fields
+    if (!patientID || !condition) {
+      return res
+        .status(400)
+        .json({ error: "Please provide all required fields." });
+    }
+
+    // Insert into database
+    const result = await query(
+      "INSERT INTO family_history (patientID, `condition`, notes) VALUES (?, ?, ?)",
+      [patientID, condition, notes || null]
+    );
+
+    // Return success response with the new familyHistoryID
+    res.status(201).json({
+      message: "Family history added successfully.",
+      familyHistoryID: result.insertId,
+    });
+  } catch (error) {
+    console.error("Error adding family history:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while adding the family history." });
+  }
+};
+
+// Add Surgery
+export const addSurgery = async (req, res) => {
+  try {
+    const { patientID, surgeryType, surgeryDateTime } = req.body;
+    const doctorID = req.user.doctorID;
+
+    // Validate required fields
+    if (!patientID || !surgeryType || !surgeryDateTime) {
+      return res
+        .status(400)
+        .json({ error: "Please provide all required fields." });
+    }
+
+    // Insert into database
+    const result = await query(
+      "INSERT INTO surgery (patientID, surgeryType, surgeryDateTime, doctorID) VALUES (?, ?, ?, ?)",
+      [patientID, surgeryType, surgeryDateTime, doctorID]
+    );
+
+    // Return success response with the new surgeryID
+    res.status(201).json({
+      message: "Surgery added successfully.",
+      surgeryID: result.insertId,
+    });
+  } catch (error) {
+    console.error("Error adding surgery:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while adding the surgery." });
+  }
+};
+
+// Add Vaccine
+export const addVaccine = async (req, res) => {
+  try {
+    const { patientID, vaccineName, dateAdministered } = req.body;
+    const doctorID = req.user.doctorID;
+
+    // Validate required fields
+    if (!patientID || !vaccineName || !dateAdministered) {
+      return res
+        .status(400)
+        .json({ error: "Please provide all required fields." });
+    }
+
+    // Insert into database
+    const result = await query(
+      "INSERT INTO vaccine (patientID, vaccineName, dateAdministered, doctorID) VALUES (?, ?, ?, ?)",
+      [patientID, vaccineName, dateAdministered, doctorID]
+    );
+
+    // Return success response with the new vaccineID
+    res.status(201).json({
+      message: "Vaccine added successfully.",
+      vaccineID: result.insertId,
+    });
+  } catch (error) {
+    console.error("Error adding vaccine:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while adding the vaccine." });
+  }
+};
