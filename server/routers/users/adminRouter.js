@@ -15,10 +15,8 @@ import {
 } from "../../controllers/admin/appointmentAnalytics.js";
 import {
   getAllDoctors,
-  addDoctor,
-  updateDoctor,
-  deleteDoctor,
-} from "../../controllers/admin/doctorController.js";
+  inactivateDoctor
+} from "../../controllers/admin/doctorAdminView.js";
 
 const router = express.Router();
 
@@ -37,8 +35,6 @@ router.get("/specialties", getSpecialties);
 router.get("/services", getServices);
 
 router.get('/doctors', getAllDoctors);
-router.post('/doctors', addDoctor);
-router.put('/doctors/:doctorID', updateDoctor);
-router.delete('/doctors/:doctorID', deleteDoctor);
+router.put('/doctors/:doctorID/inactivate', inactivateDoctor);
 
 export default router;
