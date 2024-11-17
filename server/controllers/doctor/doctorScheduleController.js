@@ -11,6 +11,7 @@ import {
   GET_PATIENT_APPOINTMENT_INFO,
   GET_PREVIOUS_APPOINTMENTS,
   SELECT_PATIENT_MEDICATION_INFORMATION_QUERY,
+  SELECT_PATIENT_PHARMACY_INFORMATION_QUERY,
 } from "../../queries/constants/selectQueries.js";
 
 export const getDoctorSchedule = async (req, res) => {
@@ -295,6 +296,25 @@ export const getPatientMedication = async (req, res) => {
   }
 };
 
+export const getPharmacies = async (req, res) => {
+  try {
+    const doctorID = req.user.doctorID;
+    const { patientID } = req.query;
+
+    const patientPharmacies = await query(
+      SELECT_PATIENT_PHARMACY_INFORMATION_QUERY,
+      [patientID]
+    );
+
+    res.status(200).json({ patientPharmacies });
+  } catch (error) {
+    console.error("Error fetching patient's pharmacy information ", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching patient's pharmacy info" });
+  }
+};
+
 export const deactivateMedication = async (req, res) => {
   try {
     const { prescriptionID } = req.body;
@@ -332,5 +352,109 @@ export const reactivateMedication = async (req, res) => {
   } catch (error) {
     console.error("Error reactivating medication:", error);
     res.status(500).json({ message: "Server error reactivating medication" });
+  }
+};
+
+export const postNewMedication = async (req, res) => {
+  try {
+    const doctorID = req.user.doctorID;
+
+    const {
+      medicationName,
+      dosage,
+      frequency,
+      start,
+      end,
+      quantity,
+      instruction,
+      daySupply,
+      refillCount,
+      refillsRemaining,
+      pharmacyID,
+      patientID,
+    } = req.body;
+
+    if (
+      !medicationName ||
+      !dosage ||
+      !frequency ||
+      !start ||
+      !quantity ||
+      !daySupply ||
+      refillCount === undefined ||
+      refillsRemaining === undefined ||
+      !patientID
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Please provide all required fields." });
+    }
+    const startDate = new Date(start);
+    const endDate = end
+      ? new Date(end)
+      : new Date(startDate.setFullYear(startDate.getFullYear() + 1));
+
+    const sql = `
+      INSERT INTO prescription (
+        medicationName,
+        dosage,
+        frequency,
+        start,
+        end,
+        quantity,
+        instruction,
+        refillCount,
+        daySupply,
+        refillsRemaining,
+        pharmacyID,
+        patientID,
+        doctorID,
+        active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `;
+
+    const values = [
+      medicationName,
+      dosage,
+      frequency,
+      start,
+      endDate || null, // Use the calculated or provided end date
+      quantity,
+      instruction || null, // If instruction is not provided, use NULL
+      refillCount,
+      daySupply,
+      refillsRemaining,
+      pharmacyID || null, // If pharmacyID is not provided, use NULL
+      patientID,
+      doctorID, // If doctorID is not provided, use NULL
+    ];
+
+    await query(sql, values);
+    res.status(201).json({ message: "Medication added successfully." });
+  } catch (error) {
+    console.error("Error saving medication:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while saving the medication." });
+  }
+};
+
+export const refillMedication = async (req, res) => {
+  try {
+    const doctorID = req.user.doctorID;
+    const { prescriptionID } = req.body;
+
+    const sql =
+      "UPDATE prescription SET refillsRemaining = refillCount WHERE prescriptionID = ?;";
+
+    await query(sql, [prescriptionID]);
+
+    res
+      .status(201)
+      .json({ message: "Medication refill count updated successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occured while updating the medicaiton" });
   }
 };

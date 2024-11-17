@@ -34,6 +34,7 @@ export default function AppointmentPage() {
   const [medicationRefill, setMedicationRefill] = useState(null);
   const [deactivateConfirmation, setDeactivateConfirmation] = useState(null);
   const [reactivateConfirmation, setReactivateConfirmation] = useState(null);
+  const [pharmacies, setPharmacies] = useState([]);
   const { appointmentID } = useParams();
   const navigate = useNavigate();
 
@@ -43,9 +44,19 @@ export default function AppointmentPage() {
     medicationName: "",
     dosage: "",
     frequency: "",
+    start: "",
+    end: "",
+    quantity: "",
+    instruction: "",
+    daySupply: "",
     refills: "",
+    pharmacyID: "",
   });
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+
+  // /tp State Variables for appointment notes
+  const [notes, setNotes] = useState("");
+  const [isEditingNotes, setIsEditingNotes] = useState(true); // Start in edit mode
 
   const fetchPatientInformation = async () => {
     try {
@@ -155,6 +166,27 @@ export default function AppointmentPage() {
     navigate("/doctor/schedule");
   };
 
+  const fetchAllPharmacies = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setError("User is not authenticated");
+        return;
+      }
+
+      const response = await axios.get(
+        "http://localhost:3000/auth/doctor/schedule/get-pharmacies",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID: patientInformation.patientID },
+        }
+      );
+      setPharmacies(response.data.patientPharmacies || []);
+    } catch (error) {
+      console.error("Error fetching all pharmacies: ", error);
+    }
+  };
   const handleRemoveMedication = async (prescriptionID) => {
     try {
       const token = localStorage.getItem("token");
@@ -232,15 +264,93 @@ export default function AppointmentPage() {
 
   const handleSaveMedication = async () => {
     try {
+      // Retrieve token for authorization
       const token = localStorage.getItem("token");
-      const { medicationName, dosage, frequency, refills } = newMedication; //Pass all the information you need to complete the query.
 
-      if (!medicationName || !dosage || !frequency || !refills) {
-        alert("Please fill in all fields.");
+      // Destructure all required fields from newMedication
+      const {
+        medicationName,
+        dosage,
+        frequency,
+        start,
+        end,
+        quantity,
+        instruction,
+        daySupply,
+        refills,
+        pharmacyID,
+      } = newMedication;
+
+      // Validate required fields
+      if (
+        !medicationName ||
+        !dosage ||
+        !frequency ||
+        !start ||
+        !quantity ||
+        !daySupply ||
+        refills === undefined
+      ) {
+        alert("Please fill in all required fields.");
         return;
       }
-    } catch (error) {}
+
+      // Ensure the end date (if provided) is after the start date
+      if (end && new Date(end) < new Date(start)) {
+        alert("End date must be after the start date.");
+        return;
+      }
+
+      // Prepare payload for the backend
+      const payload = {
+        medicationName,
+        dosage,
+        frequency,
+        start,
+        end: end || null, // If end date is not provided, send null
+        quantity,
+        instruction: instruction || null, // If instruction is not provided, send null
+        daySupply,
+        refillCount: refills, // Use refills as refillCount for clarity
+        refillsRemaining: refills,
+        pharmacyID: pharmacyID || null,
+        patientID: patientInformation.patientID,
+      };
+
+      // Make API call to save medication
+      await axios.post(
+        "http://localhost:3000/auth/doctor/schedule/add-medication", // Update this URL to match your backend endpoint
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Close the modal and reset the form
+      alert("Medication saved successfully!");
+      handleCloseModal();
+      setNewMedication({
+        medicationName: "",
+        dosage: "",
+        frequency: "",
+        start: "",
+        end: "",
+        quantity: "",
+        instruction: "",
+        daySupply: "",
+        refills: "",
+        pharmacyID: "",
+      });
+      setUnsavedChanges(false);
+
+      // Optionally, update the medications list in the UI
+      fetchPatientInformation(); // Replace this with your function to refresh medications
+    } catch (error) {
+      console.error("Error saving medication:", error);
+      alert("An error occurred while saving the medication. Please try again.");
+    }
   };
+
   const handleCloseModal = () => {
     if (unsavedChanges) {
       const confirmClose = window.confirm(
@@ -260,6 +370,12 @@ export default function AppointmentPage() {
     setIsPrescribeModalOpen(false);
     setUnsavedChanges(false);
   };
+
+  useEffect(() => {
+    if (isPrescribeModalOpen) {
+      fetchAllPharmacies();
+    }
+  }, [isPrescribeModalOpen]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -965,6 +1081,42 @@ export default function AppointmentPage() {
                     />
                   </div>
 
+                  {/* Pharmacy  gx*/}
+
+                  <div>
+                    <label
+                      htmlFor="pharmacy"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Pharmacy
+                    </label>
+                    <select
+                      id="pharmacy"
+                      value={newMedication.pharmacyID || ""}
+                      onChange={(e) => {
+                        setNewMedication({
+                          ...newMedication,
+                          pharmacyID: e.target.value,
+                        });
+                        setUnsavedChanges(true);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value="" disabled>
+                        Select a Pharmacy
+                      </option>
+                      {pharmacies.map((pharmacy) => (
+                        <option
+                          key={pharmacy.pharmacyID}
+                          value={pharmacy.pharmacyID}
+                        >
+                          {pharmacy.pharmacyName} - {pharmacy.city},{" "}
+                          {pharmacy.state}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   {/* Instructions */}
                   <div>
                     <label
@@ -1010,17 +1162,45 @@ export default function AppointmentPage() {
           )}
         </div>
 
+        {/*------------------Appointment Notes------------------------ ggs*/}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Appointment Notes
           </h2>
-          <Textarea
-            // value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Enter appointment notes"
-            rows={6}
-            className="w-full"
-          />
+
+          {isEditingNotes ? (
+            // Notes are in edit mode
+            <div>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Enter appointment notes"
+                rows={6}
+                className="w-full mb-4"
+              />
+              <div className="flex justify-end space-x-2">
+                <Button
+                  onClick={handleSaveNotes}
+                  className="bg-pink-600 hover:bg-pink-700 text-white"
+                >
+                  Save Notes
+                </Button>
+              </div>
+            </div>
+          ) : (
+            // Notes are locked (read-only)
+            <div>
+              <p className="text-gray-800 whitespace-pre-wrap mb-4">{notes}</p>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  onClick={() => setIsEditingNotes(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Edit Notes
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         <Button
