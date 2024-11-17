@@ -18,7 +18,6 @@ const router = express.Router();
 
 router.post("/register", registerDoctor);
 router.get("/get-prescription-report", getPrescriptionReport);
-router.post("/register", registerDoctor);
 router.get("/appointmentAnalytics", getAppointmentAnalytics);
 router.get("/states", getStates);
 router.get("/cities", getCities);
