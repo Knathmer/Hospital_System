@@ -6,6 +6,7 @@ import {
   CalendarSearch,
   PillBottle,
   CreditCard,
+  Tablets,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -17,6 +18,7 @@ import AdminNameDisplay from "./sidebarItems/WelcomeAdminName";
 
 // Files Linked
 import AdminDashboard from "../users/admin/adminDashboard/AdminDashboard";
+import PrescriptionSummaryReport from "../users/admin/reports/PrescriptionSummaryReport";
 import AppointmentAnalytics from "../users/admin/sections/appointmentReport/appointmentAnalytics";
 
 export default function AdminSidebar() {
@@ -27,17 +29,23 @@ export default function AdminSidebar() {
   const navigate = useNavigate();
 
   const sidebarItems = {
-    "Admin Services": [
-      { id: "dashboard", label: "Dashboard", icon: House },
-    ],
+    "Admin Services": [{ id: "dashboard", label: "Dashboard", icon: House }],
     "Manage User": [
       { id: "manage-patients", label: "Patient Profiles", icon: FolderHeart },
       { id: "manage-doctors", label: "Doctor Profiles", icon: UserRoundSearch },
     ],
     "Data Reports": [
       { id: "billing-data", label: "Financial Overview", icon: CreditCard },
-      { id: "prescription-data", label: "Prescription Analysis", icon: PillBottle },
-      { id: "appointment-data", label: "Appointment Metrics", icon: CalendarSearch },
+      {
+        id: "prescription-analysis",
+        label: "Prescription Analysis",
+        icon: PillBottle,
+      },
+      {
+        id: "appointment-data",
+        label: "Appointment Metrics",
+        icon: CalendarSearch,
+      },
     ],
   };
 
@@ -60,7 +68,7 @@ export default function AdminSidebar() {
       <aside
         className={`transform transition-transform duration-300 fixed h-screen z-50 ${
           isSidebarVisible ? "translate-x-0 w-64" : "-translate-x-64 w-0"
-        } bg-white border-r flex flex-col justify-between`}
+        } bg-white border-r flex flex-col justify-between overflow-y-auto`}
       >
         <div>
           <div className="p-4 border-b">
@@ -91,7 +99,10 @@ export default function AdminSidebar() {
             ))}
           </nav>
         </div>
-        <UserSettingsAndLogout activeTab={activeTab} setActiveTab={setActiveTab} />
+        <UserSettingsAndLogout
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
       </aside>
 
       {/* Sidebar Toggle Button */}
@@ -110,7 +121,13 @@ export default function AdminSidebar() {
         {activeTab === "manage-patients" && <div>Manage Patients Page</div>}
         {activeTab === "manage-doctors" && <div>Manage Doctors Page</div>}
         {activeTab === "billing-data" && <div>bill stuff</div>}
-        {activeTab === "prescription-data" && <div>perrrscription</div>}
+        {activeTab === "prescription-analysis" && (
+          <div>
+            <PrescriptionSummaryReport />
+          </div>
+        )}
+        {activeTab === "appointment-data" && <div>appointdick</div>}
+
         {activeTab === "appointment-data" && <AppointmentAnalytics />}
       </main>
     </div>

@@ -8,6 +8,8 @@ import Settings from "../components/users/admin/sections/settings";
 import AppointmentAnalytics from "../components/users/admin/sections/appointmentReport/appointmentAnalytics";
 import AdminSidebar from "../components/userLoginRoot/AdminSidebar";
 
+import PrescriptionSummaryReport from "../components/users/admin/reports/PrescriptionSummaryReport";
+
 const AdminRoutes = () => {
   return (
     <Routes>
@@ -17,6 +19,10 @@ const AdminRoutes = () => {
       <Route path="appointmentAnalytics" element={<AppointmentAnalytics />} />
       <Route path="settings" element={<Settings />} />
       {/* Add other admin routes here */}
+      <Route
+        path="prescription-summary-report"
+        element={<PrescriptionSummaryReport />}
+      />
     </Routes>
   );
 };
