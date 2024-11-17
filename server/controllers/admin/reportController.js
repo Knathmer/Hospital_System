@@ -71,7 +71,9 @@ export const generateDoctorReport = async (req, res) => {
 
   try {
     let query = `
-      SELECT d.doctorID, d.firstName, d.lastName, s.specialtyName, o.officeName, a.addrcity, a.addrstate
+      SELECT d.doctorID, d.firstName, d.lastName, d.gender,
+             s.specialtyName, o.officeName,
+             a.addrStreet, a.addrzip, a.addrcity, a.addrstate
       FROM doctor d
       LEFT JOIN Specialty s ON d.specialtyID = s.specialtyID
       LEFT JOIN office o ON d.officeID = o.officeID

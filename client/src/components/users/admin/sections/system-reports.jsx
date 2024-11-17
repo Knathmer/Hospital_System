@@ -137,17 +137,51 @@ const SystemReports = () => {
       hour12: true,
     });
 
+  const formatAddress = (doctor) => {
+    const { addrStreet, addrcity, addrstate, addrzip } = doctor;
+    let addressParts = [];
+    if (addrStreet) addressParts.push(addrStreet);
+    if (addrcity) addressParts.push(addrcity);
+    if (addrstate) addressParts.push(addrstate);
+    if (addrzip) addressParts.push(addrzip);
+    return addressParts.join(', ');
+  };
+
+  // Aggregate data calculations
+  const totalPrescriptions = reportData.reduce(
+    (acc, doctor) => acc + doctor.prescriptions.length,
+    0
+  );
+
+  const totalAppointments = reportData.reduce(
+    (acc, doctor) => acc.concat(doctor.appointments),
+    []
+  );
+
+  const appointmentStatusCounts = totalAppointments.reduce(
+    (acc, appointment) => {
+      const status = appointment.status;
+      if (acc[status]) {
+        acc[status] += 1;
+      } else {
+        acc[status] = 1;
+      }
+      return acc;
+    },
+    { Scheduled: 0, Requested: 0, Completed: 0 }
+  );
+
   return (
     <div className="min-h-screen bg-pink-50 flex flex-col">
       <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
         <div className="flex items-center justify-center">
-          <span className="ml-2 text-2xl font-bold text-gray-900">System Reports</span>
+          <span className="ml-2 text-2xl font-bold text-gray-900">Doctor Appointment Data</span>
         </div>
       </header>
       <main className="flex-1 p-4">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-gray-900">System Reports</h1>
+            <h1 className="text-3xl font-extrabold text-gray-900">Doctor Report</h1>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Filters */}
@@ -233,9 +267,40 @@ const SystemReports = () => {
             Generate Report
           </button>
 
+          {/* Aggregate Data Display */}
+          {reportData.length > 0 && (
+            <div className="bg-white p-6 rounded-lg shadow-md mt-8">
+              <h2 className="text-2xl font-bold mb-4 text-center">Aggregate Summary</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-600">Total Prescriptions</p>
+                  <p className="text-3xl font-bold text-gray-900">{totalPrescriptions}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-600">Scheduled Appointments</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {appointmentStatusCounts.Scheduled || 0}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-600">Requested Appointments</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {appointmentStatusCounts.Requested || 0}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-600">Completed Appointments</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {appointmentStatusCounts.Completed || 0}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Report Data Display */}
           {reportData.length > 0 && (
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white p-6 rounded-lg shadow-md mt-8">
               <h2 className="text-2xl font-bold mb-4">Report Results</h2>
               {reportData.map((doctor) => {
                 const appointmentCounts = ['Scheduled', 'Requested', 'Completed'].reduce(
@@ -247,26 +312,33 @@ const SystemReports = () => {
                 );
 
                 return (
-                  <div key={doctor.doctorID} className="border rounded-lg shadow-md p-4 mb-4 bg-white">
+                  <div
+                    key={doctor.doctorID}
+                    className="border rounded-lg shadow-md p-4 mb-4 bg-white"
+                  >
                     <div className="flex justify-between items-center">
                       <div>
                         <h3 className="text-xl font-bold text-gray-900">
                           {doctor.firstName} {doctor.lastName}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          Specialty: <span className="font-medium">{doctor.specialtyName}</span>
+                          Specialty:{' '}
+                          <span className="font-medium">{doctor.specialtyName || 'N/A'}</span>
                         </p>
                         <p className="text-sm text-gray-600">
-                          Gender: <span className="font-medium">{doctor.gender}</span>
+                          Gender: <span className="font-medium">{doctor.gender || 'N/A'}</span>
                         </p>
                         <p className="text-sm text-gray-600">
-                          Office: <span className="font-medium">{doctor.officeName || 'Unknown Office'}</span>
+                          Office:{' '}
+                          <span className="font-medium">
+                            {doctor.officeName || 'Unknown Office'}
+                          </span>
                         </p>
                         <p className="text-sm text-gray-600">
-                          City: <span className="font-medium">{doctor.addrcity || 'Unknown City'}</span>
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          State: <span className="font-medium">{doctor.addrstate || 'Unknown State'}</span>
+                          Address:{' '}
+                          <span className="font-medium">
+                            {formatAddress(doctor) || 'Unknown Address'}
+                          </span>
                         </p>
                       </div>
                       <button
@@ -279,7 +351,9 @@ const SystemReports = () => {
                     <div className="mt-4 grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Total Prescriptions:</p>
-                        <p className="text-lg font-bold text-gray-900">{doctor.prescriptions.length}</p>
+                        <p className="text-lg font-bold text-gray-900">
+                          {doctor.prescriptions.length}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-600">Scheduled Appointments:</p>
