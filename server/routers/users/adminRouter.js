@@ -13,6 +13,7 @@ import {
   getSpecialties,
   getServices,
 } from "../../controllers/admin/appointmentAnalytics.js";
+import billingReportRouter from "../subRouters/billingReportRouter.js";
 
 const router = express.Router();
 
@@ -30,4 +31,5 @@ router.get("/visitTypes", getVisitTypes);
 router.get("/specialties", getSpecialties);
 router.get("/services", getServices);
 
+router.use("/billing-report", billingReportRouter);
 export default router;
