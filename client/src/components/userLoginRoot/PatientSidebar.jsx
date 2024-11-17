@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import {
   Heart,
   Calendar,
+  CalendarCheck2,
+  CalendarDays,
   FileText,
   PillBottle,
   CreditCard,
@@ -43,8 +45,8 @@ export default function PatientSidebar() {
   const sidebarItems = {
     "Patient Services": [
       { id: "dashboard", label: "Dashboard", icon: Heart },
-      { id: "appointments", label: "Appointments", icon: Calendar },
-      { id: "visits", label: "Visits", icon: Calendar },
+      { id: "appointments", label: "Booking", icon: CalendarCheck2 },
+      { id: "visits", label: "Visits", icon: CalendarDays },
       { id: "medical-records", label: "Medical Records", icon: FileText },
       { id: "medications", label: "Medications", icon: PillBottle },
       //{ id: "personal-info", label: "Personal Info", icon: User },
