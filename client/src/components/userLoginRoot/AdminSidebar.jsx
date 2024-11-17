@@ -17,6 +17,7 @@ import AdminNameDisplay from "./sidebarItems/WelcomeAdminName";
 
 // Files Linked
 import AdminDashboard from "../users/admin/adminDashboard/AdminDashboard";
+import DoctorReports from "../users/admin/sections/system-reports";
 
 export default function AdminSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -37,6 +38,7 @@ export default function AdminSidebar() {
       { id: "billing-data", label: "Financial Overview", icon: CreditCard },
       { id: "prescription-data", label: "Prescription Analysis", icon: PillBottle },
       { id: "appointment-data", label: "Appointment Metrics", icon: CalendarSearch },
+      { id: "doctor-data", label: "Doctor Reports", icon: UserRoundSearch}, //Icon is currently placeholder
     ],
   };
 
@@ -111,6 +113,7 @@ export default function AdminSidebar() {
         {activeTab === "billing-data" && <div>bill stuff</div>}
         {activeTab === "prescription-data" && <div>perrrscription</div>}
         {activeTab === "appointment-data" && <div>appointdick</div>}
+        {activeTab === "doctor-data" && <DoctorReports />}
       </main>
     </div>
   );

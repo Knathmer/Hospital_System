@@ -1,80 +1,143 @@
 // controllers/admin/reportController.js
-import pool from "../../database.js";
+import pool from '../../database.js';
 
-// Controller function to get office locations
+// Fetch Office Locations
 export const getOfficeLocations = async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT officeID, officeName FROM office');
     res.json(rows);
   } catch (error) {
-    console.error('Error fetching office locations:', error);
-    res.status(500).send('Server Error');
+    res.status(500).send('Error fetching office locations');
   }
 };
 
-// Controller function to get doctor specialties
+// Fetch Specialties
 export const getSpecialties = async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT DISTINCT specialtyID, specialtyName FROM Specialty');
     res.json(rows);
   } catch (error) {
-    console.error('Error fetching specialties:', error);
-    res.status(500).send('Server Error');
+    res.status(500).send('Error fetching specialties');
   }
 };
 
+// Fetch States
+export const getStates = async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT DISTINCT addrstate AS value FROM address');
+    res.json(rows.map((row) => ({ value: row.value, label: row.value })));
+  } catch (error) {
+    res.status(500).send('Error fetching states');
+  }
+};
+
+// Fetch Cities
+export const getCities = async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT DISTINCT addrcity AS value FROM address');
+    res.json(rows.map((row) => ({ value: row.value, label: row.value })));
+  } catch (error) {
+    res.status(500).send('Error fetching cities');
+  }
+};
+
+// Fetch Doctors
+export const getDoctors = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT doctorID AS value, CONCAT(firstName, " ", lastName) AS label FROM doctor'
+    );
+    res.json(rows);
+  } catch (error) {
+    res.status(500).send('Error fetching doctors');
+  }
+};
+
+// Generate Doctor Report
 export const generateDoctorReport = async (req, res) => {
-  const { officeID, specialtyID, gender, startDate, endDate } = req.query;
+  const { officeID, specialtyID, gender, state, city, doctorID, startDate, endDate } = req.query;
+
+  const buildArrayParam = (param) => {
+    if (!param) return []; // Return empty array if param is undefined or null
+    return Array.isArray(param) ? param : [param];
+  };
+
+  const officeIDs = buildArrayParam(officeID);
+  const specialtyIDs = buildArrayParam(specialtyID);
+  const genders = buildArrayParam(gender);
+  const states = buildArrayParam(state);
+  const cities = buildArrayParam(city);
+  const doctorIDs = buildArrayParam(doctorID);
 
   try {
-    let doctorQuery = `
-      SELECT
-        d.doctorID,
-        d.firstName,
-        d.lastName,
-        s.specialtyName,
-        d.gender,
-        o.officeID,
-        o.officeName
+    let query = `
+      SELECT d.doctorID, d.firstName, d.lastName, s.specialtyName, o.officeName, a.addrcity, a.addrstate
       FROM doctor d
       LEFT JOIN Specialty s ON d.specialtyID = s.specialtyID
       LEFT JOIN office o ON d.officeID = o.officeID
+      LEFT JOIN address a ON o.addressID = a.addressID
       WHERE 1=1
     `;
 
     const params = [];
 
-    if (officeID) {
-      doctorQuery += ' AND d.officeID = ?';
-      params.push(officeID);
+    if (officeIDs.length > 0) {
+      query += ` AND d.officeID IN (${officeIDs.map(() => '?').join(',')})`;
+      params.push(...officeIDs);
     }
 
-    if (specialtyID) {
-      doctorQuery += ' AND d.specialtyID = ?';
-      params.push(specialtyID);
+    if (specialtyIDs.length > 0) {
+      query += ` AND d.specialtyID IN (${specialtyIDs.map(() => '?').join(',')})`;
+      params.push(...specialtyIDs);
     }
 
-    if (gender) {
-      doctorQuery += ' AND d.gender = ?';
-      params.push(gender);
+    if (genders.length > 0) {
+      query += ` AND d.gender IN (${genders.map(() => '?').join(',')})`;
+      params.push(...genders);
     }
 
-    doctorQuery += `
-      ORDER BY d.lastName, d.firstName
-    `;
+    if (states.length > 0) {
+      query += ` AND a.addrstate IN (${states.map(() => '?').join(',')})`;
+      params.push(...states);
+    }
 
-    // Fetch doctors based on filters
-    const [doctors] = await pool.query(doctorQuery, params);
+    if (cities.length > 0) {
+      query += ` AND a.addrcity IN (${cities.map(() => '?').join(',')})`;
+      params.push(...cities);
+    }
 
-    // For each doctor, fetch appointments and prescriptions
+    if (doctorIDs.length > 0) {
+      query += ` AND d.doctorID IN (${doctorIDs.map(() => '?').join(',')})`;
+      params.push(...doctorIDs);
+    }
+
+    // If startDate or endDate is provided, filter appointments and prescriptions
+    let dateFilterAppointments = '';
+    let dateFilterPrescriptions = '';
+    const dateParams = [];
+
+    if (startDate) {
+      dateFilterAppointments += ' AND a.appointmentDateTime >= ?';
+      dateFilterPrescriptions += ' AND pr.dateIssued >= ?';
+      dateParams.push(startDate);
+    }
+
+    if (endDate) {
+      dateFilterAppointments += ' AND a.appointmentDateTime <= ?';
+      dateFilterPrescriptions += ' AND pr.dateIssued <= ?';
+      dateParams.push(endDate);
+    }
+
+    const [doctors] = await pool.query(query, params);
+
+    // Fetch appointments and prescriptions for each doctor
     const detailedData = await Promise.all(
       doctors.map(async (doctor) => {
-        // Fetch appointments for the doctor
+        // Fetch appointments
         let appointmentQuery = `
           SELECT
             a.appointmentID,
             a.appointmentDateTime,
-            a.title,
             a.reason,
             a.status,
             p.patientID,
@@ -83,22 +146,13 @@ export const generateDoctorReport = async (req, res) => {
           FROM appointment a
           INNER JOIN patient p ON a.patientID = p.patientID
           WHERE a.doctorID = ?
+          ${dateFilterAppointments}
         `;
-        const appointmentParams = [doctor.doctorID];
-
-        if (startDate) {
-          appointmentQuery += ' AND a.appointmentDateTime >= ?';
-          appointmentParams.push(startDate);
-        }
-
-        if (endDate) {
-          appointmentQuery += ' AND a.appointmentDateTime <= ?';
-          appointmentParams.push(endDate);
-        }
+        const appointmentParams = [doctor.doctorID, ...dateParams];
 
         const [appointments] = await pool.query(appointmentQuery, appointmentParams);
 
-        // Fetch prescriptions for the doctor
+        // Fetch prescriptions
         let prescriptionQuery = `
           SELECT
             pr.prescriptionID,
@@ -115,18 +169,9 @@ export const generateDoctorReport = async (req, res) => {
           FROM prescription pr
           INNER JOIN patient p ON pr.patientID = p.patientID
           WHERE pr.doctorID = ?
+          ${dateFilterPrescriptions}
         `;
-        const prescriptionParams = [doctor.doctorID];
-
-        if (startDate) {
-          prescriptionQuery += ' AND pr.dateIssued >= ?';
-          prescriptionParams.push(startDate);
-        }
-
-        if (endDate) {
-          prescriptionQuery += ' AND pr.dateIssued <= ?';
-          prescriptionParams.push(endDate);
-        }
+        const prescriptionParams = [doctor.doctorID, ...dateParams];
 
         const [prescriptions] = await pool.query(prescriptionQuery, prescriptionParams);
 
@@ -140,8 +185,7 @@ export const generateDoctorReport = async (req, res) => {
 
     res.json(detailedData);
   } catch (error) {
-    console.error('Error generating doctor report:', error);
-    res.status(500).send('Server Error');
+    console.error('Error generating report:', error);
+    res.status(500).send('Error generating report');
   }
 };
-  

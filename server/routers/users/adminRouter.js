@@ -1,10 +1,17 @@
-// routers/users/adminRouter.js
 import express from 'express';
 import { registerDoctor } from "../../controllers/authController.js";
-import { getOfficeLocations, getSpecialties, generateDoctorReport } from "../../controllers/admin/reportController.js"
+import { 
+  getOfficeLocations, 
+  getSpecialties, 
+  generateDoctorReport,
+  getStates,
+  getCities,
+  getDoctors
+} from "../../controllers/admin/reportController.js";
 
 const router = express.Router();
 
+// Endpoint to register a doctor
 router.post('/register', registerDoctor);
 
 // Endpoint to get office locations
@@ -15,5 +22,14 @@ router.get('/getSpecialties', getSpecialties);
 
 // Endpoint to generate doctor report
 router.get('/generateDoctorReport', generateDoctorReport);
+
+// Endpoint to get states
+router.get('/getStates', getStates);
+
+// Endpoint to get cities
+router.get('/getCities', getCities);
+
+// Endpoint to get doctors
+router.get('/getDoctors', getDoctors);
 
 export default router;

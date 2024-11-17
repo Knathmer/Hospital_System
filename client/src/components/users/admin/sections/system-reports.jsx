@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Heart } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Select from 'react-select';
 
 const SystemReports = () => {
   const [officeLocations, setOfficeLocations] = useState([]);
   const [specialties, setSpecialties] = useState([]);
-  const [genders, setGenders] = useState(['Male', 'Female', 'Other', 'Prefer not to say']);
-  const [selectedOffice, setSelectedOffice] = useState('');
-  const [selectedSpecialty, setSelectedSpecialty] = useState('');
-  const [selectedGender, setSelectedGender] = useState('');
+  const [genders, setGenders] = useState([
+    { value: 'Male', label: 'Male' },
+    { value: 'Female', label: 'Female' },
+    { value: 'Other', label: 'Other' },
+    { value: 'Prefer not to say', label: 'Prefer not to say' },
+  ]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+
+  const [selectedOffices, setSelectedOffices] = useState([]);
+  const [selectedSpecialties, setSelectedSpecialties] = useState([]);
+  const [selectedGenders, setSelectedGenders] = useState([]);
+  const [selectedStates, setSelectedStates] = useState([]);
+  const [selectedCities, setSelectedCities] = useState([]);
+  const [selectedDoctors, setSelectedDoctors] = useState([]);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reportData, setReportData] = useState([]);
@@ -19,54 +30,85 @@ const SystemReports = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
 
+    // Fetch Office Locations
     fetch(`${API_BASE_URL}/auth/admin/getOfficeLocations`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setOfficeLocations(data);
-        } else {
-          console.error('Invalid response format:', data);
-          setOfficeLocations([]);
-        }
-      })
-      .catch((err) => {
-        console.error('Fetch error:', err);
-        setOfficeLocations([]);
-      });
+      .then((data) => setOfficeLocations(data))
+      .catch((err) => console.error('Fetch error:', err));
 
+    // Fetch Specialties
     fetch(`${API_BASE_URL}/auth/admin/getSpecialties`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setSpecialties(data);
-        } else {
-          console.error('Invalid response format:', data);
-          setSpecialties([]);
-        }
-      })
-      .catch((err) => {
-        console.error('Fetch error:', err);
-        setSpecialties([]);
-      });
+      .then((data) => setSpecialties(data))
+      .catch((err) => console.error('Fetch error:', err));
+
+    // Fetch States
+    fetch(`${API_BASE_URL}/auth/admin/getStates`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setStates(data))
+      .catch((err) => console.error('Fetch error:', err));
+
+    // Fetch Cities
+    fetch(`${API_BASE_URL}/auth/admin/getCities`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setCities(data))
+      .catch((err) => console.error('Fetch error:', err));
+
+    // Fetch Doctors
+    fetch(`${API_BASE_URL}/auth/admin/getDoctors`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setDoctors(data))
+      .catch((err) => console.error('Fetch error:', err));
   }, []);
 
   const handleGenerateReport = () => {
     const token = localStorage.getItem('token');
-    const params = new URLSearchParams({
-      officeID: selectedOffice,
-      specialtyID: selectedSpecialty,
-      gender: selectedGender,
-      startDate,
-      endDate,
+    const params = new URLSearchParams();
+
+    selectedOffices.forEach((office) => {
+      params.append('officeID', office.value);
     });
+    selectedSpecialties.forEach((specialty) => {
+      params.append('specialtyID', specialty.value);
+    });
+    selectedGenders.forEach((gender) => {
+      params.append('gender', gender.value);
+    });
+    selectedStates.forEach((state) => {
+      params.append('state', state.value);
+    });
+    selectedCities.forEach((city) => {
+      params.append('city', city.value);
+    });
+    selectedDoctors.forEach((doctor) => {
+      params.append('doctorID', doctor.value);
+    });
+    if (startDate) {
+      params.append('startDate', startDate);
+    }
+    if (endDate) {
+      params.append('endDate', endDate);
+    }
 
     fetch(`${API_BASE_URL}/auth/admin/generateDoctorReport?${params.toString()}`, {
       headers: {
@@ -99,107 +141,99 @@ const SystemReports = () => {
     <div className="min-h-screen bg-pink-50 flex flex-col">
       <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
         <div className="flex items-center justify-center">
-          <Heart className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">WomenWell Admin</span>
+          <span className="ml-2 text-2xl font-bold text-gray-900">System Reports</span>
         </div>
       </header>
       <main className="flex-1 p-4">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="text-center">
             <h1 className="text-3xl font-extrabold text-gray-900">System Reports</h1>
-            <p className="mt-2 text-lg text-gray-600">Generate reports based on doctors' data.</p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4">Doctor Workload Report</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <label htmlFor="office" className="block text-sm font-medium text-gray-700">
-                  Office Location
-                </label>
-                <select
-                  id="office"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50"
-                  value={selectedOffice}
-                  onChange={(e) => setSelectedOffice(e.target.value)}
-                >
-                  <option value="">All Offices</option>
-                  {officeLocations.map((office) => (
-                    <option key={office.officeID} value={office.officeID}>
-                      {office.officeName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="specialty" className="block text-sm font-medium text-gray-700">
-                  Specialty
-                </label>
-                <select
-                  id="specialty"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50"
-                  value={selectedSpecialty}
-                  onChange={(e) => setSelectedSpecialty(e.target.value)}
-                >
-                  <option value="">All Specialties</option>
-                  {specialties.map((specialty) => (
-                    <option key={specialty.specialtyID} value={specialty.specialtyID}>
-                      {specialty.specialtyName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
-                  Gender
-                </label>
-                <select
-                  id="gender"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50"
-                  value={selectedGender}
-                  onChange={(e) => setSelectedGender(e.target.value)}
-                >
-                  <option value="">All Genders</option>
-                  {genders.map((gender) => (
-                    <option key={gender} value={gender}>
-                      {gender}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  id="startDate"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  id="endDate"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Filters */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Office Locations</label>
+              <Select
+                isMulti
+                options={officeLocations.map((office) => ({
+                  value: office.officeID,
+                  label: office.officeName,
+                }))}
+                value={selectedOffices}
+                onChange={setSelectedOffices}
+              />
             </div>
-            <div className="mt-6">
-              <button
-                onClick={handleGenerateReport}
-                className="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
-              >
-                Generate Report
-              </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Specialties</label>
+              <Select
+                isMulti
+                options={specialties.map((specialty) => ({
+                  value: specialty.specialtyID,
+                  label: specialty.specialtyName,
+                }))}
+                value={selectedSpecialties}
+                onChange={setSelectedSpecialties}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Genders</label>
+              <Select isMulti options={genders} value={selectedGenders} onChange={setSelectedGenders} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">States</label>
+              <Select
+                isMulti
+                options={states}
+                value={selectedStates}
+                onChange={setSelectedStates}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Cities</label>
+              <Select
+                isMulti
+                options={cities}
+                value={selectedCities}
+                onChange={setSelectedCities}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Doctors</label>
+              <Select
+                isMulti
+                options={doctors}
+                value={selectedDoctors}
+                onChange={setSelectedDoctors}
+              />
+            </div>
+            {/* Date Filters */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Start Date</label>
+              <input
+                type="date"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">End Date</label>
+              <input
+                type="date"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
             </div>
           </div>
+          <button
+            onClick={handleGenerateReport}
+            className="mt-4 px-4 py-2 bg-pink-500 text-white rounded"
+          >
+            Generate Report
+          </button>
+
+          {/* Report Data Display */}
           {reportData.length > 0 && (
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-2xl font-bold mb-4">Report Results</h2>
@@ -220,17 +254,19 @@ const SystemReports = () => {
                           {doctor.firstName} {doctor.lastName}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          Specialty:{' '}
-                          <span className="font-medium">{doctor.specialtyName}</span>
+                          Specialty: <span className="font-medium">{doctor.specialtyName}</span>
                         </p>
                         <p className="text-sm text-gray-600">
                           Gender: <span className="font-medium">{doctor.gender}</span>
                         </p>
                         <p className="text-sm text-gray-600">
-                          Office:{' '}
-                          <span className="font-medium">
-                            {doctor.officeName || 'Unknown Office'}
-                          </span>
+                          Office: <span className="font-medium">{doctor.officeName || 'Unknown Office'}</span>
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          City: <span className="font-medium">{doctor.addrcity || 'Unknown City'}</span>
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          State: <span className="font-medium">{doctor.addrstate || 'Unknown State'}</span>
                         </p>
                       </div>
                       <button
@@ -238,42 +274,27 @@ const SystemReports = () => {
                         className="text-pink-600 hover:text-pink-800 flex items-center"
                       >
                         {expandedDoctors[doctor.doctorID] ? 'Hide Details' : 'Show Details'}
-                        {expandedDoctors[doctor.doctorID] ? (
-                          <ChevronUp className="ml-1 h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="ml-1 h-4 w-4" />
-                        )}
                       </button>
                     </div>
                     <div className="mt-4 grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">
-                          Total Prescriptions:
-                        </p>
-                        <p className="text-lg font-bold text-gray-900">
-                          {doctor.prescriptions.length}
-                        </p>
+                        <p className="text-sm font-medium text-gray-600">Total Prescriptions:</p>
+                        <p className="text-lg font-bold text-gray-900">{doctor.prescriptions.length}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-600">
-                          Scheduled Appointments:
-                        </p>
+                        <p className="text-sm font-medium text-gray-600">Scheduled Appointments:</p>
                         <p className="text-lg font-bold text-gray-900">
                           {appointmentCounts.Scheduled || 0}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-600">
-                          Requested Appointments:
-                        </p>
+                        <p className="text-sm font-medium text-gray-600">Requested Appointments:</p>
                         <p className="text-lg font-bold text-gray-900">
                           {appointmentCounts.Requested || 0}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-600">
-                          Completed Appointments:
-                        </p>
+                        <p className="text-sm font-medium text-gray-600">Completed Appointments:</p>
                         <p className="text-lg font-bold text-gray-900">
                           {appointmentCounts.Completed || 0}
                         </p>
@@ -281,7 +302,7 @@ const SystemReports = () => {
                     </div>
                     {expandedDoctors[doctor.doctorID] && (
                       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                        {/* Added styling to make the expanded section visually distinct */}
+                        {/* Appointment Details */}
                         {['Scheduled', 'Requested', 'Completed'].map((status) => {
                           const filteredAppointments = doctor.appointments.filter(
                             (appointment) => appointment.status === status
@@ -295,7 +316,7 @@ const SystemReports = () => {
                                   {filteredAppointments.map((appointment) => (
                                     <li key={appointment.appointmentID}>
                                       {formatDateTime(appointment.appointmentDateTime)} -{' '}
-                                      {appointment.title} ({appointment.patientFirstName}{' '}
+                                      {appointment.reason} ({appointment.patientFirstName}{' '}
                                       {appointment.patientLastName})
                                     </li>
                                   ))}
@@ -304,6 +325,7 @@ const SystemReports = () => {
                             )
                           );
                         })}
+                        {/* Prescription Details */}
                         <div>
                           <h4 className="font-semibold text-lg">Prescriptions:</h4>
                           <ul className="list-disc list-inside">
@@ -325,9 +347,6 @@ const SystemReports = () => {
           )}
         </div>
       </main>
-      <footer className="py-6 text-center border-t bg-white">
-        <p className="text-sm text-gray-500">© 2024 WomenWell. All rights reserved.</p>
-      </footer>
     </div>
   );
 };
