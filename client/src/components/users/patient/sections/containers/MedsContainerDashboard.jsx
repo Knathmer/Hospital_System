@@ -5,6 +5,8 @@ import { PillBottle } from "lucide-react";
 import GenericContainer from "./GenericContainer.jsx";
 import NavButton from "../../../../ui/buttons/NavButton.jsx";
 
+import envConfig from "../../../../../envConfig.js";
+
 const MedsDashboard = () => {
   const [testResults, setTestResults] = useState([]); // State for test results
   const [loading, setLoading] = useState(true); // State for loading indicator
@@ -14,11 +16,14 @@ const MedsDashboard = () => {
     const fetchTestResults = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/dataFetch/get-meds-dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${envConfig.apiUrl}/dataFetch/get-meds-dashboard`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         console.log("Fetched test results:", response.data);
         setTestResults(response.data);
       } catch (error) {
@@ -39,7 +44,7 @@ const MedsDashboard = () => {
         Medication Status
       </h2>
 
-      <div className="overflow-y-auto" style={{ maxHeight: "150px" }}> 
+      <div className="overflow-y-auto" style={{ maxHeight: "150px" }}>
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
@@ -53,7 +58,8 @@ const MedsDashboard = () => {
                 </span>
                 <br />
                 <span className="text-sm text-gray-500">
-                  Request Date: {new Date(result.requestDate).toLocaleDateString()}
+                  Request Date:{" "}
+                  {new Date(result.requestDate).toLocaleDateString()}
                 </span>
               </li>
             ))}

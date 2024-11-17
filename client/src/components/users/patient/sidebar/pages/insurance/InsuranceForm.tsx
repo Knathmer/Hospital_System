@@ -12,6 +12,8 @@ import Select from "react-select";
 
 import axios from "axios";
 
+import envConfig from "../../../../../../envConfig";
+
 // import Link from "next/link"
 
 const insuranceOptions = [
@@ -77,7 +79,7 @@ export default function InsuranceForm() {
       }
 
       const response = await axios.post(
-        "http://localhost:3000/auth/patient/insurance",
+        `${envConfig.apiUrl}/auth/patient/insurance`,
         formData,
         {
           headers: {

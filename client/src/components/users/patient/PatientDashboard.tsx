@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 
 import axios from "axios";
 
+import envConfig from "../../../envConfig.js";
+
 // import NavbarPatient from "./sections/header/NavbarPatient.jsx";
 import QuickActions from "./sections/QuickActionsPatient.jsx";
 
@@ -17,7 +19,7 @@ export default function PatientDashboard() {
       try {
         const token = localStorage.getItem("token"); // Retrieve token from localStorage
         const response = await axios.get(
-          "http://localhost:3000/dataFetch/get-patient-name",
+          `${envConfig.apiUrl}/dataFetch/get-patient-name`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

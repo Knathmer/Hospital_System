@@ -4,6 +4,8 @@ import MedicalHistoryForm from "./MedicalHistoryForm";
 
 import axios from "axios";
 
+import envConfig from "../../../../../../envConfig";
+
 export default function MedicalHistoryPage() {
   const [medHistoryInfo, setMedHistoryInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,7 @@ export default function MedicalHistoryPage() {
         }
         // Fetch insurance information from the server (replace with your API endpoint)
         const response = await axios.get(
-          "http://localhost:3000/auth/patient/medical-history-info",
+          `${envConfig.apiUrl}/auth/patient/medical-history-info`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
