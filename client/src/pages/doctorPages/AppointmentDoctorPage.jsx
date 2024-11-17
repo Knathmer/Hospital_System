@@ -452,6 +452,7 @@ export default function AppointmentPage() {
       );
     }
   };
+  const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
 
   //Charge Functions -----------------------------/pa
   // Function to add a new custom charge
@@ -949,7 +950,7 @@ export default function AppointmentPage() {
             Previous Appointments
           </h2>
           <div>
-            {previousAppointments.appointmentID ? (
+            {previousAppointments.length > 0 ? (
               <div className="space-y-4">
                 {previousAppointments.map((appointment) => (
                   <div
@@ -975,7 +976,7 @@ export default function AppointmentPage() {
                       Service: {appointment.serviceName}
                     </p>
                     <p className="text-gray-700">
-                      Notes: {appointment.afterAppointmentNotes}
+                      Notes: {appointment.notes || "None"}
                     </p>
                     <p className="text-gray-700">
                       {appointment.officeName} at {appointment.officeAddress}
@@ -1697,11 +1698,68 @@ export default function AppointmentPage() {
         </div>
 
         <Button
-          //   onClick={handleCompleteAppointment}
+          onClick={() => setIsCompleteDialogOpen(true)}
           className="w-full bg-pink-600 hover:bg-pink-700 text-white text-lg py-3"
         >
           Mark Appointment as Complete
         </Button>
+
+        {isCompleteDialogOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative overflow-y-auto max-h-[90vh] animate-fade-in-up">
+              {/* Modal Header */}
+              <div className="flex justify-between items-center mb-6 border-b pb-4">
+                <h3 className="text-2xl font-bold text-gray-800">
+                  Confirm Completion
+                </h3>
+                <button
+                  onClick={() => setIsCompleteDialogOpen(false)}
+                  className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                >
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="space-y-6">
+                <p className="text-gray-700">
+                  Are you sure you want to mark this appointment as complete?
+                </p>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex justify-end mt-8 space-x-3">
+                <button
+                  onClick={() => setIsCompleteDialogOpen(false)}
+                  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition-colors duration-200"
+                >
+                  No
+                </button>
+                <button
+                  onClick={() => {
+                    handleCompleteAppointment();
+                    setIsCompleteDialogOpen(false);
+                  }}
+                  className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-md transition-colors duration-200"
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

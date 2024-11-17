@@ -24,6 +24,7 @@ import {
   addVaccine,
   addSurgery,
   addFamilyHistory,
+  completeAppointment,
 } from "../../controllers/doctor/doctorScheduleController.js";
 
 const doctorScheduleRouter = express.Router();
@@ -52,6 +53,7 @@ doctorScheduleRouter.put("/reactivate-medication", reactivateMedication);
 doctorScheduleRouter.put("/refill-medication", refillMedication);
 
 //Appointment Handler POST
+doctorScheduleRouter.post("/complete-appointment", completeAppointment);
 doctorScheduleRouter.post("/add-medication", postNewMedication);
 doctorScheduleRouter.post("/save-charges", saveCharges);
 doctorScheduleRouter.post("/add-allergy", addAllergy);

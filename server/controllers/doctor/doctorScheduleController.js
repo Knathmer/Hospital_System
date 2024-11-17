@@ -486,7 +486,7 @@ export const completeAppointment = async (req, res) => {
     const { appointmentID, patientID, notes } = req.body;
 
     //Validate that you have the necessary information. You need all of these pieces of passed infomration
-    if (!appointmentID || !doctorID || !patientID || notes) {
+    if (!appointmentID || !doctorID || !patientID || !notes) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -508,18 +508,12 @@ export const completeAppointment = async (req, res) => {
     ]);
     const visitNotesID = visitNotesResult.insertId;
 
-    // Update appointment to reference visit_notes and set status to 'Completed'
-    //COME BACK TO THIS FIX THIS
-    //   const updateAppointmentQuery = `
-    //   UPDATE appointment
-    //   SET status = 'Completed', afterAppointmentNotes = ?, visitNotesID = ?
-    //   WHERE appointmentID = ?
-    // `;
-    //   await connection.execute(updateAppointmentQuery, [
-    //     notes,
-    //     visitNotesID,
-    //     appointmentID,
-    //   ]);
+    const updateAppointmentQuery = `UPDATE appointment SET status = 'Completed', visitNotesID = ? WHERE appointmentID = ?;`;
+
+    await connection.execute(updateAppointmentQuery, [
+      visitNotesID,
+      appointmentID,
+    ]);
 
     // Commit the transaction
     await connection.commit();
