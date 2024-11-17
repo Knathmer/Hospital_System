@@ -13,22 +13,6 @@ const formatPhoneNumber = (phoneNumberString) => {
   return phoneNumberString; // Return the original string if it doesn't match
 };
 
-// Function to calculate age from date of birth
-const calculateAge = (dob) => {
-  const birthDate = new Date(dob);
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDifference =
-    today.getMonth() - birthDate.getMonth();
-  if (
-    monthDifference < 0 ||
-    (monthDifference === 0 && today.getDate() < birthDate.getDate())
-  ) {
-    age--;
-  }
-  return age;
-};
-
 // Utility function to sort appointments in descending order
 const sortAppointmentsDescending = (appointmentsList) => {
   return [...appointmentsList].sort(
@@ -312,70 +296,51 @@ function DocAppointmentOverview() {
                 key={appointment.appointmentID}
                 className="bg-white shadow-md rounded-lg p-4"
               >
-                <div>
-                  <p>
-                    <strong>Reason:</strong> {appointment.reason || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {appointment.status}
-                  </p>
-                  <p>
-                    <strong>Service:</strong> {appointment.serviceName || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Visit Type:</strong> {appointment.visitType || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Date & Time:</strong>{" "}
-                    {new Date(
-                      appointment.appointmentDateTime
-                    ).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Patient:</strong> {appointment.patientFirstName}{" "}
-                    {appointment.patientLastName}
-                  </p>
-                  <p>
-                    <strong>Patient's Email:</strong>{" "}
-                    {appointment.patientEmail || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Patient's Phone:</strong>{" "}
-                    {appointment.patientPhoneNumber
-                      ? formatPhoneNumber(appointment.patientPhoneNumber)
-                      : "N/A"}
-                  </p>
-                  <p>
-                    <strong>Patient's DOB:</strong>{" "}
-                    {appointment.patientDOB
-                      ? new Date(appointment.patientDOB).toLocaleDateString()
-                      : "N/A"}{" "}
-                    {appointment.patientDOB
-                      ? `(Age: ${calculateAge(appointment.patientDOB)})`
-                      : ""}
-                  </p>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-xl font-bold">
+                      {new Date(
+                        appointment.appointmentDateTime
+                      ).toLocaleString()}
+                    </p>
+                    <p className="text-gray-600">
+                      Reason: {appointment.reason || "N/A"}
+                    </p>
+                    <p className="text-gray-600">
+                      Status: {appointment.status}
+                    </p>
+                    <p className="text-gray-600">
+                      Service: {appointment.serviceName || "N/A"}
+                    </p>
+                    <p className="text-gray-600">
+                      Visit Type: {appointment.visitType || "N/A"}
+                    </p>
+                    <p className="text-gray-600">
+                      Patient: {appointment.patientFirstName}{" "}
+                      {appointment.patientLastName}
+                    </p>
+                    <p className="text-gray-600">
+                      Patient's Email: {appointment.patientEmail || "N/A"}
+                    </p>
+                    <p className="text-gray-600">
+                      Patient's Phone:{" "}
+                      {appointment.patientPhoneNumber
+                        ? formatPhoneNumber(appointment.patientPhoneNumber)
+                        : "N/A"}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex justify-end mt-4 space-x-2">
                   {appointment.status === "Requested" && (
                     <>
                       <button
-                        onClick={() =>
-                          handleUpdateAppointment(
-                            appointment.appointmentID,
-                            "Scheduled"
-                          )
-                        }
+                        onClick={() => handleSelectEvent(appointment, "Accept")}
                         className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none"
                       >
                         Accept
                       </button>
                       <button
-                        onClick={() =>
-                          handleUpdateAppointment(
-                            appointment.appointmentID,
-                            "Request Denied"
-                          )
-                        }
+                        onClick={() => handleSelectEvent(appointment, "Reject")}
                         className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
                       >
                         Reject
@@ -384,7 +349,7 @@ function DocAppointmentOverview() {
                   )}
                   {appointment.status === "Scheduled" && (
                     <button
-                      onClick={() => handleSelectEvent(appointment)}
+                      onClick={() => handleSelectEvent(appointment, "Cancel")}
                       className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
                     >
                       Cancel Appointment
@@ -486,7 +451,6 @@ function DocAppointmentOverview() {
           appointment={selectedAppointment}
           onClose={closeModal}
           onUpdateStatus={handleUpdateAppointment}
-          showCancelOption={true}
         />
       )}
     </div>

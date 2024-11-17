@@ -10,29 +10,21 @@ const formatPhoneNumber = (phoneNumberString) => {
   return phoneNumberString; // Return the original string if it doesn't match
 };
 
-// Function to calculate age from date of birth
-const calculateAge = (dob) => {
-  const birthDate = new Date(dob);
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDifference =
-    today.getMonth() - birthDate.getMonth();
-  if (
-    monthDifference < 0 ||
-    (monthDifference === 0 && today.getDate() < birthDate.getDate())
-  ) {
-    age--;
-  }
-  return age;
-};
+function AppointmentModal({ appointment, onClose, onUpdateStatus }) {
+  const [showConfirm, setShowConfirm] = useState({
+    cancel: false,
+    accept: false,
+    reject: false,
+  });
 
-function AppointmentModal({
-  appointment,
-  onClose,
-  onUpdateStatus,
-  showCancelOption,
-}) {
-  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
+  const handleAction = (action) => {
+    setShowConfirm({ [action]: true });
+  };
+
+  const confirmAction = (status) => {
+    onUpdateStatus(appointment.appointmentID, status);
+    setShowConfirm({ cancel: false, accept: false, reject: false });
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -65,8 +57,7 @@ function AppointmentModal({
           {appointment.patientLastName}
         </p>
         <p>
-          <strong>Patient's Email:</strong>{" "}
-          {appointment.patientEmail || "N/A"}
+          <strong>Patient's Email:</strong> {appointment.patientEmail || "N/A"}
         </p>
         <p>
           <strong>Patient's Phone:</strong>{" "}
@@ -74,33 +65,39 @@ function AppointmentModal({
             ? formatPhoneNumber(appointment.patientPhoneNumber)
             : "N/A"}
         </p>
-        <p>
-          <strong>Patient's DOB:</strong>{" "}
-          {appointment.patientDOB
-            ? new Date(appointment.patientDOB).toLocaleDateString()
-            : "N/A"}{" "}
-          {appointment.patientDOB
-            ? `(Age: ${calculateAge(appointment.patientDOB)})`
-            : ""}
-        </p>
         {/* Add more details as needed */}
         <div className="flex justify-end mt-6 space-x-2">
-          {showConfirmCancel && (
+          {(showConfirm.cancel || showConfirm.accept || showConfirm.reject) && (
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
               <div className="bg-white rounded-lg shadow-lg p-6">
-                <p>Are you sure you want to cancel this appointment?</p>
+                <p>
+                  Are you sure you want to{" "}
+                  {showConfirm.cancel
+                    ? "cancel"
+                    : showConfirm.accept
+                    ? "accept"
+                    : "reject"}{" "}
+                  this appointment?
+                </p>
                 <div className="flex justify-end mt-4 space-x-2">
                   <button
-                    onClick={() => {
-                      onUpdateStatus(appointment.appointmentID, "Cancelled");
-                      setShowConfirmCancel(false);
-                    }}
+                    onClick={() =>
+                      confirmAction(
+                        showConfirm.cancel
+                          ? "Cancelled"
+                          : showConfirm.accept
+                          ? "Scheduled"
+                          : "Request Denied"
+                      )
+                    }
                     className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
                   >
-                    Yes, Cancel
+                    Yes
                   </button>
                   <button
-                    onClick={() => setShowConfirmCancel(false)}
+                    onClick={() =>
+                      setShowConfirm({ cancel: false, accept: false, reject: false })
+                    }
                     className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none"
                   >
                     No
@@ -112,26 +109,22 @@ function AppointmentModal({
           {appointment.status === "Requested" && (
             <>
               <button
-                onClick={() =>
-                  onUpdateStatus(appointment.appointmentID, "Scheduled")
-                }
+                onClick={() => handleAction("accept")}
                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none"
               >
                 Accept
               </button>
               <button
-                onClick={() =>
-                  onUpdateStatus(appointment.appointmentID, "Request Denied")
-                }
+                onClick={() => handleAction("reject")}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
               >
                 Reject
               </button>
             </>
           )}
-          {appointment.status === "Scheduled" && showCancelOption && (
+          {appointment.status === "Scheduled" && (
             <button
-              onClick={() => setShowConfirmCancel(true)}
+              onClick={() => handleAction("cancel")}
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none"
             >
               Cancel Appointment
