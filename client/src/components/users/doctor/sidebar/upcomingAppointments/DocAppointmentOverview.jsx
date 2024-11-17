@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import AppointmentModal from "./AppointmentModal";
+import MultiSelectInput from "./MultiSelectInput"; // Adjust the import path accordingly
 
 // Utility function to format phone numbers
 const formatPhoneNumber = (phoneNumberString) => {
@@ -51,14 +52,13 @@ function DocAppointmentOverview() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Filter States
-  const [patientFilter, setPatientFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
+  // Multi-select Filter States
+  const [patientOptions, setPatientOptions] = useState([]);
+  const [statusOptions, setStatusOptions] = useState([]);
+  const [selectedPatients, setSelectedPatients] = useState([]);
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
 
-  // Unique patients and statuses for Filters
-  const [uniquePatients, setUniquePatients] = useState([]);
-  const [uniqueStatuses, setUniqueStatuses] = useState([]);
+  const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -128,8 +128,18 @@ function DocAppointmentOverview() {
           statuses.add(appointment.status);
         });
 
-        setUniquePatients(Array.from(patients));
-        setUniqueStatuses(Array.from(statuses));
+        // Prepare options for MultiSelectInput
+        const patientOptionsArray = Array.from(patients).map((patient) => ({
+          value: patient,
+          label: patient,
+        }));
+        const statusOptionsArray = Array.from(statuses).map((status) => ({
+          value: status,
+          label: status,
+        }));
+
+        setPatientOptions(patientOptionsArray);
+        setStatusOptions(statusOptionsArray);
       } catch (err) {
         console.error("Error fetching appointments:", err);
         setError("Failed to load appointments.");
@@ -144,7 +154,7 @@ function DocAppointmentOverview() {
     // Apply Filters whenever filter states change
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientFilter, statusFilter, dateFilter, appointments]);
+  }, [selectedPatients, selectedStatuses, dateFilter, appointments]);
 
   const applyFilters = () => {
     const { upcoming, requested, past, other } = appointments;
@@ -152,14 +162,20 @@ function DocAppointmentOverview() {
     const filterList = (list) => {
       return list.filter((app) => {
         // Patient Filter
-        if (patientFilter) {
+        if (selectedPatients.length > 0) {
           const patientName = `${app.patientFirstName} ${app.patientLastName}`;
-          if (patientName !== patientFilter) return false;
+          const isSelected = selectedPatients.some(
+            (selected) => selected.value === patientName
+          );
+          if (!isSelected) return false;
         }
 
         // Status Filter
-        if (statusFilter) {
-          if (app.status !== statusFilter) return false;
+        if (selectedStatuses.length > 0) {
+          const isSelected = selectedStatuses.some(
+            (selected) => selected.value === app.status
+          );
+          if (!isSelected) return false;
         }
 
         // Date Filter
@@ -180,10 +196,10 @@ function DocAppointmentOverview() {
     };
 
     setFilteredAppointments({
-      upcoming: filterList(upcoming),
-      requested: filterList(requested),
-      past: filterList(past),
-      other: filterList(other),
+      upcoming: filterList(appointments.upcoming),
+      requested: filterList(appointments.requested),
+      past: filterList(appointments.past),
+      other: filterList(appointments.other),
     });
   };
 
@@ -332,9 +348,7 @@ function DocAppointmentOverview() {
                   <p>
                     <strong>Patient's DOB:</strong>{" "}
                     {appointment.patientDOB
-                      ? new Date(
-                          appointment.patientDOB
-                        ).toLocaleDateString()
+                      ? new Date(appointment.patientDOB).toLocaleDateString()
                       : "N/A"}{" "}
                     {appointment.patientDOB
                       ? `(Age: ${calculateAge(appointment.patientDOB)})`
@@ -394,43 +408,25 @@ function DocAppointmentOverview() {
         <h2 className="text-2xl font-semibold mb-4">Filter Appointments</h2>
         <div className="flex flex-col md:flex-row md:space-x-4">
           {/* Patient Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="patient" className="block text-gray-700 mb-2">
-              Patient:
-            </label>
-            <select
-              id="patient"
-              value={patientFilter}
-              onChange={(e) => setPatientFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Patients</option>
-              {uniquePatients.map((patient, index) => (
-                <option key={index} value={patient}>
-                  {patient}
-                </option>
-              ))}
-            </select>
+          <div className="flex-1">
+            <MultiSelectInput
+              label="Patient:"
+              options={patientOptions}
+              selectedValues={selectedPatients}
+              setSelectedValues={setSelectedPatients}
+              placeholder="Select Patients"
+            />
           </div>
 
           {/* Status Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="status" className="block text-gray-700 mb-2">
-              Status:
-            </label>
-            <select
-              id="status"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Statuses</option>
-              {uniqueStatuses.map((status, index) => (
-                <option key={index} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
+          <div className="flex-1">
+            <MultiSelectInput
+              label="Status:"
+              options={statusOptions}
+              selectedValues={selectedStatuses}
+              setSelectedValues={setSelectedStatuses}
+              placeholder="Select Statuses"
+            />
           </div>
 
           {/* Date Filter */}
@@ -461,8 +457,8 @@ function DocAppointmentOverview() {
         <div className="mt-4">
           <button
             onClick={() => {
-              setPatientFilter("");
-              setStatusFilter("");
+              setSelectedPatients([]);
+              setSelectedStatuses([]);
               setDateFilter({ start: "", end: "" });
             }}
             className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none"

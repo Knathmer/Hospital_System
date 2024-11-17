@@ -5,6 +5,7 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import { dateFnsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import AppointmentModal from "./AppointmentModal";
+import MultiSelectInput from "./MultiSelectInput";
 
 // Localization setup
 const locales = {
@@ -35,14 +36,13 @@ function DocAppointmentCalendar() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Filter States
-  const [patientFilter, setPatientFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
+  // Multi-select Filter States
+  const [patientOptions, setPatientOptions] = useState([]);
+  const [statusOptions, setStatusOptions] = useState([]);
+  const [selectedPatients, setSelectedPatients] = useState([]);
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
 
-  // Unique Patients and Statuses for Filters
-  const [uniquePatients, setUniquePatients] = useState([]);
-  const [uniqueStatuses, setUniqueStatuses] = useState([]);
+  const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -82,8 +82,18 @@ function DocAppointmentCalendar() {
           statuses.add(app.status);
         });
 
-        setUniquePatients(Array.from(patients));
-        setUniqueStatuses(Array.from(statuses));
+        // Prepare options for MultiSelectInput
+        const patientOptionsArray = Array.from(patients).map((patient) => ({
+          value: patient,
+          label: patient,
+        }));
+        const statusOptionsArray = Array.from(statuses).map((status) => ({
+          value: status,
+          label: status,
+        }));
+
+        setPatientOptions(patientOptionsArray);
+        setStatusOptions(statusOptionsArray);
 
         // Map appointments to calendar events
         const events = appointmentsData.map((app) => ({
@@ -115,22 +125,30 @@ function DocAppointmentCalendar() {
     // Apply Filters whenever filter states change
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientFilter, statusFilter, dateFilter, appointments]);
+  }, [selectedPatients, selectedStatuses, dateFilter, appointments]);
 
   const applyFilters = () => {
     let filtered = appointments;
 
     // Patient Filter
-    if (patientFilter) {
+    if (selectedPatients.length > 0) {
       filtered = filtered.filter((app) => {
         const patientName = `${app.resource.patientFirstName} ${app.resource.patientLastName}`;
-        return patientName === patientFilter;
+        const isSelected = selectedPatients.some(
+          (selected) => selected.value === patientName
+        );
+        return isSelected;
       });
     }
 
     // Status Filter
-    if (statusFilter) {
-      filtered = filtered.filter((app) => app.resource.status === statusFilter);
+    if (selectedStatuses.length > 0) {
+      filtered = filtered.filter((app) => {
+        const isSelected = selectedStatuses.some(
+          (selected) => selected.value === app.resource.status
+        );
+        return isSelected;
+      });
     }
 
     // Date Filter
@@ -189,8 +207,18 @@ function DocAppointmentCalendar() {
         statuses.add(app.status);
       });
 
-      setUniquePatients(Array.from(patients));
-      setUniqueStatuses(Array.from(statuses));
+      // Prepare options for MultiSelectInput
+      const patientOptionsArray = Array.from(patients).map((patient) => ({
+        value: patient,
+        label: patient,
+      }));
+      const statusOptionsArray = Array.from(statuses).map((status) => ({
+        value: status,
+        label: status,
+      }));
+
+      setPatientOptions(patientOptionsArray);
+      setStatusOptions(statusOptionsArray);
 
       // Map appointments to calendar events
       const events = appointmentsData.map((app) => ({
@@ -253,43 +281,25 @@ function DocAppointmentCalendar() {
         <h2 className="text-2xl font-semibold mb-4">Filter Appointments</h2>
         <div className="flex flex-col md:flex-row md:space-x-4">
           {/* Patient Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="patient" className="block text-gray-700 mb-2">
-              Patient:
-            </label>
-            <select
-              id="patient"
-              value={patientFilter}
-              onChange={(e) => setPatientFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Patients</option>
-              {uniquePatients.map((patient, index) => (
-                <option key={index} value={patient}>
-                  {patient}
-                </option>
-              ))}
-            </select>
+          <div className="flex-1">
+            <MultiSelectInput
+              label="Patient:"
+              options={patientOptions}
+              selectedValues={selectedPatients}
+              setSelectedValues={setSelectedPatients}
+              placeholder="Select Patients"
+            />
           </div>
 
           {/* Status Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="status" className="block text-gray-700 mb-2">
-              Status:
-            </label>
-            <select
-              id="status"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Statuses</option>
-              {uniqueStatuses.map((status, index) => (
-                <option key={index} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
+          <div className="flex-1">
+            <MultiSelectInput
+              label="Status:"
+              options={statusOptions}
+              selectedValues={selectedStatuses}
+              setSelectedValues={setSelectedStatuses}
+              placeholder="Select Statuses"
+            />
           </div>
 
           {/* Date Filter */}
@@ -320,8 +330,8 @@ function DocAppointmentCalendar() {
         <div className="mt-4">
           <button
             onClick={() => {
-              setPatientFilter("");
-              setStatusFilter("");
+              setSelectedPatients([]);
+              setSelectedStatuses([]);
               setDateFilter({ start: "", end: "" });
             }}
             className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none"
