@@ -1,7 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import jwtDecode from 'jwt-decode';
-
+import { default as jwt_decode } from "jwt-decode"; // Fixed import
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const token = localStorage.getItem("token");
@@ -11,7 +10,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   try {
-    const decodedToken = jwtDecode(token);
+    const decodedToken = jwt_decode(token);
     if (!allowedRoles.includes(decodedToken.role))
       return <Navigate to="/forbidden" />;
 

@@ -4,12 +4,12 @@ import { Heart } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import jwtDecode from 'jwt-decode';
+import { default as jwt_decode } from "jwt-decode"; // Fixed import
 import NavButton from "../../ui/buttons/NavButton";
 import Input from "../../ui/Input";
 
 const LoginPage = () => {
-  //Hooks(Event handler) (For dyanmically updating site)
+  //Hooks(Event handler) (For dynamically updating site)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -29,7 +29,7 @@ const LoginPage = () => {
         // Store the JWT token and user role in the browser
         localStorage.setItem("token", response.data.token);
 
-        const decodedToken = jwtDecode(response.data.token);
+        const decodedToken = jwt_decode(response.data.token);
         const userRole = decodedToken.role;
 
         // Redirect based on user role
