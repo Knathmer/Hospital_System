@@ -7,6 +7,7 @@ import {
   GET_RECENT_PAYMENTS,
   GET_DETAILS_YTD,
   GET_PAYMENTS_STATEMENTS,
+  GET_OUTSTANDING_BILLS,
 } from "../../queries/constants/selectQueries.js";
 
 export const getCurrentPastBalance = async (req, res) => {
@@ -303,5 +304,89 @@ export const getPaymentsDateRange = async (req, res) => {
     res.status(500).json({
       message: "Server error fetching patients statement information.",
     });
+  }
+};
+
+//-------------Start of Make a Payment Controller Functions----------------------------------\\
+
+export const getOutstandingBills = async (req, res) => {
+  try {
+    const patientID = req.user.patientID;
+
+    const outstandingBills = await query(GET_OUTSTANDING_BILLS, [patientID]);
+
+    if (outstandingBills.length === 0) {
+      return res.status(200).json({ message: "No outstanding bills found" });
+    }
+
+    res.status(200).json({ outstandingBills });
+  } catch (error) {
+    console.error(
+      "Error fetching patients outstanding information from the server",
+      error
+    );
+    res.status(500).json({
+      message: "Server error fetching patients outstanding information.",
+    });
+  }
+};
+
+export const postPayment = async (req, res) => {
+  try {
+    const { billID, amount } = req.body;
+
+    const insertPaymentResult = await query(
+      `INSERT INTO payment (billID, amount, paymentMethod) VALUES (?, ?, 'Online Payment');`,
+      [billID, amount]
+    );
+
+    if (insertPaymentResult.affectedRows === 0) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Payment insertion failed." });
+    }
+
+    const [bill] = await query(
+      `SELECT paidAmount, amount FROM bill WHERE billID = ?`,
+      [billID]
+    );
+
+    if (!bill) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Bill not found." });
+    }
+
+    const updatedPaidAmount = parseFloat(bill.paidAmount) + parseFloat(amount);
+    const outstandingBalance = parseFloat(bill.amount) - updatedPaidAmount;
+
+    let newStatus;
+    if (outstandingBalance <= 0) {
+      newStatus = "Paid";
+    } else {
+      newStatus = "Partially Paid";
+    }
+
+    const updateBillResult = await query(
+      `UPDATE bill SET paidAmount = ?, paidStatus = ? WHERE billID = ?`,
+      [updatedPaidAmount, newStatus, billID]
+    );
+
+    if (updateBillResult.affectedRows === 0) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to update bill." });
+    }
+
+    // Step 4: Send success response to frontend
+    res.json({ success: true, message: "Payment processed successfully." });
+  } catch (error) {
+    console.error("Error processing payment:", error);
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "An error occurred while processing payment.",
+      });
   }
 };
