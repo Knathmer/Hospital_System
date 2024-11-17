@@ -202,7 +202,7 @@ export default function PrescriptionSummaryReport() {
                 >
                   <SelectItem value="">Select Status</SelectItem>
                   <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Accepted">Accepted</SelectItem>
+                  <SelectItem value="Approved">Approved</SelectItem>
                   <SelectItem value="Denied">Denied</SelectItem>
                 </Select>
               </div>
@@ -232,37 +232,6 @@ export default function PrescriptionSummaryReport() {
               </div>
             );
           }
-
-          const customStyles = {
-            control: (provided) => ({
-              ...provided,
-              borderColor: "#fbbf24", // Tailwind's border-pink-200
-              focusRing: "2px solid #ec4899", // Tailwind's focus:ring-pink-500
-              borderRadius: "0.375rem", // Tailwind's rounded-lg
-              padding: "0.5rem", // Tailwind's p-2
-            }),
-            option: (provided, state) => ({
-              ...provided,
-              padding: "1rem", // Tailwind's py-4 px-6
-              backgroundColor: state.isSelected
-                ? "#ec4899" // Tailwind's pink-500
-                : state.isFocused
-                ? "#f3f4f6" // Tailwind's gray-100
-                : "white",
-              color: state.isSelected ? "white" : "black",
-            }),
-            menu: (provided) => ({
-              ...provided,
-              backgroundColor: "white",
-              borderRadius: "0.375rem", // Tailwind's rounded-lg
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Tailwind's shadow-lg
-            }),
-            singleValue: (provided) => ({
-              ...provided,
-              color: "#333", // Tailwind's text-gray-800
-              fontWeight: "600", // Tailwind's font-semibold
-            }),
-          };
 
           return (
             <div key={key}>
@@ -306,10 +275,10 @@ export default function PrescriptionSummaryReport() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 p-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 p-6 space-y-6 shadow-2xl rounded-lg">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-6 text-black">
-          Prescription Summary Report
+          Prescription Analysis
         </h1>
 
         <Card className="mb-6 border-pink-200 shadow-lg">
