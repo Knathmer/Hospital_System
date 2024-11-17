@@ -17,72 +17,8 @@ import {
   Pill,
   CircleMinus,
   CirclePlus,
+  RotateCcw,
 } from "lucide-react";
-
-// Mock data for the appointment
-const appointmentData = {
-  patient: {
-    name: "John Doe",
-    dob: "1990-05-15",
-    phone: "123-456-7890",
-    email: "john.doe@example.com",
-  },
-  insurance: {
-    provider: "HealthCare Inc.",
-    policyNumber: "HC123456789",
-    groupNumber: "GRP987654",
-  },
-  appointment: {
-    date: "2023-06-01",
-    time: "10:00 AM",
-    reason: "Annual check-up",
-    office: "Main Street Clinic",
-  },
-  medicalHistory: {
-    allergies: [
-      { name: "Penicillin", severity: "Severe", reaction: "Anaphylaxis" },
-      { name: "Peanuts", severity: "Moderate", reaction: "Hives and swelling" },
-    ],
-    disabilities: [{ name: "None", details: "No known disabilities" }],
-    vaccines: [
-      { name: "Flu shot", date: "2023-01-15", details: "Annual vaccination" },
-      { name: "COVID-19", date: "2022-06-30", details: "Booster shot" },
-      { name: "Tetanus", date: "2020-03-10", details: "10-year booster" },
-    ],
-    surgeries: [
-      {
-        name: "Appendectomy",
-        date: "2015-08-22",
-        details: "Laparoscopic procedure",
-      },
-    ],
-    familyHistory: [
-      {
-        condition: "Diabetes",
-        relation: "Father",
-        details: "Type 2, diagnosed at age 50",
-      },
-      {
-        condition: "Hypertension",
-        relation: "Mother",
-        details: "Controlled with medication",
-      },
-    ],
-  },
-  medications: [
-    { id: 1, name: "Lisinopril", dosage: "10mg", frequency: "Once daily" },
-    { id: 2, name: "Metformin", dosage: "500mg", frequency: "Twice daily" },
-  ],
-  previousAppointments: [
-    { date: "2023-01-15", reason: "Flu symptoms", doctor: "Dr. Smith" },
-    { date: "2022-09-30", reason: "Annual physical", doctor: "Dr. Johnson" },
-    {
-      date: "2022-05-12",
-      reason: "Follow-up for hypertension",
-      doctor: "Dr. Williams",
-    },
-  ],
-};
 
 export default function AppointmentPage() {
   const [patientInformation, setPatientInformation] = useState({});
@@ -95,14 +31,26 @@ export default function AppointmentPage() {
   const [vaccines, setVaccines] = useState([]);
   const [surgeries, setSurgeries] = useState([]);
   const [familyHistory, setFamilyHistory] = useState([]);
-  const { appointmentID } = useParams(); //extract the appointmentID from the URL.
+  const [medicationRefill, setMedicationRefill] = useState(null);
+  const [deactivateConfirmation, setDeactivateConfirmation] = useState(null);
+  const [reactivateConfirmation, setReactivateConfirmation] = useState(null);
+  const { appointmentID } = useParams();
   const navigate = useNavigate();
+
+  //State variables for prescribing a new medication
+  const [isPrescribeModalOpen, setIsPrescribeModalOpen] = useState(false);
+  const [newMedication, setNewMedication] = useState({
+    medicationName: "",
+    dosage: "",
+    frequency: "",
+    refills: "",
+  });
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
 
   const fetchPatientInformation = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      // Step 1: Fetch Patient Information
       const patientInfoResponse = await axios.get(
         "http://localhost:3000/auth/doctor/schedule/patient-info",
         {
@@ -114,7 +62,6 @@ export default function AppointmentPage() {
       const patientInfo = patientInfoResponse.data.patientInfo;
       setPatientInformation(patientInfo);
 
-      // Step 2: Fetch Related Data in Parallel
       const patientID = patientInfo.patientID;
 
       const [
@@ -178,7 +125,6 @@ export default function AppointmentPage() {
         ),
       ]);
 
-      // Step 3: Set States
       setInsuranceInformation(
         insuranceInfoResponse.data.insuranceInformation || {}
       );
@@ -209,58 +155,9 @@ export default function AppointmentPage() {
     navigate("/doctor/schedule");
   };
 
-  //-----------------------------------------------------
-  const [notes, setNotes] = useState("");
-  const [selectedCharges, setSelectedCharges] = useState({
-    labTests: false,
-    xRay: false,
-    medication: false,
-  });
-  const [customCharge, setCustomCharge] = useState({
-    description: "",
-    amount: "",
-  });
-  const [medications, setMedications] = useState(appointmentData.medications);
-  const [newMedication, setNewMedication] = useState({
-    name: "",
-    dosage: "",
-    frequency: "",
-  });
-  const [medicalHistory, setMedicalHistory] = useState(
-    appointmentData.medicalHistory
-  );
-
-  const handleSaveCharges = () => {
-    // In a real app, you'd save these charges to your backend
-    console.log("Saving charges:", { selectedCharges, customCharge });
-  };
-
-  const calculateTotalCharges = () => {
-    let total = 100; // Base service price
-    if (selectedCharges.labTests) total += 50;
-    if (selectedCharges.xRay) total += 75;
-    if (selectedCharges.medication) total += 30;
-    if (customCharge.amount) total += parseFloat(customCharge.amount);
-    return total.toFixed(2);
-  };
-
-  const handleCompleteAppointment = () => {
-    // In a real app, you'd mark the appointment as complete in your backend
-    console.log("Appointment completed");
-  };
-
-  const handleAddMedication = () => {
-    if (newMedication.name && newMedication.dosage && newMedication.frequency) {
-      setMedications([...medications, { ...newMedication, id: Date.now() }]);
-      setNewMedication({ name: "", dosage: "", frequency: "" });
-    }
-  };
-
   const handleRemoveMedication = async (prescriptionID) => {
     try {
       const token = localStorage.getItem("token");
-
-      // Send a request to the backend to deactivate the medication
       await axios.put(
         "http://localhost:3000/auth/doctor/schedule/deactivate-medication",
         { prescriptionID },
@@ -268,24 +165,20 @@ export default function AppointmentPage() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      // Update the local state to reflect the change
       setMedication((prevMedications) =>
         prevMedications.map((med) =>
-          med.prescriptionID === prescriptionID
-            ? { ...med, active: 0 } // Set active to false for the specified medication
-            : med
+          med.prescriptionID === prescriptionID ? { ...med, active: 0 } : med
         )
       );
+      setDeactivateConfirmation(null);
     } catch (error) {
       console.error("Error deactivating medication:", error);
     }
   };
+
   const handleReactivateMedication = async (prescriptionID) => {
     try {
       const token = localStorage.getItem("token");
-
-      // Send a request to the backend to reactivate the medication
       await axios.put(
         "http://localhost:3000/auth/doctor/schedule/reactivate-medication",
         { prescriptionID },
@@ -293,30 +186,79 @@ export default function AppointmentPage() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      // Update the local state to reflect the change
       setMedication((prevMedications) =>
         prevMedications.map((med) =>
-          med.prescriptionID === prescriptionID
-            ? { ...med, active: 1 } // Set active to true for the specified medication
-            : med
+          med.prescriptionID === prescriptionID ? { ...med, active: 1 } : med
         )
       );
+      setReactivateConfirmation(null);
     } catch (error) {
       console.error("Error reactivating medication:", error);
     }
   };
+
   const handleRefillMedication = async (prescriptionID) => {
     try {
       const token = localStorage.getItem("token");
-    } catch (error) {}
+      await axios.put(
+        "http://localhost:3000/auth/doctor/schedule/refill-medication",
+        { prescriptionID },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Reset the refill count in the state
+      setMedication((prevMedications) =>
+        prevMedications.map((med) =>
+          med.prescriptionID === prescriptionID
+            ? { ...med, refillsRemaining: med.refillCount }
+            : med
+        )
+      );
+
+      setMedicationRefill(null); // Close the confirmation prompt
+    } catch (error) {
+      console.error("Error refilling medication:", error);
+    }
   };
 
-  const handleAddMedicalHistoryItem = (category, item) => {
-    setMedicalHistory((prev) => ({
-      ...prev,
-      [category]: [...prev[category], item],
-    }));
+  const cancelRefill = () => {
+    setMedicationRefill(null);
+  };
+
+  const cancelDeactivate = () => setDeactivateConfirmation(null);
+  const cancelReactivate = () => setReactivateConfirmation(null);
+
+  const handleSaveMedication = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const { medicationName, dosage, frequency, refills } = newMedication; //Pass all the information you need to complete the query.
+
+      if (!medicationName || !dosage || !frequency || !refills) {
+        alert("Please fill in all fields.");
+        return;
+      }
+    } catch (error) {}
+  };
+  const handleCloseModal = () => {
+    if (unsavedChanges) {
+      const confirmClose = window.confirm(
+        "You have unsaved changes. Are you sure you want to close?"
+      );
+      if (!confirmClose) {
+        return;
+      }
+    }
+    // Reset form and close modal
+    setNewMedication({
+      medicationName: "",
+      dosage: "",
+      frequency: "",
+      refills: "",
+    });
+    setIsPrescribeModalOpen(false);
+    setUnsavedChanges(false);
   };
 
   return (
@@ -610,11 +552,117 @@ export default function AppointmentPage() {
           )}
           <div>
             <h3 className="font-semibold text-lg mb-4">Active Medications</h3>
-            {medication && medication.length > 0 ? (
-              <>
+            {medication && medication.some((med) => med.active === 1) ? (
+              <div className="space-y-4 mb-6">
+                {medication
+                  .filter((med) => med.active === 1)
+                  .map((med) => (
+                    <div
+                      key={med.prescriptionID}
+                      className="flex items-center justify-between bg-gray-50 p-4 rounded-md"
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-800">
+                          {med.medicationName}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {med.dosage} - {med.frequency}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Refills: {med.refillsRemaining}/{med.refillCount}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {medicationRefill === med.prescriptionID ? (
+                          <>
+                            <p>Reset Refill Count?</p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleRefillMedication(med.prescriptionID)
+                              }
+                              className="text-green-600 hover:text-green-700 hover:bg-green-100"
+                            >
+                              Yes
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={cancelRefill}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-100"
+                            >
+                              No
+                            </Button>
+                          </>
+                        ) : deactivateConfirmation === med.prescriptionID ? (
+                          <>
+                            <p>Deactivate this medication?</p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleRemoveMedication(med.prescriptionID)
+                              }
+                              className="text-green-600 hover:text-green-700 hover:bg-green-100"
+                            >
+                              Yes
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={cancelDeactivate}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-100"
+                            >
+                              No
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            {med.refillsRemaining === 0 && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  setMedicationRefill(med.prescriptionID)
+                                }
+                                className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                              >
+                                <Pill />
+                                Refill
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                setDeactivateConfirmation(med.prescriptionID)
+                              }
+                              className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                            >
+                              <CircleMinus />
+                              Remove
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-400 mb-6">
+                Patient does not have any active medications.
+              </p>
+            )}
+
+            <div>
+              <h3 className="font-semibold text-lg mb-4">
+                Inactive Medications
+              </h3>
+              {medication.some((med) => med.active === 0) ? (
                 <div className="space-y-4 mb-6">
                   {medication
-                    .filter((med) => med.active === 1)
+                    .filter((med) => med.active === 0)
                     .map((med) => (
                       <div
                         key={med.prescriptionID}
@@ -632,119 +680,334 @@ export default function AppointmentPage() {
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          {/* New Button */}
-                          {med.refillsRemaining === 0 && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                handleRefillMedication(med.prescriptionID)
-                              }
-                              className="text-pink-600 hover:text-pink-700 hover:bg-pink-100 text-center"
-                            >
-                              <Pill />
-                              Refill
-                            </Button>
-                          )}
-                          {/* Existing Remove Button */}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              handleRemoveMedication(med.prescriptionID)
-                            }
-                            className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
-                          >
-                            <CircleMinus className="h-5 w-5" />
-                            Remove
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-4">
-                    Inactive Medications
-                  </h3>
-                  {medication.some((med) => med.active === 0) ? (
-                    <div className="space-y-4 mb-6">
-                      {medication
-                        .filter((med) => med.active === 0)
-                        .map((med) => (
-                          <div
-                            key={med.prescriptionID}
-                            className="flex items-center justify-between bg-gray-50 p-4 rounded-md"
-                          >
-                            <div>
-                              <p className="font-semibold text-gray-800">
-                                {med.medicationName}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                {med.dosage} - {med.frequency}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                Refills: {med.refillsRemaining}/
-                                {med.refillCount}
-                              </p>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              {/* Option to Reactivate or Remove */}
+                          {reactivateConfirmation === med.prescriptionID ? (
+                            <>
+                              <p>Reactivate this medication?</p>
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() =>
                                   handleReactivateMedication(med.prescriptionID)
                                 }
-                                className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                                className="text-green-600 hover:text-green-700 hover:bg-green-100"
                               >
-                                <CirclePlus />
-                                Reactivate
+                                Yes
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() =>
-                                  handleRemoveMedication(med.prescriptionID)
-                                }
-                                className="text-pink-600 hover:text-pink-700 hover:bg-pink-100"
+                                onClick={cancelReactivate}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-100"
                               >
-                                <CircleMinus className="h-5 w-5" />
-                                Remove
+                                No
                               </Button>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  ) : (
-                    <p className="text-center text-gray-400 mb-6">
-                      Patient does not have any inactive medications.
-                    </p>
-                  )}
+                            </>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                setReactivateConfirmation(med.prescriptionID)
+                              }
+                              className="text-pink-600 hover:text-pink-700 hover:bg-pink-100 flex items-center space-x-2"
+                            >
+                              <RotateCcw className="h-5 w-5" />
+                              <span>Reactivate</span>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                 </div>
-                <div className="space-y-4">
-                  <Button
-                    onClick={handleAddMedication}
-                    className="w-full bg-pink-600 hover:bg-pink-700 text-white"
-                  >
-                    <Plus className="mr-2 h-5 w-5" />
-                    Add Medication
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <div>
-                <p className="text-center text-gray-400 mb-5">
-                  Patient has not been prescribed any medications.
+              ) : (
+                <p className="text-center text-gray-400 mb-6">
+                  Patient does not have any inactive medications.
                 </p>
-                <Button
-                  onClick={handleAddMedication}
-                  className="w-full bg-pink-600 hover:bg-pink-700 text-white"
-                >
-                  <Plus className="mr-2 h-5 w-5" /> Prescribe New Medication
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
+            <Button
+              onClick={() => setIsPrescribeModalOpen(true)}
+              className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+            >
+              <Plus className="mr-2 h-5 w-5" /> Prescribe New Medication
+            </Button>
           </div>
+          {/*------------------------Dialog Pop up for medications----------------------------- */}
+          {isPrescribeModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-8 relative overflow-y-auto max-h-[90vh] animate-fade-in-up">
+                {/* Modal Header */}
+                <div className="flex justify-between items-center mb-6 border-b pb-4">
+                  <h3 className="text-2xl font-bold text-gray-800">
+                    Prescribe New Medication
+                  </h3>
+                  <button
+                    onClick={handleCloseModal}
+                    className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                  >
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Modal Body */}
+                <div className="space-y-6">
+                  {/* Medication Name */}
+                  <div>
+                    <label
+                      htmlFor="medicationName"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Medication Name
+                    </label>
+                    <input
+                      id="medicationName"
+                      value={newMedication.medicationName}
+                      onChange={(e) => {
+                        setNewMedication({
+                          ...newMedication,
+                          medicationName: e.target.value,
+                        });
+                        setUnsavedChanges(true);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      placeholder="e.g., Lisinopril, Metformin, Ibuprofen"
+                    />
+                  </div>
+
+                  {/* Dosage and Frequency */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor="dosage"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Dosage
+                      </label>
+                      <input
+                        id="dosage"
+                        value={newMedication.dosage}
+                        onChange={(e) => {
+                          setNewMedication({
+                            ...newMedication,
+                            dosage: e.target.value,
+                          });
+                          setUnsavedChanges(true);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                        placeholder="e.g., 10 mg, 500 mg, 5 ml"
+                        pattern="^\d+\s?(mg|ml|g)$"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="frequency"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Frequency
+                      </label>
+                      <input
+                        id="frequency"
+                        value={newMedication.frequency}
+                        onChange={(e) => {
+                          setNewMedication({
+                            ...newMedication,
+                            frequency: e.target.value,
+                          });
+                          setUnsavedChanges(true);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                        placeholder="e.g., Once daily, Twice a day"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Start and End Date */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor="start"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Start Date
+                      </label>
+                      <input
+                        id="start"
+                        type="date"
+                        value={newMedication.start}
+                        min={new Date().toISOString().split("T")[0]} // Restrict to today and future dates
+                        onChange={(e) => {
+                          const newStartDate = e.target.value;
+                          setNewMedication((prev) => ({
+                            ...prev,
+                            start: newStartDate,
+                            // If end date is before the new start date, reset it
+                            end:
+                              prev.end && newStartDate > prev.end
+                                ? ""
+                                : prev.end,
+                          }));
+                          setUnsavedChanges(true);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="end"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        End Date (Optional)
+                      </label>
+                      <input
+                        id="end"
+                        type="date"
+                        value={newMedication.end}
+                        min={
+                          newMedication.start ||
+                          new Date().toISOString().split("T")[0]
+                        } // End date must be after start date
+                        onChange={(e) => {
+                          setNewMedication((prev) => ({
+                            ...prev,
+                            end: e.target.value,
+                          }));
+                          setUnsavedChanges(true);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Quantity and Day Supply */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor="quantity"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Quantity
+                      </label>
+                      <input
+                        id="quantity"
+                        type="number"
+                        min="1"
+                        value={newMedication.quantity}
+                        onChange={(e) => {
+                          setNewMedication({
+                            ...newMedication,
+                            quantity: e.target.value,
+                          });
+                          setUnsavedChanges(true);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                        placeholder="e.g., 30"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="daySupply"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Day Supply
+                      </label>
+                      <input
+                        id="daySupply"
+                        type="number"
+                        min="1"
+                        value={newMedication.daySupply}
+                        onChange={(e) => {
+                          setNewMedication({
+                            ...newMedication,
+                            daySupply: e.target.value,
+                          });
+                          setUnsavedChanges(true);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                        placeholder="e.g., 30"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Number of Refills */}
+                  <div>
+                    <label
+                      htmlFor="refills"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Number of Refills
+                    </label>
+                    <input
+                      id="refills"
+                      type="number"
+                      min="0"
+                      value={newMedication.refills}
+                      onChange={(e) => {
+                        setNewMedication({
+                          ...newMedication,
+                          refills: e.target.value,
+                        });
+                        setUnsavedChanges(true);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      placeholder="e.g., 3"
+                    />
+                  </div>
+
+                  {/* Instructions */}
+                  <div>
+                    <label
+                      htmlFor="instruction"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Instructions
+                    </label>
+                    <textarea
+                      id="instruction"
+                      value={newMedication.instruction}
+                      onChange={(e) => {
+                        setNewMedication({
+                          ...newMedication,
+                          instruction: e.target.value,
+                        });
+                        setUnsavedChanges(true);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      placeholder="e.g., Take one tablet daily with food."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="flex justify-end mt-8 space-x-3">
+                  <button
+                    onClick={handleCloseModal}
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveMedication}
+                    className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-md transition-colors duration-200"
+                  >
+                    Save Medication
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6">
@@ -752,7 +1015,7 @@ export default function AppointmentPage() {
             Appointment Notes
           </h2>
           <Textarea
-            value={notes}
+            // value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Enter appointment notes"
             rows={6}
@@ -760,144 +1023,8 @@ export default function AppointmentPage() {
           />
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Charges</h2>
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Additional Charges
-              </h3>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <Checkbox
-                    id="labTests"
-                    checked={selectedCharges.labTests}
-                    onCheckedChange={(checked) =>
-                      setSelectedCharges((prev) => ({
-                        ...prev,
-                        labTests: checked,
-                      }))
-                    }
-                  />
-                  <label htmlFor="labTests" className="ml-2 text-gray-700">
-                    Lab Tests - $50.00
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox
-                    id="xRay"
-                    checked={selectedCharges.xRay}
-                    onCheckedChange={(checked) =>
-                      setSelectedCharges((prev) => ({ ...prev, xRay: checked }))
-                    }
-                  />
-                  <label htmlFor="xRay" className="ml-2 text-gray-700">
-                    X-Ray - $75.00
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox
-                    id="medication"
-                    checked={selectedCharges.medication}
-                    onCheckedChange={(checked) =>
-                      setSelectedCharges((prev) => ({
-                        ...prev,
-                        medication: checked,
-                      }))
-                    }
-                  />
-                  <label htmlFor="medication" className="ml-2 text-gray-700">
-                    Medication - $30.00
-                  </label>
-                </div>
-              </div>
-            </div>
-            <Separator />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Custom Charge
-              </h3>
-              <div className="flex space-x-4">
-                <div className="flex-grow">
-                  <Label htmlFor="customChargeDescription">Description</Label>
-                  <Input
-                    id="customChargeDescription"
-                    value={customCharge.description}
-                    onChange={(e) =>
-                      setCustomCharge((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                    placeholder="Enter description"
-                  />
-                </div>
-                <div className="w-1/3">
-                  <Label htmlFor="customChargeAmount">Amount</Label>
-                  <Input
-                    id="customChargeAmount"
-                    type="number"
-                    value={customCharge.amount}
-                    onChange={(e) =>
-                      setCustomCharge((prev) => ({
-                        ...prev,
-                        amount: e.target.value,
-                      }))
-                    }
-                    placeholder="0.00"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
-            </div>
-            <Separator />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Summary of Charges
-              </h3>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex justify-between">
-                  <span>Base Service:</span> <span>$100.00</span>
-                </li>
-                {selectedCharges.labTests && (
-                  <li className="flex justify-between">
-                    <span>Lab Tests:</span> <span>$50.00</span>
-                  </li>
-                )}
-                {selectedCharges.xRay && (
-                  <li className="flex justify-between">
-                    <span>X-Ray:</span> <span>$75.00</span>
-                  </li>
-                )}
-                {selectedCharges.medication && (
-                  <li className="flex justify-between">
-                    <span>Medication:</span> <span>$30.00</span>
-                  </li>
-                )}
-                {customCharge.amount && (
-                  <li className="flex justify-between">
-                    <span>{customCharge.description}:</span>{" "}
-                    <span>${parseFloat(customCharge.amount).toFixed(2)}</span>
-                  </li>
-                )}
-              </ul>
-              <div className="mt-4 text-xl font-bold text-gray-900 flex justify-between">
-                <span>Total Amount:</span>
-                <span>${calculateTotalCharges()}</span>
-              </div>
-            </div>
-            <Button
-              onClick={handleSaveCharges}
-              className="w-full bg-pink-600 hover:bg-pink-700 text-white"
-            >
-              Save Charges
-            </Button>
-          </div>
-        </div>
-
         <Button
-          onClick={handleCompleteAppointment}
+          //   onClick={handleCompleteAppointment}
           className="w-full bg-pink-600 hover:bg-pink-700 text-white text-lg py-3"
         >
           Mark Appointment as Complete
