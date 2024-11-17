@@ -5,7 +5,7 @@ import { Heart } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import jwtDecode from "jwt-decode";
 import NavButton from "../../ui/buttons/NavButton";
 import Input from "../../ui/Input";
 

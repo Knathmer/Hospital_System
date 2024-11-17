@@ -611,6 +611,14 @@ export default function AppointmentPage() {
         ...item,
       };
 
+      const singularTitleMap = {
+        Allergies: "Allergy",
+        Disabilities: "Disability",
+        Vaccines: "Vaccine",
+        Surgeries: "Surgery",
+        "Family History": "Family History", // No change needed
+      };
+
       switch (type) {
         case "Allergies":
           // Validate severity
@@ -711,11 +719,11 @@ export default function AppointmentPage() {
 
       // Optionally, show a success message
       await fetchPatientInformation();
-      alert(`${type.slice(0, -1)} added successfully.`);
+      alert(`${singularTitleMap[type]} added successfully.`);
     } catch (error) {
-      console.error(`Error adding ${type.slice(0, -1)}:`, error);
+      console.error(`Error adding ${type}:`, error);
       alert(
-        `An error occurred while adding ${type.slice(0, -1)}. Please try again.`
+        `An error occurred while adding ${singularTitleMap[type]}. Please try again.`
       );
     }
   };
