@@ -76,14 +76,32 @@ const SystemReports = () => {
       .then((data) => setCities(data))
       .catch((err) => console.error('Fetch error:', err));
 
-    // Fetch Doctors
+    // Fetch Doctors with Debugging
     fetch(`${API_BASE_URL}/auth/admin/adminDoctorReport/getDoctors`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
-      .then((data) => setDoctors(data))
+      .then((data) => {
+        console.log("Fetched Doctors Data:", data); // Debugging Line
+
+        // **Adjust based on data structure**
+        if (Array.isArray(data)) {
+          // If data is an array directly
+          setDoctors(data);
+        } else if (data.doctors && Array.isArray(data.doctors)) {
+          // If doctors are nested within an object
+          setDoctors(data.doctors);
+        } else if (data.length === 0) {
+          // If data is an empty array or undefined
+          setDoctors([]);
+        } else {
+          // Handle other unexpected structures
+          console.warn("Unexpected doctors data structure:", data);
+          setDoctors([]);
+        }
+      })
       .catch((err) => console.error('Fetch error:', err));
   }, []);
 
@@ -274,12 +292,10 @@ const SystemReports = () => {
               <label className="block text-sm font-medium text-gray-700">Doctors</label>
               <Select
                 isMulti
-                options={doctors.map((doctor) => ({
-                  value: doctor.doctorID,
-                  label: `${doctor.firstName} ${doctor.lastName}`,
-                }))}
+                options={doctors} // Use the fetched data directly
                 value={selectedDoctors}
                 onChange={setSelectedDoctors}
+                placeholder="Select Doctors..."
               />
             </div>
             {/* Date Filters */}
