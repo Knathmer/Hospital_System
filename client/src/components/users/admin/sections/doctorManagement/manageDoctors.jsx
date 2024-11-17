@@ -2,10 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DoctorsTable from './DoctorsTable.jsx';
 import DoctorForm from './DoctorForm.jsx';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 
 const ManageDoctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -33,7 +29,6 @@ const ManageDoctors = () => {
       console.error('Error fetching doctors:', err);
       setError('Failed to fetch doctors.');
       setLoading(false);
-      toast.error('Failed to fetch doctors.');
     }
   };
 
@@ -55,10 +50,9 @@ const ManageDoctors = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDoctors(doctors.filter(doc => doc.doctorID !== doctorID));
-      toast.success('Doctor deleted successfully.');
     } catch (err) {
       console.error('Error deleting doctor:', err);
-      toast.error('Failed to delete doctor.');
+      alert('Failed to delete doctor.');
     }
   };
 
@@ -71,10 +65,9 @@ const ManageDoctors = () => {
         });
         setDoctors(doctors.map(doc => doc.doctorID === currentDoctor.doctorID ? res.data.doctor : doc));
         setIsModalOpen(false);
-        toast.success('Doctor updated successfully.');
       } catch (err) {
         console.error('Error updating doctor:', err);
-        toast.error('Failed to update doctor.');
+        alert('Failed to update doctor.');
       }
     } else {
       // Add new doctor
@@ -84,19 +77,15 @@ const ManageDoctors = () => {
         });
         setDoctors([...doctors, res.data.doctor]);
         setIsModalOpen(false);
-        toast.success('Doctor added successfully.');
       } catch (err) {
         console.error('Error adding doctor:', err);
-        toast.error('Failed to add doctor.');
+        alert('Failed to add doctor.');
       }
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-pink-50 p-6">
-      {/* Toast Container for notifications */}
-      <ToastContainer />
-
       <h1 className="text-3xl font-bold text-center mb-6">Manage Doctors</h1>
 
       <div className="mb-4 flex justify-end">
@@ -109,7 +98,7 @@ const ManageDoctors = () => {
       </div>
 
       {loading ? (
-        <Skeleton count={10} height={40} />
+        <p className="text-center">Loading doctors...</p>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
       ) : (
@@ -122,8 +111,8 @@ const ManageDoctors = () => {
 
       {/* Modal for Add/Edit Doctor */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg w-11/12 md:w-1/2 lg:w-1/3 p-6 overflow-auto max-h-screen">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg w-11/12 md:w-1/2 lg:w-1/3 p-6">
             <DoctorForm
               doctor={currentDoctor}
               onSubmit={handleFormSubmit}
