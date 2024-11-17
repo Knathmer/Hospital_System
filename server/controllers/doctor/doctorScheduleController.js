@@ -13,6 +13,7 @@ import {
   GET_PREVIOUS_APPOINTMENTS,
   SELECT_PATIENT_MEDICATION_INFORMATION_QUERY,
   SELECT_PATIENT_PHARMACY_INFORMATION_QUERY,
+  GET_ADDITIONAL_CHARGES,
 } from "../../queries/constants/selectQueries.js";
 
 export const getDoctorSchedule = async (req, res) => {
@@ -316,6 +317,23 @@ export const getPharmacies = async (req, res) => {
   }
 };
 
+export const getAdditionalCharges = async (req, res) => {
+  try {
+    const { specialtyID } = req.query;
+
+    const additionalCharges = await query(GET_ADDITIONAL_CHARGES, [
+      specialtyID,
+    ]);
+
+    res.status(200).json({ additionalCharges });
+  } catch (error) {
+    console.error("Error fetching additional charges information ", error);
+    res
+      .status(500)
+      .json({ message: "Server error fetching additional charges info" });
+  }
+};
+
 export const deactivateMedication = async (req, res) => {
   try {
     const { prescriptionID } = req.body;
@@ -521,5 +539,102 @@ export const completeAppointment = async (req, res) => {
       // Release the connection back to the pool
       connection.release();
     }
+  }
+};
+
+export const saveCharges = async (req, res) => {
+  let connection;
+  try {
+    const {
+      appointmentID,
+      baseServicePrice = 0,
+      selectedAdditionalCharges = [],
+      customCharges = [],
+      totalAmount = 0,
+      patientID,
+      officeID,
+      insuranceID,
+      serviceID,
+    } = req.body;
+
+    if (!appointmentID) {
+      return res.status(400).json({ error: "appointmentID is required" });
+    }
+
+    // Get a connection from the pool
+    connection = await pool.getConnection();
+
+    // Start a transaction
+    await connection.beginTransaction();
+
+    // Check if bill exists for the appointment
+    let [bill] = await connection.execute(
+      "SELECT billID FROM bill WHERE appointmentID = ?",
+      [appointmentID]
+    );
+
+    let billID;
+    if (bill.length > 0) {
+      billID = bill[0].billID;
+    } else {
+      const [result] = await connection.execute(
+        "INSERT INTO bill (appointmentID, amount, patientID, paidStatus, dueDate, officeID, insuranceID, serviceID) VALUES (?, ?, ?, 'Pending', DATE_ADD(NOW(), INTERVAL 30 DAY), ?, ?, ?);",
+        [
+          appointmentID,
+          totalAmount,
+          patientID,
+          officeID,
+          insuranceID,
+          serviceID,
+        ]
+      );
+      billID = result.insertId;
+    }
+
+    // Delete existing charges to prevent duplicates
+    await connection.execute(
+      "DELETE FROM bill_additional_charge WHERE billID = ?",
+      [billID]
+    );
+    await connection.execute("DELETE FROM custom_charge WHERE billID = ?", [
+      billID,
+    ]);
+
+    // Insert additional charges if valid
+    for (const charge of selectedAdditionalCharges) {
+      if (charge.ACTID && charge.price) {
+        await connection.execute(
+          "INSERT INTO bill_additional_charge (billID, additionalChargeTypeID, amount) VALUES (?, ?, ?)",
+          [billID, charge.ACTID, charge.price]
+        );
+      }
+    }
+
+    // Insert custom charges if valid
+    for (const customCharge of customCharges) {
+      if (customCharge.description && customCharge.amount) {
+        await connection.execute(
+          "INSERT INTO custom_charge (billID, description, amount) VALUES (?, ?, ?)",
+          [billID, customCharge.description.trim(), customCharge.amount]
+        );
+      }
+    }
+
+    // Update the total amount in the bill
+    await connection.execute("UPDATE bill SET amount = ? WHERE billID = ?", [
+      totalAmount,
+      billID,
+    ]);
+
+    // Commit transaction
+    await connection.commit();
+
+    res.status(200).json({ message: "Charges saved successfully." });
+  } catch (error) {
+    if (connection) await connection.rollback();
+    console.error("Error saving charges:", error);
+    res.status(500).json({ error: "An error occurred while saving charges." });
+  } finally {
+    if (connection) connection.release();
   }
 };

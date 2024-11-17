@@ -58,6 +58,22 @@ export default function AppointmentPage() {
   const [notes, setNotes] = useState("");
   const [isEditingNotes, setIsEditingNotes] = useState(true); // Start in edit mode
 
+  //-----------------------------------------------------
+
+  //Additional charges State variables /qa
+
+  //Addtional Charges fetched from the backend, used for display
+  const [additionalCharges, setAdditonalCharges] = useState([]);
+
+  //Holds the selected charges that the doctor selects, used for summing total.
+  const [selectedCharges, setSelectedCharges] = useState({});
+
+  //Holds the custom charge(s) that the doctor makes, can hold multiple (array).
+  const [customCharges, setCustomCharges] = useState([]);
+
+  //State for the base price, which is based off the service that the appointment is on.
+  const [baseServicePrice, setBaseServicePrice] = useState(0);
+
   const fetchPatientInformation = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -153,6 +169,24 @@ export default function AppointmentPage() {
         previousAppointmentsResponse.data.previousAppointments || []
       );
       setMedication(patientMedicationResponse.data.patientMedication || []);
+
+      const specialtyID =
+        appointmentInfoResponse.data.appointmentInformation.specialtyID;
+
+      const additionalChargeResponse = await axios.get(
+        "http://localhost:3000/auth/doctor/schedule/additional-charges",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { specialtyID },
+        }
+      );
+
+      setAdditonalCharges(
+        additionalChargeResponse.data.additionalCharges || []
+      );
+      setBaseServicePrice(
+        appointmentInfoResponse.data.appointmentInformation.price
+      );
     } catch (error) {
       console.error("Error fetching patient information: ", error);
     }
@@ -412,6 +446,87 @@ export default function AppointmentPage() {
       alert(
         "An error occurred while completing the appointment. Please try again."
       );
+    }
+  };
+
+  //Charge Functions -----------------------------/pa
+  // Function to add a new custom charge
+  const handleAddCustomCharge = () => {
+    setCustomCharges((prev) => [...prev, { description: "", amount: "" }]);
+  };
+
+  // Function to remove a custom charge
+  const handleRemoveCustomCharge = (index) => {
+    setCustomCharges((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const calculateTotalCharges = () => {
+    const basePrice = parseFloat(baseServicePrice) || 0;
+
+    const additionalChargesTotal = Object.values(selectedCharges)
+      .filter(Boolean)
+      .reduce((sum, charge) => sum + parseFloat(charge.price), 0);
+
+    const customChargesTotal = customCharges.reduce(
+      (sum, charge) => sum + (parseFloat(charge.amount) || 0),
+      0
+    );
+
+    return (basePrice + additionalChargesTotal + customChargesTotal).toFixed(2);
+  };
+
+  const handleSaveCharges = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Validate and sanitize data
+      const data = {
+        appointmentID, // from params
+        baseServicePrice: parseFloat(baseServicePrice) || 0, // Default to 0 if invalid
+        selectedAdditionalCharges: Object.values(selectedCharges)
+          .filter(
+            (charge) => charge && charge.ACTID && charge.price // Ensure valid entries
+          )
+          .map((charge) => ({
+            ACTID: charge.ACTID,
+            price: parseFloat(charge.price),
+          })),
+        customCharges: customCharges
+          .filter(
+            (charge) =>
+              charge.description && charge.description.trim() && charge.amount // Ensure valid entries
+          )
+          .map((charge) => ({
+            description: charge.description.trim(),
+            amount: parseFloat(charge.amount),
+          })),
+        totalAmount: parseFloat(calculateTotalCharges()) || 0, // Default to 0 if invalid
+        patientID: patientInformation.patientID,
+        officeID: appointmentInformation.officeID,
+        insuranceID: insuranceInformation.insuranceID || null,
+        serviceID: appointmentInformation.serviceID,
+      };
+
+      if (
+        data.selectedAdditionalCharges.length === 0 &&
+        data.customCharges.length === 0
+      ) {
+        alert("No charges to save. Please add charges before saving.");
+        return;
+      }
+
+      await axios.post(
+        "http://localhost:3000/auth/doctor/schedule/save-charges",
+        data,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      alert("Charges saved successfully!");
+    } catch (error) {
+      console.error("Error saving charges:", error);
+      alert("An error occurred while saving charges. Please try again.");
     }
   };
 
@@ -1245,6 +1360,161 @@ export default function AppointmentPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Charges Section       /ti */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Charges</h2>
+          <div className="space-y-4">
+            {/* Additional Charges */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Additional Charges
+              </h3>
+              <div className="space-y-2">
+                {additionalCharges.length > 0 ? (
+                  additionalCharges.map((charge) => (
+                    <div key={charge.ACTID} className="flex items-center">
+                      <Checkbox
+                        id={`charge-${charge.ACTID}`}
+                        checked={!!selectedCharges[charge.ACTID]}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setSelectedCharges((prev) => ({
+                            ...prev,
+                            [charge.ACTID]: checked ? charge : undefined,
+                          }));
+                        }}
+                      />
+                      <label
+                        htmlFor={`charge-${charge.ACTID}`}
+                        className="ml-2 text-gray-700"
+                      >
+                        {charge.name} - ${parseFloat(charge.price).toFixed(2)}
+                      </label>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">
+                    No additional charges available for this specialty.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Custom Charges */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Custom Charges
+              </h3>
+              {customCharges.map((customCharge, index) => (
+                <div key={index} className="flex space-x-4 mb-2">
+                  <div className="flex-grow">
+                    <Label htmlFor={`customChargeDescription-${index}`}>
+                      Description
+                    </Label>
+                    <Input
+                      id={`customChargeDescription-${index}`}
+                      value={customCharge.description}
+                      onChange={(e) => {
+                        const updatedDescription = e.target.value;
+                        setCustomCharges((prev) => {
+                          const newCharges = [...prev];
+                          newCharges[index].description = updatedDescription;
+                          return newCharges;
+                        });
+                      }}
+                      placeholder="Enter description"
+                    />
+                  </div>
+                  <div className="w-1/3">
+                    <Label htmlFor={`customChargeAmount-${index}`}>
+                      Amount
+                    </Label>
+                    <Input
+                      id={`customChargeAmount-${index}`}
+                      type="number"
+                      value={customCharge.amount}
+                      onChange={(e) => {
+                        const updatedAmount = e.target.value;
+                        setCustomCharges((prev) => {
+                          const newCharges = [...prev];
+                          newCharges[index].amount = updatedAmount;
+                          return newCharges;
+                        });
+                      }}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveCustomCharge(index)}
+                    className="text-red-600 hover:text-red-700 mt-6"
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleAddCustomCharge}
+                className="text-pink-600 hover:text-pink-700"
+              >
+                + Add Custom Charge
+              </Button>
+            </div>
+
+            <Separator />
+
+            {/* Summary of Charges */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Summary of Charges
+              </h3>
+              <ul className="space-y-2 text-gray-700">
+                <li className="flex justify-between">
+                  <span>Base Service:</span>{" "}
+                  <span>${parseFloat(baseServicePrice).toFixed(2)}</span>
+                </li>
+                {Object.values(selectedCharges)
+                  .filter(Boolean)
+                  .map((charge) => (
+                    <li
+                      key={charge.additionalChargeTypeID}
+                      className="flex justify-between"
+                    >
+                      <span>{charge.name}:</span>{" "}
+                      <span>${parseFloat(charge.price).toFixed(2)}</span>
+                    </li>
+                  ))}
+                {customCharges.map((customCharge, index) => (
+                  <li key={`custom-${index}`} className="flex justify-between">
+                    <span>{customCharge.description}:</span>{" "}
+                    <span>
+                      ${parseFloat(customCharge.amount || 0).toFixed(2)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4 text-xl font-bold text-gray-900 flex justify-between">
+                <span>Total Amount:</span>
+                <span>${calculateTotalCharges()}</span>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleSaveCharges}
+              className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+            >
+              Save Charges
+            </Button>
+          </div>
         </div>
 
         <Button

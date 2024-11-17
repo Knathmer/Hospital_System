@@ -17,6 +17,8 @@ import {
   getPharmacies,
   postNewMedication,
   refillMedication,
+  getAdditionalCharges,
+  saveCharges,
 } from "../../controllers/doctor/doctorScheduleController.js";
 
 const doctorScheduleRouter = express.Router();
@@ -37,6 +39,7 @@ doctorScheduleRouter.get("/appointment-info", getAppointmentInformation);
 doctorScheduleRouter.get("/previous-appointments", getPreviousAppointments);
 doctorScheduleRouter.get("/patient-medication", getPatientMedication);
 doctorScheduleRouter.get("/get-pharmacies", getPharmacies);
+doctorScheduleRouter.get("/additional-charges", getAdditionalCharges);
 
 //Appointment Handler PUT Requests
 doctorScheduleRouter.put("/deactivate-medication", deactivateMedication);
@@ -45,5 +48,6 @@ doctorScheduleRouter.put("/refill-medication", refillMedication);
 
 //Appointment Handler POST
 doctorScheduleRouter.post("/add-medication", postNewMedication);
+doctorScheduleRouter.post("/save-charges", saveCharges);
 
 export default doctorScheduleRouter;
