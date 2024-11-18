@@ -27,7 +27,7 @@ export default function PatientReports() {
     const fetchPatientServices = async () => {
       try {
         const token = localStorage.getItem("token"); // Retrieve token from localStorage
-         const response = await axios.get(`${envConfig.apiUrl}/dataFetch/get-patient-services`, {
+        const response = await axios.get(`${envConfig.apiUrl}/dataFetch/get-patient-services`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setPatientServices(response.data);
@@ -236,39 +236,63 @@ export default function PatientReports() {
                   <TableRow key={index}>
                     <TableCell>{service.patientName}</TableCell>
                     <TableCell>
-                      <ul className="list-disc list-inside">
-                        <li>ID: {service.appointments?.id || "N/A"}</li>
-                        <li>Created At: {formatDate(service.appointments?.createdAt) || "N/A"}</li>
-                        <li>Updated At: {formatDate(service.appointments?.updatedAt) || "N/A"}</li>
+                      {service.appointments.length > 0 ? (
+                        <ul className="list-disc list-inside max-h-32 overflow-y-auto">
+                          {service.appointments.map((appointment, idx) => (
+                            <li key={idx}>
+                              ID: {appointment.id}, Created At: {formatDate(appointment.createdAt)}, Updated At: {formatDate(appointment.updatedAt)}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        "N/A"
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <ul className="list-disc list-inside max-h-32 overflow-y-auto">
+                        <li>Allergies: {service.medicalRecords.allergies.join(", ") || "N/A"}</li>
+                        <li>Disabilities: {service.medicalRecords.disabilities.join(", ") || "N/A"}</li>
+                        <li>Surgeries: {service.medicalRecords.surgeries.join(", ") || "N/A"}</li>
                       </ul>
                     </TableCell>
                     <TableCell>
-                      <ul className="list-disc list-inside">
-                        <li>Allergen: {service.medicalRecords?.allergen || "N/A"}</li>
-                        <li>Disability: {service.medicalRecords?.disability || "N/A"}</li>
-                        <li>Surgery: {service.medicalRecords?.surgery || "N/A"}</li>
-                      </ul>
+                      {service.medicine.length > 0 ? (
+                        <ul className="list-disc list-inside max-h-32 overflow-y-auto">
+                          {service.medicine.map((med, idx) => (
+                            <li key={idx}>
+                              Name: {med.name}, Issued: {formatDate(med.dateIssued)}, Start: {formatDate(med.start)}, End: {formatDate(med.end)}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        "N/A"
+                      )}
                     </TableCell>
                     <TableCell>
-                      <ul className="list-disc list-inside">
-                        <li>Name: {service.medicine?.name || "N/A"}</li>
-                        <li>Date Issued: {formatDate(service.medicine?.dateIssued) || "N/A"}</li>
-                        <li>Start: {formatDate(service.medicine?.start) || "N/A"}</li>
-                        <li>End: {formatDate(service.medicine?.end) || "N/A"}</li>
-                      </ul>
+                      {service.billing.length > 0 ? (
+                        <ul className="list-disc list-inside max-h-32 overflow-y-auto">
+                          {service.billing.map((bill, idx) => (
+                            <li key={idx}>
+                              ID: {bill.id}, Issued: {formatDate(bill.dateIssued)}, Due: {formatDate(bill.dueDate)}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        "N/A"
+                      )}
                     </TableCell>
                     <TableCell>
-                      <ul className="list-disc list-inside">
-                        <li>ID: {service.billing?.id || "N/A"}</li>
-                        <li>Date Issued: {formatDate(service.billing?.dateIssued) || "N/A"}</li>
-                        <li>Due Date: {formatDate(service.billing?.dueDate) || "N/A"}</li>
-                      </ul>
-                    </TableCell>
-                    <TableCell>
-                      <ul className="list-disc list-inside">
-                        <li>Provider: {service.insurance?.providerName || "N/A"}</li>
-                        <li>Expiration: {formatDate(service.insurance?.expirationDate) || "N/A"}</li>
-                      </ul>
+                      {service.insurance.length > 0 ? (
+                        <ul className="list-disc list-inside max-h-32 overflow-y-auto">
+                          {service.insurance.map((insurance, idx) => (
+                            <li key={idx}>
+                              Provider: {insurance.providerName}, Expiration: {formatDate(insurance.expirationDate)}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        "N/A"
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
