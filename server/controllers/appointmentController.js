@@ -1,3 +1,5 @@
+// server/controllers/appointmentController.js
+
 import { query } from "../database.js"; // Import query function
 import pool from "../database.js"; // Import pool for transactions
 
@@ -67,7 +69,7 @@ export async function getOffices(req, res) {
   }
 }
 
-
+// Function to get patient appointments
 export async function getPatientAppointments(req, res) {
   const patientID = req.user.patientID; // Get patientID from the verified JWT
 
@@ -86,15 +88,17 @@ export async function getPatientAppointments(req, res) {
           s.serviceName AS service,
           d.firstName AS doctorFirstName, 
           d.lastName AS doctorLastName,
-          d.workEmail AS doctorEmail,       -- Updated
-          d.workPhoneNumber AS doctorPhone, -- Updated
+          d.workEmail AS doctorEmail,       
+          d.workPhoneNumber AS doctorPhone, 
           o.officeName AS officeName,
-          CONCAT(addr.addrStreet, ', ', addr.addrcity, ', ', addr.addrstate, ' ', addr.addrzip) AS officeAddress
+          CONCAT(addr.addrStreet, ', ', addr.addrcity, ', ', addr.addrstate, ' ', addr.addrzip) AS officeAddress,
+          ap.status AS approvalStatus
         FROM appointment a
         LEFT JOIN doctor d ON a.doctorID = d.doctorID
         LEFT JOIN office o ON a.officeID = o.officeID
         LEFT JOIN address addr ON o.addressID = addr.addressID
         LEFT JOIN service s ON a.serviceID = s.serviceID
+        LEFT JOIN approval ap ON a.approvalID = ap.approvalID
         WHERE a.patientID = ?
         ORDER BY a.appointmentDateTime DESC`,
       [patientID]
@@ -148,7 +152,6 @@ export async function getSpecialties(req, res) {
   try {
     // Query the database to get unique specialties from the doctor table
     const specialties = await query("SELECT * FROM specialty;");
-
     res.json(specialties);
   } catch (error) {
     console.error("Error retrieving specialties:", error);
@@ -156,6 +159,7 @@ export async function getSpecialties(req, res) {
   }
 }
 
+// Function to get services
 export const getServices = async (req, res) => {
   try {
     const { specialtyID } = req.query;
@@ -185,6 +189,7 @@ export const getServices = async (req, res) => {
   }
 };
 
+// Function to get doctors by specialty and other filters
 export async function getDoctorsBySpecialty(req, res) {
   const { specialtyID, gender, state, city, officeID, serviceID } = req.query;
 
@@ -200,7 +205,8 @@ export async function getDoctorsBySpecialty(req, res) {
         s.specialtyName,
         doctor.officeID,
         office.officeName AS officeLocation,
-        CONCAT(a.addrStreet, ', ', a.addrcity, ', ', a.addrstate, ' ', a.addrzip) AS officeAddress
+        CONCAT(a.addrStreet, ', ', a.addrcity, ', ', a.addrstate, ' ', a.addrzip) AS officeAddress,
+        doctor.isSpecialist
       FROM doctor
       LEFT JOIN office ON doctor.officeID = office.officeID
       INNER JOIN specialty s ON doctor.specialtyID = s.specialtyID
@@ -299,9 +305,9 @@ export async function bookAppointment(req, res) {
       return res.status(400).json({ message: "Time slot is already booked" });
     }
 
-    // Retrieve the officeID associated with the doctor
+    // Retrieve the officeID and isSpecialist associated with the doctor
     const [doctorRows] = await connection.query(
-      "SELECT officeID FROM doctor WHERE doctorID = ?",
+      "SELECT officeID, isSpecialist FROM doctor WHERE doctorID = ?",
       [doctorID]
     );
 
@@ -310,7 +316,7 @@ export async function bookAppointment(req, res) {
       return res.status(404).json({ message: "Doctor not found" });
     }
 
-    const officeID = doctorRows[0].officeID;
+    const { officeID, isSpecialist } = doctorRows[0];
 
     // Ensure the doctor has an associated office
     if (!officeID) {
@@ -318,16 +324,37 @@ export async function bookAppointment(req, res) {
       return res.status(400).json({ message: "Doctor does not have an associated office" });
     }
 
-    // Book the appointment with officeID
+    let approvalID = null;
+    let approvalRequired = false;
+
+    if (isSpecialist === 1) {
+      // If the doctor is a specialist, create an approval entry
+      const [approvalResult] = await connection.query(
+        `INSERT INTO approval (status, patientID, doctorID)
+         VALUES ('Pending', ?, ?)`,
+        [patientID, doctorID]
+      );
+
+      approvalID = approvalResult.insertId;
+      approvalRequired = true;
+    }
+
+    // Book the appointment with officeID and approvalID (if any)
     await connection.query(
       `INSERT INTO appointment 
-          (appointmentDateTime, reason, status, patientID, doctorID, officeID, serviceID, visitType)
-          VALUES (?, ?, 'Requested', ?, ?, ?, ?, ?)`,
-      [appointmentDateTime, reason, patientID, doctorID, officeID, serviceID, visitType]
+          (appointmentDateTime, reason, status, patientID, doctorID, officeID, serviceID, visitType, approvalID)
+          VALUES (?, ?, 'Requested', ?, ?, ?, ?, ?, ?)`,
+      [appointmentDateTime, reason, patientID, doctorID, officeID, serviceID, visitType, approvalID]
     );
 
     await connection.commit();
-    return res.status(200).json({ message: "Appointment booked successfully" });
+
+    // Respond based on whether approval is required
+    if (approvalRequired) {
+      return res.status(200).json({ message: "Appointment request is pending approval", approvalRequired: true });
+    } else {
+      return res.status(200).json({ message: "Appointment booked successfully", approvalRequired: false });
+    }
   } catch (error) {
     if (connection) {
       await connection.rollback();
@@ -340,7 +367,6 @@ export async function bookAppointment(req, res) {
     }
   }
 }
-
 
 // Function to get appointments for a doctor on a specific date
 export async function getAppointmentsByDoctorAndDate(req, res) {
@@ -397,10 +423,12 @@ export async function getDoctorAppointments(req, res) {
         patient.gender as patientGender,
         patient.phoneNumber as patientPhoneNumber,
         patient.email as patientEmail,
-        service.serviceName
+        service.serviceName,
+        approval.status as approvalStatus
       FROM appointment
       JOIN patient ON appointment.patientID = patient.patientID
       LEFT JOIN service ON appointment.serviceID = service.serviceID
+      LEFT JOIN approval ON appointment.approvalID = approval.approvalID
       WHERE appointment.doctorID = ?`,
       [doctorID]
     );
@@ -420,6 +448,12 @@ export async function updateAppointment(req, res) {
   }
 
   const { appointmentID, status } = req.body;
+
+  // Validate status against allowed enum values
+  const allowedStatuses = ['Scheduled', 'Completed', 'Cancelled', 'Missed', 'Request Denied'];
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: "Invalid status value" });
+  }
 
   try {
     const result = await query(

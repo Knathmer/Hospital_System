@@ -1,3 +1,5 @@
+// src/components/users/patient/BookPage.jsx
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -166,7 +168,7 @@ function BookPage() {
     if (date && selectedDoctor) {
       // Fetch booked times for the selected doctor and date
       axios
-        .get(`${envConfig.apiUrl}/appointment/appointments`, {
+        .get(`${envConfig.apiUrl}/appointment/doctor/appointmentsByDate`, {
           params: { doctorID: selectedDoctor.doctorID, date },
         })
         .then((response) => {
@@ -198,7 +200,7 @@ function BookPage() {
   const isWeekend = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDay();
-    return day === 5 || day === 6; // Sunday (5) and Saturday (6)
+    return day === 0 || day === 6; // Sunday (0) and Saturday (6)
   };
 
   const convertTo24HourFormat = (timeStr) => {
@@ -241,6 +243,11 @@ function BookPage() {
       return;
     }
 
+    if (!time) {
+      setMessage("Please select a time.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const formattedTime = convertTo24HourFormat(time); // Convert to 24-hour format
@@ -254,7 +261,7 @@ function BookPage() {
         visitType: selectedVisitType,
       });
 
-      await axios.post(
+      const response = await axios.post(
         `${envConfig.apiUrl}/appointment/book`,
         {
           appointmentDateTime: `${date}T${formattedTime}:00`,
@@ -267,7 +274,13 @@ function BookPage() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setMessage("Appointment booked successfully!");
+
+      // Check if an approval is required
+      if (response.data.approvalRequired) {
+        setMessage("Your appointment request is pending approval.");
+      } else {
+        setMessage("Appointment booked successfully!");
+      }
 
       // Reset form fields
       setSpecialty("");
@@ -284,7 +297,11 @@ function BookPage() {
       setBookedTimes([]);
       setAvailableTimes([]);
     } catch (error) {
-      setMessage("Error booking appointment.");
+      if (error.response && error.response.data && error.response.data.message) {
+        setMessage(error.response.data.message);
+      } else {
+        setMessage("Error booking appointment.");
+      }
       console.error("Error booking appointment:", error);
     }
   };
@@ -437,7 +454,7 @@ function BookPage() {
                     <h3 className="text-lg font-semibold text-gray-700">
                       Available Doctors
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
                       {doctors.length === 0 && (
                         <p className="text-gray-500">
                           No Doctors Available For The Selected Fields
@@ -460,10 +477,7 @@ function BookPage() {
                             Specialty: {doc.specialtyName}
                           </p>
                           <p className="text-sm text-gray-600">
-                            Gender: {doc.gender}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Location: {doc.officeLocation} - {doc.officeAddress}
+                            Office: {doc.officeLocation || 'Unknown Office'}
                           </p>
                           <p className="text-sm text-gray-600">
                             Phone: {formatPhoneNumber(doc.workPhoneNumber)}
@@ -471,6 +485,11 @@ function BookPage() {
                           <p className="text-sm text-gray-600">
                             Email: {doc.workEmail}
                           </p>
+                          {doc.isSpecialist === 1 && (
+                            <span className="inline-block mt-1 px-2 py-1 text-xs font-semibold text-white bg-blue-500 rounded-full">
+                              Specialist
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -631,7 +650,7 @@ function BookPage() {
                   {message && (
                     <p
                       className={`mt-4 ${
-                        message.includes("successfully")
+                        message.includes("successfully") || message.includes("pending")
                           ? "text-green-500"
                           : "text-pink-600"
                       }`}
