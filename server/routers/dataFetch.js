@@ -6,6 +6,7 @@ import { welcomeDocName } from '../controllers/doctor/docNameInSidebar.js';
 import { welcomeAdminName } from '../controllers/adminNameInSidebar.js';
 import { getAppointmentsDashboard, getBillDashboard, getMedsResultsDashboard } from '../controllers/patient/patientDashboard.js';
 import { getUpcomingAppointmentAdmin, listOfDocAdmin, totalAdmins, totalAppointments, totalDoctors, totalPatients } from '../controllers/adminDashboard.js';
+import { getPatientServices } from '../controllers/admin/patientReports.js';
 
 const router = express.Router();
 
@@ -24,5 +25,8 @@ router.get('/get-total-admin', verifyToken, totalAdmins );
 router.get('/get-total-appointments', verifyToken, totalAppointments);
 router.get('/get-upcoming-appointments', verifyToken, getUpcomingAppointmentAdmin);
 router.get('/get-doctors-list', verifyToken, listOfDocAdmin);
+
+// Patient Reports
+router.get("/get-patient-services", verifyToken, getPatientServices);
 
 export default router;

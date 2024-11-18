@@ -8,6 +8,7 @@ import {
   CreditCard,
   Tablets,
   BookOpen,
+  FileHeart,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -24,6 +25,7 @@ import AppointmentAnalytics from "../users/admin/sections/appointmentReport/appo
 import DoctorReports from "../users/admin/reports/adminDoctorReport";
 import DoctorManagement from "../users/admin/sections/doctorManagement/doctorManagement";
 import PatientManagement from "../users/admin/sections/patientManagement/patientManagement";
+import PatientReports from "../users/admin/sections/patientReport/PatientReport";
 
 export default function AdminSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -51,6 +53,7 @@ export default function AdminSidebar() {
         icon: CalendarSearch,
       },
       { id: "doctor-data", label: "Doctor Reports", icon: BookOpen}, //Icon is currently placeholder
+      { id: "patient-data", label: "Patient Reports", icon: FileHeart},
     ],
   };
 
@@ -135,6 +138,7 @@ export default function AdminSidebar() {
         {activeTab === "appointment-data" && <AppointmentAnalytics />}
         
         {activeTab === "doctor-data" && <DoctorReports />}
+        {activeTab === "patient-data" && <PatientReports />}
         
       </main>
     </div>
