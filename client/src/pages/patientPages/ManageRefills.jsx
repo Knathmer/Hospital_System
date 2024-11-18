@@ -173,6 +173,7 @@ export default function ManageRefillsPage() {
 
         // Refresh Data
         await fetchRefillHistory();
+        await fetchPendingRequests();
         await fetchCurrentPrescriptions();
       }
     } catch (error) {

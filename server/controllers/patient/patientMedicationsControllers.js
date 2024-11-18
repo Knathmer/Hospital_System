@@ -91,7 +91,7 @@ export const postPatientRefill = async (req, res) => {
 
       // Step 4: Decrement the refill count by 1
       await query(
-        "UPDATE prescription SET refillCount = refillCount - 1 WHERE prescriptionID = ?",
+        "UPDATE prescription SET refillsRemaining = refillsRemaining - 1 WHERE prescriptionID = ?",
         [prescriptionID]
       );
 

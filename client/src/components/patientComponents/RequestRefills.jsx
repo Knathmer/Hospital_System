@@ -33,7 +33,7 @@ export default function RequestRefills({
                   day: "2-digit",
                   year: "numeric",
                 })}
-                refillCount={prescription.refillCount}
+                refillCount={prescription.refillsRemaining}
                 prescriptionID={prescription.prescriptionID}
                 onSelectRefill={handleSelectRefill}
               />
