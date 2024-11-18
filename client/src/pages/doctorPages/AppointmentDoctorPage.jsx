@@ -605,7 +605,6 @@ export default function AppointmentPage() {
       const token = localStorage.getItem("token");
       const patientID = patientInformation.patientID;
 
-      // Prepare payload for the backend
       let payload = {
         patientID,
         ...item,
@@ -613,7 +612,6 @@ export default function AppointmentPage() {
 
       switch (type) {
         case "Allergies":
-          // Validate severity
           const validSeverities = ["Mild", "Moderate", "Severe"];
           if (!validSeverities.includes(item.severity)) {
             alert(
@@ -621,13 +619,11 @@ export default function AppointmentPage() {
             );
             return;
           }
-          // Make API call
           const allergyResponse = await axios.post(
             "http://localhost:3000/auth/doctor/schedule/add-allergy",
             payload,
             { headers: { Authorization: `Bearer ${token}` } }
           );
-          // Update the allergies state with the new item
           setAllergies((prev) => [
             ...prev,
             { ...item, allergyID: allergyResponse.data.allergyID },
@@ -647,10 +643,8 @@ export default function AppointmentPage() {
           break;
 
         case "Vaccines":
-          // Date handling
           payload.dateAdministered = item.date;
-          delete payload.date; // Remove 'date' as backend expects 'dateAdministered'
-
+          delete payload.date;
           const vaccineResponse = await axios.post(
             "http://localhost:3000/auth/doctor/schedule/add-vaccine",
             payload,
@@ -668,10 +662,8 @@ export default function AppointmentPage() {
           break;
 
         case "Surgeries":
-          // Date handling
           payload.surgeryDateTime = item.date;
-          delete payload.date; // Remove 'date' as backend expects 'surgeryDateTime'
-
+          delete payload.date;
           const surgeryResponse = await axios.post(
             "http://localhost:3000/auth/doctor/schedule/add-surgery",
             payload,
@@ -709,14 +701,11 @@ export default function AppointmentPage() {
           console.error("Unknown medical history type:", type);
       }
 
-      // Optionally, show a success message
       await fetchPatientInformation();
-      alert(`${type.slice(0, -1)} added successfully.`);
+      alert(`${type} added successfully.`);
     } catch (error) {
-      console.error(`Error adding ${type.slice(0, -1)}:`, error);
-      alert(
-        `An error occurred while adding ${type.slice(0, -1)}. Please try again.`
-      );
+      console.error(`Error adding ${type}:`, error);
+      alert(`An error occurred while adding ${type}. Please try again.`);
     }
   };
 
