@@ -378,15 +378,13 @@ export const postPayment = async (req, res) => {
         .json({ success: false, message: "Failed to update bill." });
     }
 
-    // Step 4: Send success response to frontend
+    // Send success response to frontend
     res.json({ success: true, message: "Payment processed successfully." });
   } catch (error) {
     console.error("Error processing payment:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred while processing payment.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while processing payment.",
+    });
   }
 };
