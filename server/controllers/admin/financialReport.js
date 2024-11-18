@@ -1,3 +1,5 @@
+// financialReport.js
+
 import { query } from "../../database.js";
 
 export const getFinancialOverview = async (req, res) => {
@@ -12,6 +14,7 @@ export const getFinancialOverview = async (req, res) => {
       patientName,
     } = req.query;
 
+    // Main Query for Detailed Data
     let sql = `
       SELECT 
         appointment.appointmentID, 
@@ -33,7 +36,7 @@ export const getFinancialOverview = async (req, res) => {
             INNER JOIN additional_charge_type ON bill_additional_charge.additionalChargeTypeID = additional_charge_type.additionalChargeTypeID 
           WHERE 
             bill_additional_charge.billID = bill.billID
-        ) AS additionalCharges, 
+        ) AS additionalChargesDetails, 
         (
           SELECT 
             GROUP_CONCAT(CONCAT(description, ' ($', amount, ')') SEPARATOR ', ') 
@@ -41,7 +44,23 @@ export const getFinancialOverview = async (req, res) => {
             custom_charge 
           WHERE 
             custom_charge.billID = bill.billID
-        ) AS customCharges 
+        ) AS customChargesDetails,
+        (
+          SELECT 
+            SUM(bill_additional_charge.amount)
+          FROM 
+            bill_additional_charge
+          WHERE 
+            bill_additional_charge.billID = bill.billID
+        ) AS totalAdditionalCharges,
+        (
+          SELECT 
+            SUM(amount)
+          FROM 
+            custom_charge
+          WHERE 
+            custom_charge.billID = bill.billID
+        ) AS totalCustomCharges
       FROM 
         appointment 
         LEFT JOIN patient ON appointment.patientID = patient.patientID 
@@ -104,6 +123,7 @@ export const getFinancialOverview = async (req, res) => {
         appointment
         INNER JOIN service ON appointment.serviceID = service.serviceID
         INNER JOIN bill ON appointment.appointmentID = bill.appointmentID
+        LEFT JOIN patient ON appointment.patientID = patient.patientID
       WHERE 
         appointment.status = 'Completed'
     `;
@@ -130,6 +150,22 @@ export const getFinancialOverview = async (req, res) => {
       revenueByServiceParams.push(officeID);
     }
 
+    if (serviceID) {
+      revenueByServiceSql += " AND appointment.serviceID = ?";
+      revenueByServiceParams.push(serviceID);
+    }
+
+    if (paymentStatus) {
+      revenueByServiceSql += " AND bill.paidStatus = ?";
+      revenueByServiceParams.push(paymentStatus);
+    }
+
+    if (patientName) {
+      revenueByServiceSql +=
+        ' AND CONCAT(patient.firstName, " ", patient.lastName) LIKE ?';
+      revenueByServiceParams.push(`%${patientName}%`);
+    }
+
     revenueByServiceSql += " GROUP BY service.serviceName";
 
     const revenueByService = await query(
@@ -145,11 +181,13 @@ export const getFinancialOverview = async (req, res) => {
       FROM 
         appointment
         INNER JOIN bill ON appointment.appointmentID = bill.appointmentID
+        LEFT JOIN patient ON appointment.patientID = patient.patientID
       WHERE 
         appointment.status = 'Completed'
     `;
     const monthlyRevenueParams = [];
 
+    // Apply same filters to monthly revenue
     if (startDate) {
       monthlyRevenueSql += " AND DATE(appointment.appointmentDateTime) >= ?";
       monthlyRevenueParams.push(startDate);
@@ -158,6 +196,32 @@ export const getFinancialOverview = async (req, res) => {
     if (endDate) {
       monthlyRevenueSql += " AND DATE(appointment.appointmentDateTime) <= ?";
       monthlyRevenueParams.push(endDate);
+    }
+
+    if (doctorID) {
+      monthlyRevenueSql += " AND appointment.doctorID = ?";
+      monthlyRevenueParams.push(doctorID);
+    }
+
+    if (officeID) {
+      monthlyRevenueSql += " AND appointment.officeID = ?";
+      monthlyRevenueParams.push(officeID);
+    }
+
+    if (serviceID) {
+      monthlyRevenueSql += " AND appointment.serviceID = ?";
+      monthlyRevenueParams.push(serviceID);
+    }
+
+    if (paymentStatus) {
+      monthlyRevenueSql += " AND bill.paidStatus = ?";
+      monthlyRevenueParams.push(paymentStatus);
+    }
+
+    if (patientName) {
+      monthlyRevenueSql +=
+        ' AND CONCAT(patient.firstName, " ", patient.lastName) LIKE ?';
+      monthlyRevenueParams.push(`%${patientName}%`);
     }
 
     monthlyRevenueSql += " GROUP BY month ORDER BY month";

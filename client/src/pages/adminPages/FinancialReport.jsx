@@ -7,6 +7,7 @@ import Input from "../../components/ui/Input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Bar, Line } from "react-chartjs-2";
+import { Navigate, useNavigate } from "react-router-dom";
 import {
   Chart as ChartJS,
   BarElement,
@@ -15,9 +16,10 @@ import {
   PointElement,
   LineElement,
   Title,
-  Tooltip,
+  Tooltip as ChartTooltip,
   Legend,
 } from "chart.js";
+// import { useHistory } from "react-router-dom";
 
 ChartJS.register(
   BarElement,
@@ -26,7 +28,7 @@ ChartJS.register(
   PointElement,
   LineElement,
   Title,
-  Tooltip,
+  ChartTooltip,
   Legend
 );
 
@@ -52,43 +54,44 @@ export default function FinancialOverviewPage() {
   });
   const [revenueByService, setRevenueByService] = useState([]);
   const [monthlyRevenue, setMonthlyRevenue] = useState([]);
+  const [expandedRows, setExpandedRows] = useState({});
+  const navigate = useNavigate();
+
+  // const history = useHistory();
 
   useEffect(() => {
     fetchFinancialData();
     fetchFilterOptions();
   }, []);
 
+  // Reset expandedRows when data changes
+  useEffect(() => {
+    setExpandedRows({});
+  }, [data]);
+
   const fetchFinancialData = async () => {
     try {
       const token = localStorage.getItem("token");
       const params = {};
 
-      // Date handling
       if (filters.startDate) {
         params.startDate = filters.startDate.toISOString().split("T")[0];
       }
-
       if (filters.endDate) {
         params.endDate = filters.endDate.toISOString().split("T")[0];
       }
-
-      // Other filters
       if (filters.doctorID) {
         params.doctorID = filters.doctorID;
       }
-
       if (filters.officeID) {
         params.officeID = filters.officeID;
       }
-
       if (filters.serviceID) {
         params.serviceID = filters.serviceID;
       }
-
       if (filters.paymentStatus) {
         params.paymentStatus = filters.paymentStatus;
       }
-
       if (filters.patientName) {
         params.patientName = filters.patientName;
       }
@@ -106,7 +109,6 @@ export default function FinancialOverviewPage() {
       const monthlyRevenueData = response.data.monthlyRevenue || [];
       setData(rows);
 
-      // Compute summary
       let totalRevenue = 0;
       let totalOutstanding = 0;
       let totalAppointments = rows.length;
@@ -121,7 +123,6 @@ export default function FinancialOverviewPage() {
           totalOutstanding += totalBillAmount - paidAmount;
         }
 
-        // Count payment statuses
         paymentStatusCounts[item.paidStatus] =
           (paymentStatusCounts[item.paidStatus] || 0) + 1;
       });
@@ -133,7 +134,6 @@ export default function FinancialOverviewPage() {
         paymentStatusCounts,
       });
 
-      // Set data for charts
       setRevenueByService(revenueServiceData);
       setMonthlyRevenue(monthlyRevenueData);
     } catch (error) {
@@ -189,14 +189,37 @@ export default function FinancialOverviewPage() {
     fetchFinancialData();
   };
 
-  // Chart Data Preparation
+  const handleResetFilters = () => {
+    setFilters({
+      startDate: null,
+      endDate: null,
+      doctorID: "",
+      officeID: "",
+      serviceID: "",
+      paymentStatus: "",
+      patientName: "",
+    });
+    fetchFinancialData();
+  };
+
+  const handleBackClick = () => {
+    navigate("/admin/dashboard");
+  };
+
+  const toggleRowExpansion = (appointmentID) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [appointmentID]: !prev[appointmentID],
+    }));
+  };
+
   const revenueByServiceChartData = {
     labels: revenueByService.map((item) => item.serviceName),
     datasets: [
       {
         label: "Revenue",
         data: revenueByService.map((item) => item.totalRevenue),
-        backgroundColor: "rgba(75, 192, 192, 0.6)",
+        backgroundColor: "rgba(236, 72, 153, 0.6)",
       },
     ],
   };
@@ -207,113 +230,79 @@ export default function FinancialOverviewPage() {
       {
         label: "Monthly Revenue",
         data: monthlyRevenue.map((item) => item.totalRevenue),
-        borderColor: "rgba(153, 102, 255, 1)",
-        backgroundColor: "rgba(153, 102, 255, 0.2)",
+        borderColor: "rgba(236, 72, 153, 1)",
+        backgroundColor: "rgba(236, 72, 153, 0.2)",
         fill: true,
       },
     ],
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Financial Overview</h1>
+    <div className="bg-gray-50 min-h-screen p-8">
+      <button
+        onClick={handleBackClick}
+        className="mb-4 text-pink-600 hover:text-pink-800 focus:outline-none flex items-center"
+      >
+        <svg
+          className="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        Back
+      </button>
 
-      {/* Summary Section */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 bg-white rounded shadow">
-          <h2 className="text-xl font-semibold text-gray-700">Total Revenue</h2>
-          <p className="text-2xl font-bold text-green-600">
-            ${summary.totalRevenue}
-          </p>
-        </div>
-        <div className="p-4 bg-white rounded shadow">
-          <h2 className="text-xl font-semibold text-gray-700">
-            Total Appointments
-          </h2>
-          <p className="text-2xl font-bold text-blue-600">
-            {summary.totalAppointments}
-          </p>
-        </div>
-        <div className="p-4 bg-white rounded shadow">
-          <h2 className="text-xl font-semibold text-gray-700">
-            Total Outstanding
-          </h2>
-          <p className="text-2xl font-bold text-red-600">
-            ${summary.totalOutstanding}
-          </p>
-        </div>
-      </div>
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">
+        Financial Overview
+      </h1>
 
-      {/* Payment Status Summary */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-        {["Paid", "Partially Paid", "Pending", "Overdue"].map((status) => (
-          <div key={status} className="p-4 bg-white rounded shadow">
-            <h2 className="text-xl font-semibold text-gray-700">{status}</h2>
-            <p className="text-2xl font-bold text-gray-800">
-              {summary.paymentStatusCounts[status] || 0}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Charts */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Revenue by Service */}
-        <div className="p-4 bg-white rounded shadow">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">
-            Revenue by Service
-          </h2>
-          <Bar data={revenueByServiceChartData} />
-        </div>
-
-        {/* Monthly Revenue */}
-        <div className="p-4 bg-white rounded shadow">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">
-            Monthly Revenue
-          </h2>
-          <Line data={monthlyRevenueChartData} />
-        </div>
-      </div>
-
-      {/* Filter Section */}
-      <form onSubmit={handleFilterSubmit} className="mb-6 space-y-4">
+      <form
+        onSubmit={handleFilterSubmit}
+        className="mb-6 bg-white p-6 rounded-lg shadow-md"
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {/* Start Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Start Date
             </label>
             <DatePicker
               selected={filters.startDate}
               onChange={(date) => handleDateChange(date, "startDate")}
               dateFormat="yyyy-MM-dd"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               placeholderText="Select start date"
+              wrapperClassName="w-full"
             />
           </div>
-          {/* End Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               End Date
             </label>
             <DatePicker
               selected={filters.endDate}
               onChange={(date) => handleDateChange(date, "endDate")}
               dateFormat="yyyy-MM-dd"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               placeholderText="Select end date"
+              wrapperClassName="w-full"
             />
           </div>
-          {/* Doctor */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Doctor
             </label>
             <select
               name="doctorID"
               value={filters.doctorID}
               onChange={handleFilterChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
             >
               <option value="">All Doctors</option>
               {doctors.map((doctor) => (
@@ -323,16 +312,15 @@ export default function FinancialOverviewPage() {
               ))}
             </select>
           </div>
-          {/* Office */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Office
             </label>
             <select
               name="officeID"
               value={filters.officeID}
               onChange={handleFilterChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
             >
               <option value="">All Offices</option>
               {offices.map((office) => (
@@ -342,16 +330,15 @@ export default function FinancialOverviewPage() {
               ))}
             </select>
           </div>
-          {/* Service */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Service
             </label>
             <select
               name="serviceID"
               value={filters.serviceID}
               onChange={handleFilterChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
             >
               <option value="">All Services</option>
               {services.map((service) => (
@@ -361,16 +348,15 @@ export default function FinancialOverviewPage() {
               ))}
             </select>
           </div>
-          {/* Payment Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Payment Status
             </label>
             <select
               name="paymentStatus"
               value={filters.paymentStatus}
               onChange={handleFilterChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
             >
               <option value="">All Statuses</option>
               <option value="Paid">Paid</option>
@@ -379,9 +365,8 @@ export default function FinancialOverviewPage() {
               <option value="Overdue">Overdue</option>
             </select>
           </div>
-          {/* Patient Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Patient Name
             </label>
             <Input
@@ -389,120 +374,276 @@ export default function FinancialOverviewPage() {
               value={filters.patientName}
               onChange={handleFilterChange}
               placeholder="Enter patient name"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
             />
           </div>
         </div>
-        <div>
+        <div className="mt-4 flex space-x-4">
           <Button
             type="submit"
-            className="bg-pink-600 hover:bg-pink-700 text-white"
+            className="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
           >
             Apply Filters
+          </Button>
+          <Button
+            type="button"
+            onClick={handleResetFilters}
+            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+          >
+            Reset Filters
           </Button>
         </div>
       </form>
 
-      {/* Data Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white shadow-md rounded">
-          <thead>
-            <tr>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">
-                Appointment Date
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">
-                Patient
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">
-                Doctor
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">
-                Service
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-right text-xs font-semibold text-gray-600 uppercase">
-                Service Price
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">
-                Additional Charges
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">
-                Custom Charges
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-right text-xs font-semibold text-gray-600 uppercase">
-                Total Bill Amount
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-right text-xs font-semibold text-gray-600 uppercase">
-                Insurance Covered
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-right text-xs font-semibold text-gray-600 uppercase">
-                Paid Amount
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-center text-xs font-semibold text-gray-600 uppercase">
-                Payment Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.length > 0 ? (
-              data.map((item) => (
-                <tr key={item.appointmentID}>
-                  <td className="px-6 py-4 border-b border-gray-200">
-                    {item.appointmentDateTime
-                      ? new Date(item.appointmentDateTime).toLocaleDateString()
-                      : "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200">
-                    {item.patientName || "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200">
-                    {item.doctorName || "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200">
-                    {item.serviceName || "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-right">
-                    {item.servicePrice != null
-                      ? `$${parseFloat(item.servicePrice).toFixed(2)}`
-                      : "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200">
-                    {item.additionalCharges || "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200">
-                    {item.customCharges || "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-right">
-                    {item.totalBillAmount != null
-                      ? `$${parseFloat(item.totalBillAmount).toFixed(2)}`
-                      : "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-right">
-                    {item.insuranceCoveredAmount != null
-                      ? `$${parseFloat(item.insuranceCoveredAmount).toFixed(2)}`
-                      : "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-right">
-                    {item.paidAmount != null
-                      ? `$${parseFloat(item.paidAmount).toFixed(2)}`
-                      : "-"}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-center">
-                    {item.paidStatus || "-"}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 bg-white rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">
+            Total Revenue
+          </h2>
+          <p className="text-3xl font-bold text-pink-600">
+            ${summary.totalRevenue}
+          </p>
+        </div>
+        <div className="p-4 bg-white rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">
+            Total Appointments
+          </h2>
+          <p className="text-3xl font-bold text-blue-600">
+            {summary.totalAppointments}
+          </p>
+        </div>
+        <div className="p-4 bg-white rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">
+            Total Outstanding
+          </h2>
+          <p className="text-3xl font-bold text-red-600">
+            ${summary.totalOutstanding}
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        {["Paid", "Partially Paid", "Pending", "Overdue"].map((status) => (
+          <div key={status} className="p-4 bg-white rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-gray-700 mb-2">
+              {status}
+            </h2>
+            <p className="text-2xl font-bold text-gray-800">
+              {summary.paymentStatusCounts[status] || 0}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-6 bg-white rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">
+            Revenue by Service
+          </h2>
+          <Bar data={revenueByServiceChartData} />
+        </div>
+        <div className="p-6 bg-white rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">
+            Monthly Revenue
+          </h2>
+          <Line data={monthlyRevenueChartData} />
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                {[
+                  "Appointment Date",
+                  "Patient",
+                  "Doctor",
+                  "Service",
+                  "Service Price",
+                  "Additional Charges",
+                  "Custom Charges",
+                  "Total Bill Amount",
+                  "Insurance Covered",
+                  "Paid Amount",
+                  "Payment Status",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {data.length > 0 ? (
+                data.map((item, index) => (
+                  <React.Fragment key={`${item.appointmentID}-${index}`}>
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => toggleRowExpansion(item.appointmentID)}
+                          className="text-pink-600 hover:text-pink-800 focus:outline-none"
+                        >
+                          {expandedRows[item.appointmentID] ? (
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                              />
+                            </svg>
+                          ) : (
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item.appointmentDateTime
+                          ? new Date(
+                              item.appointmentDateTime
+                            ).toLocaleDateString()
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.patientName || "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.doctorName || "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.serviceName || "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {item.servicePrice != null
+                          ? `$${parseFloat(item.servicePrice).toFixed(2)}`
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {item.totalAdditionalCharges != null
+                          ? `$${parseFloat(item.totalAdditionalCharges).toFixed(
+                              2
+                            )}`
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {item.totalCustomCharges != null
+                          ? `$${parseFloat(item.totalCustomCharges).toFixed(2)}`
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {item.totalBillAmount != null
+                          ? `$${parseFloat(item.totalBillAmount).toFixed(2)}`
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {item.insuranceCoveredAmount != null
+                          ? `$${parseFloat(item.insuranceCoveredAmount).toFixed(
+                              2
+                            )}`
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {item.paidAmount != null
+                          ? `$${parseFloat(item.paidAmount).toFixed(2)}`
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            item.paidStatus === "Paid"
+                              ? "bg-green-100 text-green-800"
+                              : item.paidStatus === "Partially Paid"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : item.paidStatus === "Pending"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {item.paidStatus || "-"}
+                        </span>
+                      </td>
+                    </tr>
+                    {expandedRows[item.appointmentID] && (
+                      <tr>
+                        <td colSpan="12" className="px-6 py-4 bg-gray-50">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <h3 className="text-sm font-medium text-gray-700 mb-2">
+                                Additional Charges Details
+                              </h3>
+                              {item.additionalChargesDetails ? (
+                                <ul className="list-disc list-inside text-sm text-gray-600">
+                                  {item.additionalChargesDetails
+                                    .split(", ")
+                                    .map((detail, idx) => (
+                                      <li key={idx}>{detail}</li>
+                                    ))}
+                                </ul>
+                              ) : (
+                                <p className="text-sm text-gray-600">
+                                  No additional charges.
+                                </p>
+                              )}
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-medium text-gray-700 mb-2">
+                                Custom Charges Details
+                              </h3>
+                              {item.customChargesDetails ? (
+                                <ul className="list-disc list-inside text-sm text-gray-600">
+                                  {item.customChargesDetails
+                                    .split(", ")
+                                    .map((detail, idx) => (
+                                      <li key={idx}>{detail}</li>
+                                    ))}
+                                </ul>
+                              ) : (
+                                <p className="text-sm text-gray-600">
+                                  No custom charges.
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="12"
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
+                    No data available.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="11"
-                  className="px-6 py-4 text-center text-gray-500"
-                >
-                  No data available.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
