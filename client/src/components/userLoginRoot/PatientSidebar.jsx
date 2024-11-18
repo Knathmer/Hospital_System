@@ -12,6 +12,7 @@ import {
   Settings,
   ChevronDown,
   ChevronUp,
+  UserSearch,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -50,7 +51,7 @@ export default function PatientSidebar() {
       { id: "visits", label: "Visits", icon: CalendarDays },
       { id: "medical-records", label: "Medical Records", icon: FileText },
       { id: "medications", label: "Medications", icon: PillBottle },
-      { id: "doctor_selection", label: "Doctor", icon: PillBottle },
+      { id: "doctor_selection", label: "Doctors", icon: UserSearch },
       //{ id: "personal-info", label: "Personal Info", icon: User },
     ],
     "Billing & Payments": [
