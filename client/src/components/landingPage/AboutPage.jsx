@@ -62,7 +62,7 @@ const AboutPage = () => {
             Experience the UMA Cares difference – where your health is our passion, and your well-being is our mission.
           </p>
           <Link
-            to="/appointments"
+            to="/patient/dashboard?tab=appointments"
             className="inline-block bg-[#4a5d23] text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-[#3a4a1c] transition duration-300"
           >
             Book an Appointment Today

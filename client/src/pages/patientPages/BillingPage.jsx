@@ -324,7 +324,6 @@ export default function BillingPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <NavbarPatient linkTo={"/patient/dashboard"} />
       <main className="flex-grow py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-8 text-gray-800">Billing</h1>
