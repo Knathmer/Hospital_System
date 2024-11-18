@@ -80,7 +80,7 @@ export default function RequestRefills({
       </div>
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">Pending Refills</h2>
-        {pendingRequests.length === 0 ? (
+        {!pendingRequests || pendingRequests.length === 0 ? (
           <p className="text-gray-600">
             No pending refill requests currently available.
           </p>
