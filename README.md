@@ -12,11 +12,11 @@ Patient Services
 - Prescriptions: Access medication details, request refills, and track their status.
 - Billing: Patients can pay bills in partial or full amounts.
 - Insurance Search: Find insurance providers conveniently through the platform.
-- 
+ 
 Doctor Services
 - Multiple Offices: Doctors can manage appointments across multiple offices in different states.
 - Appointment Updates: View and update the status of patient appointments, ensuring streamlined communication and care delivery.
-- 
+ 
 Admin Services
 - Reports and Metrics:
 - Prescription Analysis: View detailed tables of medicines, doctors, and insurance data.
