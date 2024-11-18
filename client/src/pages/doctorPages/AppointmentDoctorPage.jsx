@@ -1553,7 +1553,7 @@ export default function AppointmentPage() {
               <div className="flex justify-end space-x-2">
                 <Button
                   onClick={() => setIsEditingNotes(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-pink-600 hover:bg-pink-700 text-white"
                 >
                   Edit Notes
                 </Button>
@@ -1696,7 +1696,7 @@ export default function AppointmentPage() {
 
                 <Button
                   onClick={() => setIsEditingCharges(true)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-pink-600 hover:bg-pink-700 text-white"
                 >
                   Edit Charges
                 </Button>
