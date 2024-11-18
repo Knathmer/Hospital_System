@@ -19,6 +19,7 @@ import {
   CirclePlus,
   RotateCcw,
 } from "lucide-react";
+import envConfig from "../../envConfig.js";
 
 export default function AppointmentPage() {
   const [patientInformation, setPatientInformation] = useState({});
@@ -83,7 +84,7 @@ export default function AppointmentPage() {
       const token = localStorage.getItem("token");
 
       const patientInfoResponse = await axios.get(
-        "http://localhost:3000/auth/doctor/schedule/patient-info",
+        `${envConfig.apiUrl}/auth/doctor/schedule/patient-info`,
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { appointmentID },
@@ -106,49 +107,43 @@ export default function AppointmentPage() {
         previousAppointmentsResponse,
         patientMedicationResponse,
       ] = await Promise.all([
-        axios.get("http://localhost:3000/auth/doctor/schedule/insurance-info", {
+        axios.get(`${envConfig.apiUrl}/auth/doctor/schedule/insurance-info`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+        axios.get(`${envConfig.apiUrl}/auth/doctor/schedule/appointment-info`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID, appointmentID },
+        }),
+        axios.get(`${envConfig.apiUrl}/auth/doctor/schedule/allergy-info`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+        axios.get(`${envConfig.apiUrl}/auth/doctor/schedule/disability-info`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+        axios.get(`${envConfig.apiUrl}/auth/doctor/schedule/vaccine-info`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+        axios.get(`${envConfig.apiUrl}/auth/doctor/schedule/surgery-info`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { patientID },
+        }),
+        axios.get(`${envConfig.apiUrl}/auth/doctor/schedule/family-info`, {
           headers: { Authorization: `Bearer ${token}` },
           params: { patientID },
         }),
         axios.get(
-          "http://localhost:3000/auth/doctor/schedule/appointment-info",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            params: { patientID, appointmentID },
-          }
-        ),
-        axios.get("http://localhost:3000/auth/doctor/schedule/allergy-info", {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { patientID },
-        }),
-        axios.get(
-          "http://localhost:3000/auth/doctor/schedule/disability-info",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            params: { patientID },
-          }
-        ),
-        axios.get("http://localhost:3000/auth/doctor/schedule/vaccine-info", {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { patientID },
-        }),
-        axios.get("http://localhost:3000/auth/doctor/schedule/surgery-info", {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { patientID },
-        }),
-        axios.get("http://localhost:3000/auth/doctor/schedule/family-info", {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { patientID },
-        }),
-        axios.get(
-          "http://localhost:3000/auth/doctor/schedule/previous-appointments",
+          `${envConfig.apiUrl}/auth/doctor/schedule/previous-appointments`,
           {
             headers: { Authorization: `Bearer ${token}` },
             params: { patientID },
           }
         ),
         axios.get(
-          "http://localhost:3000/auth/doctor/schedule/patient-medication",
+          `${envConfig.apiUrl}/auth/doctor/schedule/patient-medication`,
           {
             headers: { Authorization: `Bearer ${token}` },
             params: { patientID },
@@ -178,7 +173,7 @@ export default function AppointmentPage() {
         appointmentInfoResponse.data.appointmentInformation.specialtyID;
 
       const additionalChargeResponse = await axios.get(
-        "http://localhost:3000/auth/doctor/schedule/additional-charges",
+        `${envConfig.apiUrl}/auth/doctor/schedule/additional-charges`,
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { specialtyID },
@@ -214,7 +209,7 @@ export default function AppointmentPage() {
       }
 
       const response = await axios.get(
-        "http://localhost:3000/auth/doctor/schedule/get-pharmacies",
+        `${envConfig.apiUrl}/auth/doctor/schedule/get-pharmacies`,
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { patientID: patientInformation.patientID },
@@ -229,7 +224,7 @@ export default function AppointmentPage() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:3000/auth/doctor/schedule/deactivate-medication",
+        `${envConfig.apiUrl}/auth/doctor/schedule/deactivate-medication`,
         { prescriptionID },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -250,7 +245,7 @@ export default function AppointmentPage() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:3000/auth/doctor/schedule/reactivate-medication",
+        `${envConfig.apiUrl}/auth/doctor/schedule/reactivate-medication`,
         { prescriptionID },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -271,7 +266,7 @@ export default function AppointmentPage() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:3000/auth/doctor/schedule/refill-medication",
+        `${envConfig.apiUrl}/auth/doctor/schedule/refill-medication`,
         { prescriptionID },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -357,7 +352,7 @@ export default function AppointmentPage() {
 
       // Make API call to save medication
       await axios.post(
-        "http://localhost:3000/auth/doctor/schedule/add-medication", // Update this URL to match your backend endpoint
+        `${envConfig.apiUrl}/auth/doctor/schedule/add-medication`, // Update this URL to match your backend endpoint
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -438,7 +433,7 @@ export default function AppointmentPage() {
       //Passing an object : use req.body for it.
       //Passing auth : thats the doctor's payload req.user.doctorID has the DID, can be used for queries.
       await axios.post(
-        "http://localhost:3000/auth/doctor/schedule/complete-appointment",
+        `${envConfig.apiUrl}/auth/doctor/schedule/complete-appointment`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -537,7 +532,7 @@ export default function AppointmentPage() {
       };
 
       await axios.post(
-        "http://localhost:3000/auth/doctor/schedule/save-charges",
+        `${envConfig.apiUrl}/auth/doctor/schedule/save-charges`,
         data,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -631,7 +626,7 @@ export default function AppointmentPage() {
           }
           // Make API call
           const allergyResponse = await axios.post(
-            "http://localhost:3000/auth/doctor/schedule/add-allergy",
+            `${envConfig.apiUrl}/auth/doctor/schedule/add-allergy`,
             payload,
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -644,7 +639,7 @@ export default function AppointmentPage() {
 
         case "Disabilities":
           const disabilityResponse = await axios.post(
-            "http://localhost:3000/auth/doctor/schedule/add-disability",
+            `${envConfig.apiUrl}/auth/doctor/schedule/add-disability`,
             payload,
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -660,7 +655,7 @@ export default function AppointmentPage() {
           delete payload.date; // Remove 'date' as backend expects 'dateAdministered'
 
           const vaccineResponse = await axios.post(
-            "http://localhost:3000/auth/doctor/schedule/add-vaccine",
+            `${envConfig.apiUrl}/auth/doctor/schedule/add-vaccine`,
             payload,
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -681,7 +676,7 @@ export default function AppointmentPage() {
           delete payload.date; // Remove 'date' as backend expects 'surgeryDateTime'
 
           const surgeryResponse = await axios.post(
-            "http://localhost:3000/auth/doctor/schedule/add-surgery",
+            `${envConfig.apiUrl}/auth/doctor/schedule/add-surgery`,
             payload,
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -700,7 +695,7 @@ export default function AppointmentPage() {
 
         case "Family History":
           const familyHistoryResponse = await axios.post(
-            "http://localhost:3000/auth/doctor/schedule/add-family-history",
+            `${envConfig.apiUrl}/auth/doctor/schedule/add-family-history`,
             payload,
             { headers: { Authorization: `Bearer ${token}` } }
           );

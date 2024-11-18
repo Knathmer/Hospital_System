@@ -12,7 +12,6 @@ import RefillHistory from "../../components/patientComponents/RefillHistory";
 import envConfig from "../../envConfig";
 
 export default function ManageRefillsPage() {
-  // State Management
   const [patientsCurrentPrescriptions, setPatientsCurrentPrescriptions] =
     useState([]);
   const [selectedRefills, setSelectedRefills] = useState([]);
@@ -33,7 +32,6 @@ export default function ManageRefillsPage() {
       ? RequestRefills
       : RefillHistory;
 
-  // Fetch Current Prescriptions
   const fetchCurrentPrescriptions = async () => {
     try {
       setLoading(true);
@@ -50,9 +48,13 @@ export default function ManageRefillsPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setPatientsCurrentPrescriptions(
-        response.data.patientMedicationInformation
-      );
+      // Filter active medications
+      const activePrescriptions =
+        response.data.patientMedicationInformation.filter(
+          (medication) => medication.active === 1
+        );
+
+      setPatientsCurrentPrescriptions(activePrescriptions);
     } catch (error) {
       console.error("Error fetching medications: ", error);
       if (error.response && error.response.status === 401) {
@@ -65,7 +67,6 @@ export default function ManageRefillsPage() {
     }
   };
 
-  // Fetch Refill History
   const fetchRefillHistory = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -86,28 +87,11 @@ export default function ManageRefillsPage() {
     }
   };
 
-  // Initial Data Fetching
   useEffect(() => {
     fetchCurrentPrescriptions();
     fetchRefillHistory();
     fetchPendingRequests();
   }, []);
-
-  // Handle Selecting a Refill
-  const handleSelectRefill = (medication) => {
-    if (medication.refillCount === 0) {
-      setErrorMessage("Cannot refill this prescription. No refills remaining");
-      return;
-    }
-
-    if (
-      !selectedRefills.find(
-        (item) => item.prescriptionID === medication.prescriptionID
-      )
-    ) {
-      setSelectedRefills([...selectedRefills, medication]);
-    }
-  };
 
   const fetchPendingRequests = async () => {
     try {
@@ -130,7 +114,21 @@ export default function ManageRefillsPage() {
     }
   };
 
-  // Handle Unselecting a Refill
+  const handleSelectRefill = (medication) => {
+    if (medication.refillCount === 0) {
+      setErrorMessage("Cannot refill this prescription. No refills remaining");
+      return;
+    }
+
+    if (
+      !selectedRefills.find(
+        (item) => item.prescriptionID === medication.prescriptionID
+      )
+    ) {
+      setSelectedRefills([...selectedRefills, medication]);
+    }
+  };
+
   const handleUnselectRefill = (prescriptionID) => {
     const refillToRemove = selectedRefills.find(
       (refill) => refill.prescriptionID === prescriptionID
@@ -144,7 +142,6 @@ export default function ManageRefillsPage() {
     }
   };
 
-  // Handle Requesting Refills
   const handleRequestRefills = async () => {
     try {
       setRefillLoading(true);
@@ -171,7 +168,6 @@ export default function ManageRefillsPage() {
         setSuccessMessage(response.data.message);
         setSelectedRefills([]);
 
-        // Refresh Data
         await fetchRefillHistory();
         await fetchPendingRequests();
         await fetchCurrentPrescriptions();
@@ -192,39 +188,12 @@ export default function ManageRefillsPage() {
     }
   };
 
-  // Implement Auto-Dismiss for Error and Success Messages
-  useEffect(() => {
-    if (errorMessage) {
-      const timer = setTimeout(() => {
-        setErrorMessage("");
-      }, 6000); // 6 seconds
-
-      // Cleanup the timer if the component unmounts or if errorMessage changes
-      return () => clearTimeout(timer);
-    }
-  }, [errorMessage]);
-
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage("");
-      }, 8000); // 8 seconds
-
-      // Cleanup the timer if the component unmounts or if successMessage changes
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage]);
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Navbar */}
       <NavbarPatient linkTo="/dashboard" />
-
-      {/* Main Content */}
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
-            {/* Page Title */}
             <h1 className="text-3xl font-bold text-black mb-2">
               Manage Refills
             </h1>
@@ -237,7 +206,6 @@ export default function ManageRefillsPage() {
               Back to Medications
             </Link>
 
-            {/* Display Error and Success Messages */}
             <div className="mb-4">
               {errorMessage && (
                 <p className="text-red-700 bg-red-100 border border-red-400 rounded p-4 mb-4">
@@ -280,8 +248,6 @@ export default function ManageRefillsPage() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
       <Footer />
     </div>
   );
