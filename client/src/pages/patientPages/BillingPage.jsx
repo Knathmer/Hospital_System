@@ -293,7 +293,7 @@ export default function BillingPage() {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `"${envConfig.apiUrl}/auth/patient/billing/make-payment`,
+        `${envConfig.apiUrl}/auth/patient/billing/make-payment`,
         {
           billID: selectedBill.billID,
           amount: amountToPay,
@@ -711,11 +711,9 @@ export default function BillingPage() {
 
                             <div className="space-y-2">
                               <h3 className="text-xl font-semibold text-gray-800">
-                                {statement.visitType}
-                              </h3>
-                              <p className="text-gray-600">
                                 {statement.serviceName}
-                              </p>
+                              </h3>
+
                               <div className="space-y-1 text-sm text-gray-700">
                                 <p>
                                   Provider:{" "}
@@ -917,7 +915,7 @@ export default function BillingPage() {
                                 </h3>
                               )}
                               <p className="text-sm text-gray-600">
-                                Display which office they made the payment
+                                Payment sent to {statement.officeName}
                               </p>
                             </div>
                           </div>
