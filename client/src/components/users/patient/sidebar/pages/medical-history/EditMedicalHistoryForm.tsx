@@ -23,6 +23,8 @@ import SelectItem from "../../../../../ui/select/SelectItem";
 import Select from "../../../../../ui/select/Select";
 import axios from "axios";
 
+import envConfig from "../../../../../../envConfig";
+
 import {
   useAllergyState,
   useMedicationState,
@@ -162,7 +164,7 @@ export default function EditMedicalHistoryForm() {
       }
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/medical-history-info",
+        `${envConfig.apiUrl}/auth/patient/medical-history-info`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -213,7 +215,7 @@ export default function EditMedicalHistoryForm() {
       }
 
       const response = await axios.delete(
-        "http://localhost:3000/auth/patient/remove-medical-history",
+        `${envConfig.apiUrl}/auth/patient/remove-medical-history`,
 
         {
           data: formDataRemoved,
@@ -317,7 +319,7 @@ export default function EditMedicalHistoryForm() {
       //setFormData(filteredFormData);
 
       const response = await axios.post(
-        "http://localhost:3000/auth/patient/update-medical-history",
+        `${envConfig.apiUrl}/auth/patient/update-medical-history`,
         filteredFormData,
         {
           headers: {
@@ -359,13 +361,6 @@ export default function EditMedicalHistoryForm() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="p-6 sm:p-10">
-            <Link
-              to="/patient/dashboard?tab=dashboard"
-              className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Link>
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold">Medical History Form</h1>
               <DefaultButton

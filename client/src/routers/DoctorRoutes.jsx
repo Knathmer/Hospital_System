@@ -6,11 +6,14 @@ import PatientInfoPage from "../components/users/doctor/PatientInfoPage.jsx";
 import DoctorSchedulePage from "../pages/doctorPages/DoctorSchedulePage.jsx";
 import AppointmentHandlerPage from "../pages/doctorPages/AppointmentHandlerPage.jsx";
 import AppointmentDoctorPage from "../pages/doctorPages/AppointmentDoctorPage.jsx";
+// import DoctorBookingPage from "../components/users/doctor/DoctorBookingPage";
+import PatientInfoPage from "../components/users/doctor/PatientInfoPage.jsx";
+import DoctorSidebar from "../components/userLoginRoot/DoctorSidebar.jsx";
 
 const DoctorRoutes = () => {
   return (
     <Routes>
-      <Route path="dashboard" element={<DocDashboard />} />
+      <Route path="dashboard" element={<DoctorSidebar />} />
       <Route path="patient/:patientID" element={<PatientInfoPage />} />
       <Route path="schedule">
         <Route index element={<DoctorSchedulePage />} />

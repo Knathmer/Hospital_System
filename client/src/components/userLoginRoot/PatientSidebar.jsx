@@ -2,12 +2,17 @@ import { useState, useEffect } from "react";
 import {
   Heart,
   Calendar,
+  CalendarCheck2,
+  CalendarDays,
   FileText,
   PillBottle,
   CreditCard,
   ShieldPlus,
   User,
-  Building,
+  Settings,
+  ChevronDown,
+  ChevronUp,
+  UserSearch,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -28,9 +33,16 @@ import MedicalHistoryPage from "../users/patient/sidebar/pages/medical-history/M
 import PersonalInfoForm from "../users/patient/sidebar/pages/personal-info/PersonalInfoForm.tsx";
 import ManagePharmaciesPage from "../../pages/patientPages/ManagePharmaciesPage.jsx";
 import PrescriptionPage from "../../pages/patientPages/PatientMedicationPage.jsx";
+import AppointmentsPage from "../users/patient/sidebar/pages/AppointmentInfo/AppointmentsPage.jsx";
+
+import BillingPage from "../../pages/patientPages/BillingPage.jsx";
+
+import SetDoctorPage from "../users/patient/sidebar/pages/setdoctor.jsx";
+
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
+
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
   const location = useLocation();
@@ -39,10 +51,12 @@ export default function PatientSidebar() {
   const sidebarItems = {
     "Patient Services": [
       { id: "dashboard", label: "Dashboard", icon: Heart },
-      { id: "appointments", label: "Appointments", icon: Calendar },
+      { id: "appointments", label: "Booking", icon: CalendarCheck2 },
+      { id: "visits", label: "Visits", icon: CalendarDays },
       { id: "medical-records", label: "Medical Records", icon: FileText },
       { id: "medications", label: "Medications", icon: PillBottle },
-      { id: "personal-info", label: "Personal Info", icon: User },
+      { id: "doctor_selection", label: "Doctors", icon: UserSearch },
+      //{ id: "personal-info", label: "Personal Info", icon: User },
     ],
     "Billing & Payments": [
       { id: "billing", label: "Billing", icon: CreditCard },
@@ -140,6 +154,11 @@ export default function PatientSidebar() {
             <BookPage />
           </div>
         )}
+        {activeTab === "visits" && (
+          <div>
+            <AppointmentsPage />
+          </div>
+        )}
         {activeTab === "insurance" && (
           <div>
             {" "}
@@ -156,9 +175,19 @@ export default function PatientSidebar() {
             <PrescriptionPage />
           </div>
         )}
-        {activeTab === "personal-info" && (
+        {activeTab === "billing" && (
+          <div>
+            <BillingPage />
+          </div>
+        )}
+        {activeTab === "settings-personal-info" && (
           <div>
             <PersonalInfoForm />
+          </div>
+        )}
+        {activeTab === "doctor_selection" && (
+          <div>
+            <SetDoctorPage />
           </div>
         )}
       </main>

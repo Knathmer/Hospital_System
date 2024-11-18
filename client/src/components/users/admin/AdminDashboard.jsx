@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, Users, UserPlus, FileText, Settings } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Heart, Users, UserPlus, FileText, Settings } from "lucide-react";
 
 const AdminDashboard = () => {
   return (
@@ -8,31 +8,58 @@ const AdminDashboard = () => {
       <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
         <Link className="flex items-center justify-center" to="/">
           <Heart className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">WomenWell Admin</span>
+          <span className="ml-2 text-2xl font-bold text-gray-900">
+            WomenWell Admin
+          </span>
         </Link>
       </header>
       <main className="flex-1 p-4">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-gray-900">Admin Dashboard</h1>
-            <p className="mt-2 text-lg text-gray-600">Welcome, Admin! Here you can manage users, doctors, and system settings.</p>
+            <h1 className="text-3xl font-extrabold text-gray-900">
+              Admin Dashboard
+            </h1>
+            <p className="mt-2 text-lg text-gray-600">
+              Welcome, Admin! Here you can manage users, doctors, and system
+              settings.
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link to="/admin/manage-patients" className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <Link
+              to="/admin/manage-patients"
+              className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            >
               <Users className="h-8 w-8 text-pink-500 mr-4" />
-              <span className="text-xl font-semibold text-gray-800">Manage Patients</span>
+              <span className="text-xl font-semibold text-gray-800">
+                Manage Patients
+              </span>
             </Link>
-            <Link to="/admin/manage-doctors" className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <Link
+              to="/admin/manage-doctors"
+              className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            >
               <UserPlus className="h-8 w-8 text-pink-500 mr-4" />
-              <span className="text-xl font-semibold text-gray-800">Manage Doctors</span>
+              <span className="text-xl font-semibold text-gray-800">
+                Manage Doctors
+              </span>
             </Link>
-            <Link to="/admin/system-reports" className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <Link
+              to="/admin/prescription-summary-report"
+              className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            >
               <FileText className="h-8 w-8 text-pink-500 mr-4" />
-              <span className="text-xl font-semibold text-gray-800">System Reports</span>
+              <span className="text-xl font-semibold text-gray-800">
+                System Reports
+              </span>
             </Link>
-            <Link to="/admin/settings" className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <Link
+              to="/admin/settings"
+              className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            >
               <Settings className="h-8 w-8 text-pink-500 mr-4" />
-              <span className="text-xl font-semibold text-gray-800">Settings</span>
+              <span className="text-xl font-semibold text-gray-800">
+                Settings
+              </span>
             </Link>
           </div>
           <div className="text-center">

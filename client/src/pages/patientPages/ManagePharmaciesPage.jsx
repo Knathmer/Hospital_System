@@ -7,6 +7,8 @@ import Footer from "../../components/ui/Footer";
 import { Link } from "react-router-dom";
 import PharmacyCard from "../../components/patientComponents/PharmacyCard.jsx";
 
+import envConfig from "../../envConfig.js";
+
 export default function ManagePharmaciesPage() {
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ export default function ManagePharmaciesPage() {
       }
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/medications/manage-pharmacies",
+        `${envConfig.apiUrl}/auth/patient/medications/manage-pharmacies`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -62,7 +64,7 @@ export default function ManagePharmaciesPage() {
       }
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/pharmacies",
+        `${envConfig.apiUrl}/auth/patient/pharmacies`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setAllPharmacies(response.data.allPharmacies);
@@ -81,7 +83,7 @@ export default function ManagePharmaciesPage() {
       }
 
       await axios.delete(
-        `http://localhost:3000/auth/patient/pharmacies/${pharmacyID}`,
+        `${envConfig.apiUrl}/auth/patient/pharmacies/${pharmacyID}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -146,7 +148,7 @@ export default function ManagePharmaciesPage() {
 
           // Send POST request to add the new pharmacy
           const response = await axios.post(
-            "http://localhost:3000/auth/patient/pharmacies",
+            `${envConfig.apiUrl}/auth/patient/pharmacies`,
             pharmacyData,
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -165,7 +167,7 @@ export default function ManagePharmaciesPage() {
 
         // Associate the pharmacy with the patient
         await axios.post(
-          "http://localhost:3000/auth/patient/pharmacies/add",
+          `${envConfig.apiUrl}/auth/patient/pharmacies/add`,
           { pharmacyID },
           { headers: { Authorization: `Bearer ${token}` } }
         );

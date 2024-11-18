@@ -22,7 +22,7 @@ export const TableRow = ({ children, className = "", ...props }) => (
 
 export const TableHead = ({ children, className = "", ...props }) => (
   <th
-    className={`text-left p-2 bg-gray-100 font-semibold ${className}`}
+    className={`text-left p-2 bg-pink-50 font-semibold ${className}`}
     {...props}
   >
     {children}

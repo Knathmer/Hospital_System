@@ -4,6 +4,8 @@ import GenericContainer from "./GenericContainer";
 import { CreditCard } from "lucide-react";
 import NavButton from "../../../../ui/buttons/NavButton";
 
+import envConfig from "../../../../../envConfig";
+
 const BillingNotificationsPatientDashboard = () => {
   const [billingDashboard, setBillingDashboard] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,18 +15,24 @@ const BillingNotificationsPatientDashboard = () => {
     const fetchBillingDashboard = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/dataFetch/get-billing-dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${envConfig.apiUrl}/dataFetch/get-billing-dashboard`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setBillingDashboard(response.data);
       } catch (error) {
         if (error.response) {
           if (error.response.status === 404) {
             setBillingDashboard([]);
           } else {
-            console.error("Error fetching billing data:", error.response.data || error);
+            console.error(
+              "Error fetching billing data:",
+              error.response.data || error
+            );
             setError("Failed to fetch billing data");
           }
         } else {
@@ -54,7 +62,9 @@ const BillingNotificationsPatientDashboard = () => {
           <ul className="space-y-2">
             {billingDashboard.map((bill, index) => (
               <li key={index}>
-                <span className="font-medium">Due Date: {new Date(bill.dueDate).toLocaleDateString()}</span>
+                <span className="font-medium">
+                  Due Date: {new Date(bill.dueDate).toLocaleDateString()}
+                </span>
                 <br />
                 <span className="text-sm text-gray-500">
                   Status: {bill.paidStatus ? "Paid" : "Unpaid"}
@@ -67,9 +77,9 @@ const BillingNotificationsPatientDashboard = () => {
         )}
       </div>
 
-      <NavButton variant="outline" className="mt-4">
-        View All Billing Statements
-      </NavButton>
+      <NavButton variant="outline" to="/patient/dashboard?tab=billing">
+          View All Billing Statements
+        </NavButton>
     </GenericContainer>
   );
 };

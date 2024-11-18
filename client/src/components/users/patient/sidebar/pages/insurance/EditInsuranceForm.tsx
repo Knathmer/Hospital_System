@@ -16,6 +16,8 @@ import Select from "react-select";
 
 import axios from "axios";
 
+import envConfig from "../../../../../../envConfig";
+
 const fetchInsuranceData = async () => {
   try {
     const token = localStorage.getItem("token");
@@ -25,7 +27,7 @@ const fetchInsuranceData = async () => {
     }
     // Fetch insurance information
     const response = await axios.get(
-      "http://localhost:3000/auth/patient/insurance-info",
+      `${envConfig.apiUrl}/auth/patient/insurance-info`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -177,7 +179,7 @@ export default function EditInsuranceForm() {
       }
 
       const response = await axios.put(
-        "http://localhost:3000/auth/patient/update-insurance",
+        `${envConfig.apiUrl}/auth/patient/update-insurance`,
         formData,
         {
           headers: {
@@ -236,13 +238,6 @@ export default function EditInsuranceForm() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="p-6 sm:p-10">
-            <Link
-              to="/patient/dashboard?tab=dashboard"
-              className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Link>
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold mb-6">Insurance Information</h1>
               <DefaultButton onClick={() => setIsEditing(!isEditing)}>

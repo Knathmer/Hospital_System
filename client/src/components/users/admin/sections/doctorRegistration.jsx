@@ -1,39 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Heart } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Heart } from "lucide-react";
+
+import envConfig from "../../../../envConfig";
 
 const RegisterDoctor = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    gender: '',
-    specialty: '',
-    workPhoneNumber: '',
-    workEmail: '',
-    password: '',
-    confirmPassword: '',
-    personalPhoneNumber: '',
-    personalEmail: '',
-    addrStreet: '',
-    addrZip: '',
-    addrCity: '',
-    addrState: '',
-    officeID: '',
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    gender: "",
+    specialty: "",
+    workPhoneNumber: "",
+    workEmail: "",
+    password: "",
+    confirmPassword: "",
+    personalPhoneNumber: "",
+    personalEmail: "",
+    addrStreet: "",
+    addrZip: "",
+    addrCity: "",
+    addrState: "",
+    officeID: "",
   });
 
   const [offices, setOffices] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchOffices = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/dataFetch/getOfficeLocations');
+        const response = await axios.get(
+          `${envConfig.apiUrl}/dataFetch/getOfficeLocations`
+        );
         setOffices(response.data); // Set the offices in state
       } catch (error) {
-        console.error('Error fetching office locations:', error);
-        setError('Failed to load office locations');
+        console.error("Error fetching office locations:", error);
+        setError("Failed to load office locations");
       }
     };
     fetchOffices();
@@ -51,17 +55,17 @@ const RegisterDoctor = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     try {
       const token = localStorage.getItem("token"); // Grab JWT since we are going to protected routes
       const response = await axios.post(
-        'http://localhost:3000/auth/admin/register',
+        `${envConfig.apiUrl}/auth/admin/register`,
         formData,
         {
           headers: {
@@ -71,34 +75,36 @@ const RegisterDoctor = () => {
       );
 
       if (response.status === 200 && response.data) {
-        console.log('Doctor Registration Successful!');
-        navigate('/admin/dashboard');
+        console.log("Doctor Registration Successful!");
+        navigate("/admin/dashboard");
       } else {
-        setError('Registration failed. Please try again.');
+        setError("Registration failed. Please try again.");
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         setError(error.response.data.message);
       } else {
-        setError('An error occurred. Please try again.');
+        setError("An error occurred. Please try again.");
       }
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
-      <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white">
-        <Link className="flex items-center justify-center" to="/">
-          <Heart className="h-6 w-6 text-pink-500" />
-          <span className="ml-2 text-2xl font-bold text-gray-900">WomenWell Admin</span>
-        </Link>
-      </header>
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-2xl space-y-8 bg-white p-8 rounded-lg shadow-xl">
           <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-gray-900">Register Doctor</h1>
-            <p className="mt-2 text-sm text-gray-600">Fill in the details below to register a new doctor</p>
+            <h1 className="text-3xl font-extrabold text-gray-900">
+              Register Doctor
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Fill in the details below to register a new doctor
+            </p>
           </div>
 
           {error && <p className="text-red-500 text-center">{error}</p>}
@@ -107,7 +113,10 @@ const RegisterDoctor = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Personal Information */}
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   First Name
                 </label>
                 <input
@@ -122,7 +131,10 @@ const RegisterDoctor = () => {
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Last Name
                 </label>
                 <input
@@ -137,7 +149,10 @@ const RegisterDoctor = () => {
                 />
               </div>
               <div>
-                <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="dateOfBirth"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Date of Birth
                 </label>
                 <input
@@ -151,7 +166,10 @@ const RegisterDoctor = () => {
                 />
               </div>
               <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="gender"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Gender
                 </label>
                 <select
@@ -170,7 +188,10 @@ const RegisterDoctor = () => {
                 </select>
               </div>
               <div>
-                <label htmlFor="specialty" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="specialty"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Specialty
                 </label>
                 <input
@@ -186,7 +207,10 @@ const RegisterDoctor = () => {
               </div>
               {/* Contact Information */}
               <div>
-                <label htmlFor="workPhoneNumber" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="workPhoneNumber"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Work Phone Number
                 </label>
                 <input
@@ -201,7 +225,10 @@ const RegisterDoctor = () => {
                 />
               </div>
               <div>
-                <label htmlFor="workEmail" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="workEmail"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Work Email
                 </label>
                 <input
@@ -216,7 +243,10 @@ const RegisterDoctor = () => {
                 />
               </div>
               <div>
-                <label htmlFor="personalPhoneNumber" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="personalPhoneNumber"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Personal Phone Number
                 </label>
                 <input
@@ -230,7 +260,10 @@ const RegisterDoctor = () => {
                 />
               </div>
               <div>
-                <label htmlFor="personalEmail" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="personalEmail"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Personal Email
                 </label>
                 <input
@@ -245,7 +278,10 @@ const RegisterDoctor = () => {
               </div>
               {/* Password Fields */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Password
                 </label>
                 <input
@@ -260,7 +296,10 @@ const RegisterDoctor = () => {
                 />
               </div>
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Confirm Password
                 </label>
                 <input
@@ -273,10 +312,13 @@ const RegisterDoctor = () => {
                   maxLength="100"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
                 />
-               </div>
+              </div>
               <div>
-              <label htmlFor="officeID" className="block text-sm font-medium text-gray-700">
-                Office Location
+                <label
+                  htmlFor="officeID"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Office Location
                 </label>
                 <select
                   id="officeID"
@@ -286,21 +328,26 @@ const RegisterDoctor = () => {
                   required
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
                 >
-              <option value="">Select Office</option>
-              {offices.map((office) => (
-                <option key={office.officeID} value={office.officeID}>
-                  {office.officeName}
-                </option>
-              ))}
-            </select>
-          </div>
+                  <option value="">Select Office</option>
+                  {offices.map((office) => (
+                    <option key={office.officeID} value={office.officeID}>
+                      {office.officeName}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             {/* Address Fields */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Address</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Address
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="addrStreet" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="addrStreet"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Street
                   </label>
                   <input
@@ -315,7 +362,10 @@ const RegisterDoctor = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="addrZip" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="addrZip"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     ZIP Code
                   </label>
                   <input
@@ -330,7 +380,10 @@ const RegisterDoctor = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="addrCity" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="addrCity"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     City
                   </label>
                   <input
@@ -345,7 +398,10 @@ const RegisterDoctor = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="addrState" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="addrState"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     State
                   </label>
                   <input
@@ -374,7 +430,9 @@ const RegisterDoctor = () => {
         </div>
       </main>
       <footer className="py-6 text-center border-t bg-white">
-        <p className="text-sm text-gray-500">© 2024 WomenWell. All rights reserved.</p>
+        <p className="text-sm text-gray-500">
+          © 2024 WomenWell. All rights reserved.
+        </p>
       </footer>
     </div>
   );

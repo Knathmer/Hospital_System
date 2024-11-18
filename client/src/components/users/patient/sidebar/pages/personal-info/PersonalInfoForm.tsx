@@ -24,6 +24,8 @@ import DefaultButton from "../../../../../ui/buttons/DefaultButton";
 import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
 
 import axios from "axios";
+
+import envConfig from "../../../../../../envConfig";
 // import Link from "next/link"
 
 const fetchPersonalInfoData = async () => {
@@ -35,7 +37,7 @@ const fetchPersonalInfoData = async () => {
     }
     // Fetch insurance information
     const response = await axios.get(
-      "http://localhost:3000/auth/patient/personal-info",
+      `${envConfig.apiUrl}/auth/patient/personal-info`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,7 +149,7 @@ export default function PersonalInfoForm() {
       }
 
       const response = await axios.put(
-        "http://localhost:3000/auth/patient/update-personal-info",
+        `${envConfig.apiUrl}/auth/patient/update-personal-info`,
         formData,
         {
           headers: {
@@ -191,13 +193,6 @@ export default function PersonalInfoForm() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="p-6 sm:p-10">
-            <Link
-              to="/patient/dashboard?tab=dashboard"
-              className="inline-flex items-center text-pink-500 hover:text-pink-600 mb-6 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Link>
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold mb-8 text-gray-800">
                 Personal Information
