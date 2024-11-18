@@ -115,6 +115,47 @@ export const SELECT_UPCOMING_APPOINTMENTS_ADMIN = `
   ORDER BY 
       a.appointmentDateTime ASC;
 `;
+
+// admin-patient-report
+export const SELECT_PATIENT_SERVICES = `
+SELECT 
+    p.firstName AS patientFirstName,
+    p.lastName AS patientLastName,
+    a.appointmentID AS appointmentID,
+    a.createdAt AS appointmentCreatedAt,
+    a.updatedAt AS appointmentUpdatedAt,
+    al.allergen AS medicalAllergy,
+    d.disabilityType AS medicalDisability,
+    s.surgeryType AS medicalSurgery,
+    pr.medicationName AS prescriptionMedicationName,
+    pr.dateIssued AS prescriptionDateIssued,
+    pr.start AS prescriptionStartDate,
+    pr.end AS prescriptionEndDate,
+    b.billID AS billingID,
+    b.dateIssued AS billingDateIssued,
+    b.dueDate AS billingDueDate,
+    i.providerName AS insuranceProvider,
+    i.coverage_expiration_date AS insuranceExpirationDate
+FROM 
+    patient AS p
+LEFT JOIN 
+    appointment AS a ON p.patientID = a.patientID
+LEFT JOIN 
+    allergy AS al ON p.patientID = al.patientID
+LEFT JOIN 
+    disability AS d ON p.patientID = d.patientID
+LEFT JOIN 
+    surgery AS s ON p.patientID = s.patientID
+LEFT JOIN 
+    prescription AS pr ON p.patientID = pr.patientID
+LEFT JOIN 
+    bill AS b ON p.patientID = b.patientID
+LEFT JOIN 
+    insurance AS i ON p.patientID = i.patientID
+ORDER BY 
+    p.patientID, a.createdAt;
+
+`;
 export const SELECT_DOCTORS_WITH_SPECIALTY = `
   SELECT 
       d.firstName, 
