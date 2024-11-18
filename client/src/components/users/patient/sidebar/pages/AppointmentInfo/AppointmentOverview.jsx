@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import envConfig from "../../../../../../envConfig";
+import MultiSelectInput from './MultiSelectInput'; // Ensure the path is correct
 
 // Utility function to format phone numbers
 const formatPhoneNumber = (phoneNumberString) => {
@@ -15,9 +16,7 @@ const formatPhoneNumber = (phoneNumberString) => {
 
 // Utility function to sort appointments in descending order
 const sortAppointmentsDescending = (appointmentsList) => {
-  return [...appointmentsList].sort(
-    (a, b) => new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime)
-  );
+  return [...appointmentsList].sort((a, b) => new Date(b.appointmentDateTime) - new Date(a.appointmentDateTime));
 };
 
 function AppointmentOverview() {
@@ -37,8 +36,8 @@ function AppointmentOverview() {
   const [error, setError] = useState("");
 
   // Filter States
-  const [doctorFilter, setDoctorFilter] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
+  const [selectedDoctors, setSelectedDoctors] = useState([]); // Array of { value, label }
+  const [selectedLocations, setSelectedLocations] = useState([]); // Array of { value, label }
   const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
 
   // Unique Doctors and Locations for Filters
@@ -91,7 +90,7 @@ function AppointmentOverview() {
     // Apply Filters whenever filter states change
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doctorFilter, locationFilter, dateFilter, appointments]);
+  }, [selectedDoctors, selectedLocations, dateFilter, appointments]);
 
   const applyFilters = () => {
     const { upcoming, requested, past, other } = appointments;
@@ -99,14 +98,16 @@ function AppointmentOverview() {
     const filterList = (list) => {
       return list.filter((app) => {
         // Doctor Filter
-        if (doctorFilter) {
-          const doctorName = `Dr. ${app.doctorFirstName} ${app.doctorLastName}`;
-          if (doctorName !== doctorFilter) return false;
+        if (selectedDoctors.length > 0) {
+          const doctorNames = selectedDoctors.map(doctor => doctor.value);
+          const appDoctorName = `Dr. ${app.doctorFirstName} ${app.doctorLastName}`;
+          if (!doctorNames.includes(appDoctorName)) return false;
         }
 
         // Location Filter
-        if (locationFilter) {
-          if (app.officeName !== locationFilter) return false;
+        if (selectedLocations.length > 0) {
+          const locationNames = selectedLocations.map(location => location.value);
+          if (!locationNames.includes(app.officeName)) return false;
         }
 
         // Date Filter
@@ -154,6 +155,17 @@ function AppointmentOverview() {
     return <p className="text-center text-red-500">{error}</p>;
   }
 
+  // Transform uniqueDoctors and uniqueLocations for react-select
+  const doctorOptions = uniqueDoctors.map((doctor) => ({
+    value: doctor,
+    label: doctor,
+  }));
+
+  const locationOptions = uniqueLocations.map((location) => ({
+    value: location,
+    label: location,
+  }));
+
   const renderAppointmentList = (title, list) => {
     // Determine if the current list should be sorted in descending order
     const shouldSortDescending =
@@ -185,18 +197,13 @@ function AppointmentOverview() {
                       ).toLocaleString()}
                     </p>
                     <p className="text-gray-600">
-                      Reason: {appointment.reason || "N/A"}
-                    </p>
-                    <p className="text-gray-600">
                       Status: {appointment.status}
                     </p>
                     <p className="text-gray-600">
-                      <p className="text-gray-600">
-                        Service: {appointment.service || "N/A"}
-                      </p>
-                      <p>Visit Type: {appointment.visitType || "N/A"}</p>
-                      Doctor: Dr. {appointment.doctorFirstName}{" "}
-                      {appointment.doctorLastName}
+                      Visit Type: {appointment.visitType || "N/A"}
+                    </p>
+                    <p className="text-gray-600">
+                      Doctor: Dr. {appointment.doctorFirstName} {appointment.doctorLastName}
                     </p>
                     <p className="text-gray-600">
                       Doctor's Email: {appointment.doctorEmail || "N/A"}
@@ -229,45 +236,23 @@ function AppointmentOverview() {
       <div className="mb-8 bg-white shadow-md rounded-lg p-4">
         <h2 className="text-2xl font-semibold mb-4">Filter Appointments</h2>
         <div className="flex flex-col md:flex-row md:space-x-4">
-          {/* Doctor Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="doctor" className="block text-gray-700 mb-2">
-              Doctor:
-            </label>
-            <select
-              id="doctor"
-              value={doctorFilter}
-              onChange={(e) => setDoctorFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Doctors</option>
-              {uniqueDoctors.map((doctor, index) => (
-                <option key={index} value={doctor}>
-                  {doctor}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Doctor Multi-Select */}
+          <MultiSelectInput
+            label="Doctor:"
+            options={doctorOptions}
+            selectedValues={selectedDoctors}
+            setSelectedValues={setSelectedDoctors}
+            placeholder="Select Doctors..."
+          />
 
-          {/* Location Filter */}
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="location" className="block text-gray-700 mb-2">
-              Location:
-            </label>
-            <select
-              id="location"
-              value={locationFilter}
-              onChange={(e) => setLocationFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-            >
-              <option value="">All Locations</option>
-              {uniqueLocations.map((location, index) => (
-                <option key={index} value={location}>
-                  {location}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Location Multi-Select */}
+          <MultiSelectInput
+            label="Location:"
+            options={locationOptions}
+            selectedValues={selectedLocations}
+            setSelectedValues={setSelectedLocations}
+            placeholder="Select Locations..."
+          />
 
           {/* Date Filter */}
           <div className="flex-1">
@@ -297,8 +282,8 @@ function AppointmentOverview() {
         <div className="mt-4">
           <button
             onClick={() => {
-              setDoctorFilter("");
-              setLocationFilter("");
+              setSelectedDoctors([]);
+              setSelectedLocations([]);
               setDateFilter({ start: "", end: "" });
             }}
             className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none"
@@ -338,21 +323,17 @@ function AppointmentOverview() {
               ).toLocaleString()}
             </p>
             <p>
-              <strong>Reason:</strong> {selectedAppointment.reason || "N/A"}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedAppointment.status}
+              <strong>Doctor:</strong> Dr. {selectedAppointment.doctorFirstName} {selectedAppointment.doctorLastName}
             </p>
             <p>
               <strong>Service:</strong> {selectedAppointment.service || "N/A"}
             </p>
             <p>
-              <strong>Visit Type:</strong>{" "}
-              {selectedAppointment.visitType || "N/A"}
+              <strong>Reason:</strong> {selectedAppointment.reason || "N/A"}
             </p>
             <p>
-              <strong>Doctor:</strong> Dr. {selectedAppointment.doctorFirstName}{" "}
-              {selectedAppointment.doctorLastName}
+              <strong>Visit Type:</strong>{" "}
+              {selectedAppointment.visitType || "N/A"}
             </p>
             <p>
               <strong>Doctor's Email:</strong>{" "}
@@ -365,8 +346,7 @@ function AppointmentOverview() {
                 : "N/A"}
             </p>
             <p>
-              <strong>Location:</strong> {selectedAppointment.officeName},{" "}
-              {selectedAppointment.officeAddress}
+              <strong>Location:</strong> {selectedAppointment.officeName}, {selectedAppointment.officeAddress}
             </p>
             {/* Add more details as needed */}
             <div className="flex justify-end mt-6">

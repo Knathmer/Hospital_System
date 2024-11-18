@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import {
   Heart,
   Calendar,
+  CalendarCheck2,
+  CalendarDays,
   FileText,
   PillBottle,
   CreditCard,
@@ -10,6 +12,7 @@ import {
   Settings,
   ChevronDown,
   ChevronUp,
+  UserSearch,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -31,6 +34,7 @@ import PersonalInfoForm from "../users/patient/sidebar/pages/personal-info/Perso
 import ManagePharmaciesPage from "../../pages/patientPages/ManagePharmaciesPage.jsx";
 import PrescriptionPage from "../../pages/patientPages/PatientMedicationPage.jsx";
 import AppointmentsPage from "../users/patient/sidebar/pages/AppointmentInfo/AppointmentsPage.jsx";
+import SetDoctorPage from "../users/patient/sidebar/pages/setdoctor.jsx";
 
 export default function PatientSidebar() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -43,10 +47,11 @@ export default function PatientSidebar() {
   const sidebarItems = {
     "Patient Services": [
       { id: "dashboard", label: "Dashboard", icon: Heart },
-      { id: "appointments", label: "Appointments", icon: Calendar },
-      { id: "visits", label: "Visits", icon: Calendar },
+      { id: "appointments", label: "Booking", icon: CalendarCheck2 },
+      { id: "visits", label: "Visits", icon: CalendarDays },
       { id: "medical-records", label: "Medical Records", icon: FileText },
       { id: "medications", label: "Medications", icon: PillBottle },
+      { id: "doctor_selection", label: "Doctors", icon: UserSearch },
       //{ id: "personal-info", label: "Personal Info", icon: User },
     ],
     "Billing & Payments": [
@@ -169,6 +174,11 @@ export default function PatientSidebar() {
         {activeTab === "settings-personal-info" && (
           <div>
             <PersonalInfoForm />
+          </div>
+        )}
+        {activeTab === "doctor_selection" && (
+          <div>
+            <SetDoctorPage />
           </div>
         )}
       </main>
