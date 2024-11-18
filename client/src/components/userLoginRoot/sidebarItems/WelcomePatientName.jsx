@@ -1,29 +1,33 @@
 // This file shows the user's first and last name on the sidebar when logged in
-// note: this currently only works for patient 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+// note: this currently only works for patient
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+import envConfig from "../../../envConfig";
 
 export default function PatientNameDisplay() {
-  const [name, setName] = useState({ firstName: '', lastName: '' });
+  const [name, setName] = useState({ firstName: "", lastName: "" });
 
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        const token = localStorage.getItem('token'); // Retrieve token from localStorage
-        const response = await axios.get('http://localhost:3000/dataFetch/get-patient-name', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const token = localStorage.getItem("token"); // Retrieve token from localStorage
+        const response = await axios.get(
+          `${envConfig.apiUrl}/dataFetch/get-patient-name`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setName(response.data); // Set the name in state
       } catch (error) {
-        console.error('Error fetching patient name:', error);
+        console.error("Error fetching patient name:", error);
         // Handle error appropriately
       }
     };
     fetchUserName();
   }, []);
-
 
   // This shows user's profile picture and first/last name
   return (
@@ -37,7 +41,9 @@ export default function PatientNameDisplay() {
       </div>
       <div>
         <h2 className="text-lg font-bold text-pink-600">Welcome</h2>
-        <p className="text-sm text-gray-700">{name.firstName} {name.lastName}</p>
+        <p className="text-sm text-gray-700">
+          {name.firstName} {name.lastName}
+        </p>
       </div>
     </div>
   );

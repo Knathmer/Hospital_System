@@ -6,6 +6,8 @@ import NavbarPatient from "../../components/users/patient/sections/header/Navbar
 import Footer from "../../components/ui/Footer.jsx";
 import { Link } from "react-router-dom";
 
+import envConfig from "../../envConfig.js";
+
 export default function PrescriptionPage() {
   const [medications, setMedications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function PrescriptionPage() {
       }
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/medications",
+        `${envConfig.apiUrl}/auth/patient/medications`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -50,7 +52,7 @@ export default function PrescriptionPage() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://localhost:3000/auth/patient/medications/manage-pharmacies",
+        `${envConfig.apiUrl}/auth/patient/medications/manage-pharmacies`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setPatientPharmacies(response.data.patientPharmacyInformation);
@@ -78,7 +80,7 @@ export default function PrescriptionPage() {
       const token = localStorage.getItem("token");
 
       await axios.put(
-        `http://localhost:3000/auth/patient/medications/${assigningPharmacyPrescriptionID}/pharmacy`,
+        `${envConfig.apiUrl}/auth/patient/medications/${assigningPharmacyPrescriptionID}/pharmacy`,
         { pharmacyID: selectedPharmacyID },
         { headers: { Authorization: `Bearer ${token}` } }
       );

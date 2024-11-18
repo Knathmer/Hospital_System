@@ -91,6 +91,43 @@ export const SELECT_RECENT_MED_REQ_DB = `SELECT status, requestDate FROM refill 
 
 export const SELECT_BILLING_DB = `SELECT dueDate, paidStatus FROM bill WHERE patientID = ?`;
 
+// Admin Dashboard DB Queries
+export const SELECT_TOTAL_DOC = 'SELECT COUNT(*) AS totalDoctors FROM doctor';
+export const SELECT_TOTAL_PATIENT = 'SELECT COUNT(*) as totalPatient FROM patient';
+export const SELECT_TOTAL_ADMIN = 'SELECT COUNT(*) as totalAdmin from admin';
+export const SELECT_TOTAL_APPOINTMENT = 'SELECT COUNT(*) AS totalAppointments FROM appointment';
+export const SELECT_UPCOMING_APPOINTMENTS_ADMIN = `
+  SELECT 
+      a.appointmentDateTime, 
+      d.firstName AS doctorFirstName, 
+      d.lastName AS doctorLastName, 
+      p.firstName AS patientFirstName, 
+      p.lastName AS patientLastName
+  FROM 
+      appointment AS a
+  JOIN 
+      doctor AS d ON a.doctorID = d.doctorID
+  JOIN 
+      patient AS p ON a.patientID = p.patientID
+  WHERE 
+      a.appointmentDateTime > NOW()
+  ORDER BY 
+      a.appointmentDateTime ASC;
+`;
+export const SELECT_DOCTORS_WITH_SPECIALTY = `
+  SELECT 
+      d.firstName, 
+      d.lastName, 
+      s.specialtyName 
+  FROM 
+      doctor AS d
+  JOIN 
+      specialty AS s 
+  ON 
+      d.specialtyID = s.specialtyID;
+`;
+
+
 export const GET_CURRENT_PAST_BALANCE = `SELECT IFNULL(SUM(CASE WHEN paidStatus != 'Paid' THEN amount - paidAmount ELSE 0 END), 0) AS currentBalance, 
                                         IFNULL(SUM(CASE WHEN dueDate < CURDATE() AND paidStatus = 'Overdue' THEN amount - paidAmount ELSE 0 END), 0) AS pastDueBalance
                                         FROM bill 
@@ -120,9 +157,13 @@ export const GET_RECENT_PAYMENTS = `SELECT p.paymentID, p.paymentDate, p.amount
                                     ORDER BY p.paymentDate DESC
                                     LIMIT 5;`;
 
-export const GET_DETAILS_YTD = `SELECT b.billID, a.appointmentDateTime AS visitDate, COALESCE(vt.visitTypeName, 'N/A') AS visitType, s.serviceName AS serviceName, COALESCE(d.firstName, 'N/A') AS doctorFirstName, COALESCE(d.lastName, '') AS doctorLastName, p.firstName AS patientFirstName, p.lastName AS patientLastName, COALESCE(i.providerName, 'N/A') AS insuranceName, b.amount AS billedAmount, b.paidAmount, b.insuranceCoveredAmount, (b.amount - b.paidAmount) AS balance, b.paidStatus FROM bill b INNER JOIN appointment a ON b.appointmentID = a.appointmentID INNER JOIN patient p ON a.patientID = p.patientID INNER JOIN service s ON b.serviceID = s.serviceID LEFT JOIN doctor d ON a.doctorID = d.doctorID LEFT JOIN insurance i ON b.insuranceID = i.insuranceID LEFT JOIN visit_type vt ON a.visitTypeID = vt.visitTypeID WHERE b.patientID = ? AND DATE(a.appointmentDateTime) BETWEEN ? AND ? ORDER BY a.appointmentDateTime DESC;`;
+export const GET_DETAILS_YTD = `SELECT b.billID, a.appointmentDateTime AS visitDate, COALESCE(vt.visitTypeName, 'N/A') AS visitType, s.serviceName AS serviceName, COALESCE(d.firstName, 'N/A') AS doctorFirstName, COALESCE(d.lastName, '') AS doctorLastName, p.firstName AS patientFirstName, p.lastName AS patientLastName, COALESCE(i.providerName, 'N/A') AS insuranceName, b.amount AS billedAmount, b.paidAmount, b.insuranceCoveredAmount, (b.amount - b.paidAmount) AS balance, b.paidStatus, b.dueDate FROM bill b INNER JOIN appointment a ON b.appointmentID = a.appointmentID INNER JOIN patient p ON a.patientID = p.patientID INNER JOIN service s ON b.serviceID = s.serviceID LEFT JOIN doctor d ON a.doctorID = d.doctorID LEFT JOIN insurance i ON b.insuranceID = i.insuranceID LEFT JOIN visit_type vt ON a.visitTypeID = vt.visitTypeID WHERE b.patientID = ? AND DATE(a.appointmentDateTime) BETWEEN ? AND ? ORDER BY a.appointmentDateTime DESC;
+`;
 
 export const GET_PAYMENTS_STATEMENTS = `SELECT p.paymentDate, p.amount, p.payerType, p.paymentID FROM payment AS p JOIN bill AS b ON p.billID = b.billID WHERE b.patientID = ? AND DATE(p.paymentDate) BETWEEN ? AND ? ORDER BY p.paymentDate DESC;`;
+
+
+export const GET_OUTSTANDING_BILLS = `SELECT b.billID, b.dueDate, (b.amount - b.paidAmount) AS outstandingBalance, s.serviceName, o.officeName FROM bill AS b INNER JOIN service s ON b.serviceID = s.serviceID INNER JOIN office o ON b.officeID = o.officeID WHERE b.patientID = ? AND b.paidStatus <> 'Paid';`;
 
 export const GET_DOCTOR_SCHEDULE = `SELECT p.patientID, CONCAT(p.firstName, ' ', p.lastName) AS fullName, a.appointmentDateTime, a.appointmentID,  s.serviceName,  s.serviceID FROM patient p JOIN appointment a ON p.patientID = a.patientID JOIN service s ON a.serviceID = s.serviceID WHERE a.doctorID = ? AND a.appointmentDateTime >= ? AND a.appointmentDateTime < ? AND a.status = 'Scheduled';`;
 

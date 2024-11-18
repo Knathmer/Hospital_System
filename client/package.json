@@ -12,13 +12,28 @@
     "tailwind:watch": "tailwindcss -i ./src/input.css -o ./src/output.css --watch"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "@radix-ui/react-checkbox": "^1.1.2",
+    "@radix-ui/react-collapsible": "^1.1.1",
+    "@radix-ui/react-icons": "^1.3.2",
+    "@radix-ui/react-popover": "^1.1.2",
+    "@radix-ui/react-select": "^2.1.2",
     "axios": "^1.7.7",
-    "jwt-decode": "^4.0.0",
+    "chart.js": "^4.4.6",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "jwt-decode": "^3.1.2",
     "lucide-react": "^0.446.0",
     "react": "^18.3.1",
+    "react-big-calendar": "^1.15.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-datepicker": "^7.5.0",
+    "react-big-calendar": "^1.15.0",
     "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
     "react-router-dom": "^6.26.2",
-    "react-select": "^5.8.2"
+    "react-select": "^5.8.3",
+    "recharts": "^2.13.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

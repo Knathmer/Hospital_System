@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, Calendar, FileText, CalendarClock } from "lucide-react"
+import { Heart, Calendar, FileText, CalendarClock, CalendarDays, CalendarCheck2 } from "lucide-react"
 import { useNavigate, useLocation } from "react-router-dom";
 // import { Link } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
 
 // Files Linked
 import DoctorDashboard from '../users/doctor/DoctorDashboard';
+import DocAppointmentsPage from '../users/doctor/sidebar/upcomingAppointments/DocAppointmentsPage.jsx';
 import DoctorBookingPage from '../users/doctor/DoctorBookingPage.jsx';
 
 export default function DoctorSidebar() {
@@ -25,7 +26,8 @@ export default function DoctorSidebar() {
   
     "Services": [
       { id: 'dashboard', label: 'Home', icon: Heart },
-      { id: 'appointments', label: 'Appointments', icon: Calendar },
+      { id: 'appointments', label: 'Requests', icon: CalendarCheck2 },
+      { id: 'visits', label: 'Appointments', icon: CalendarDays },
       { id: 'schedule', label: 'Schedule', icon: CalendarClock },
       { id: 'patients-list', label: 'Patient', icon: FileText },
     //   { id: 'patient-records', label: 'Medication', icon: PillBottle },
@@ -104,6 +106,7 @@ export default function DoctorSidebar() {
        {/* Link pages here to according sidebar items */}
        {activeTab === 'dashboard' && <DoctorDashboard />}
         {activeTab === 'appointments' && <DoctorBookingPage />}
+        {activeTab === 'visits' && <DocAppointmentsPage />}
         {activeTab === 'schedule' && (
           <div>
             <p className="text-gray-700">Place schedule file here</p>

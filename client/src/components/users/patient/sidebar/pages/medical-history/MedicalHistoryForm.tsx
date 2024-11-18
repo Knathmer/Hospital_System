@@ -15,6 +15,8 @@ import FormSubmitButton from "../../../../../ui/buttons/FormSubmitButton";
 
 import axios from "axios";
 
+import envConfig from "../../../../../../envConfig";
+
 export default function MedicalHistoryForm() {
   const [allergies, setAllergies] = useState([
     { name: "", reaction: null, severity: null },
@@ -79,7 +81,7 @@ export default function MedicalHistoryForm() {
       }
 
       const response = await axios.post(
-        "http://localhost:3000/auth/patient/medical-history",
+        `${envConfig.apiUrl}/auth/patient/medical-history`,
         formData,
         {
           headers: {
