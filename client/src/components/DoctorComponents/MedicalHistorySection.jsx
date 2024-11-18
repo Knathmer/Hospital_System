@@ -303,7 +303,7 @@ export const MedicalHistorySection = ({ title, items, onAdd }) => {
           onClick={() => setIsAddingNew(true)}
           variant="outline"
           size="sm"
-          className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+          className="w-full bg-pink-600 hover:bg-pink-700 text-white flex items-center justify-center"
         >
           <Plus className="mr-2 h-4 w-4" /> Add New {singularTitleMap[title]}
         </Button>
