@@ -4,7 +4,7 @@ import MedicationCard from "../../components/patientComponents/MedicationCard.js
 import NoMedicationFound from "../../components/patientComponents/NoMedicationFound.jsx";
 import NavbarPatient from "../../components/users/patient/sections/header/NavbarPatient.jsx";
 import Footer from "../../components/ui/Footer.jsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import envConfig from "../../envConfig.js";
 
@@ -17,6 +17,8 @@ export default function PrescriptionPage() {
   const [patientPharmacies, setPatientPharmacies] = useState([]);
   const [selectedPharmacyID, setSelectedPharmacyID] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const fetchMedications = async () => {
     try {
@@ -115,6 +117,28 @@ export default function PrescriptionPage() {
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-black">
               Medications
             </h1>
+          </div>
+          <div className="flex justify-between items-center mb-6">
+            <button
+              onClick={() => navigate("/patient/dashboard/")}
+              className="text-pink-600 hover:text-pink-700 focus:outline-none flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-6 h-6 mr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back to Patient Dashboard
+            </button>
           </div>
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-xl font-bold tracking-tighter sm:text-2xl md:text-3xl mb-4 text-black">
