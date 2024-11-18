@@ -290,7 +290,7 @@ export async function bookAppointment(req, res) {
 
     // Check if the appointment time is already booked for the same doctor
     const [existingAppointments] = await connection.query(
-      "SELECT * FROM appointment WHERE doctorID = ? AND appointmentDateTime = ?",
+      "SELECT * FROM appointment WHERE doctorID = ? AND appointmentDateTime = ? AND status IN ('Requested', 'Scheduled', 'Completed')",
       [doctorID, appointmentDateTime]
     );
 
