@@ -1,7 +1,9 @@
+// routers/users/patientRouter.js
+
 import express from "express";
 import {
-  hasMedHistoryInfo,
   postMedicalHistory,
+  hasMedHistoryInfo,
 } from "../../controllers/patient/patientMedicalHistoryController.js";
 import {
   postInsurance,
@@ -24,7 +26,7 @@ import {
   hasPersonalInfo,
   updatePersonalInfo,
 } from "../../controllers/patient/patientPersonalInfoController.js";
-// import { de } from "date-fns/locale";
+import patientDoctorRouter from "../../controllers/patient/patient_doctor.js"; // Ensure correct path
 
 const router = express.Router();
 
@@ -38,14 +40,19 @@ router.post("/update-medical-history", updateMedHistory);
 router.get("/personal-info", hasPersonalInfo);
 router.put("/update-personal-info", updatePersonalInfo);
 
-//Since medications will have many sub routes, create a sub router for the path "/auth/patient/medications/*"
+// Since medications have many sub-routes
 router.use("/medications", medicationRouter);
 
+// Billing routes
 router.use("/billing", billingRouter);
 
+// Pharmacy routes
 router.get("/pharmacies", getAllPharmacies);
 router.delete(`/pharmacies/:pharmacyID`, deletePharmacyFromPatient);
 router.post("/pharmacies", postNewPharmacy);
 router.post("/pharmacies/add", postToPatientPharmacy);
+
+// Mount the patientDoctorRouter
+router.use('/', patientDoctorRouter);
 
 export default router;
