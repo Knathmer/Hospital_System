@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import AppointmentModal from "./AppointmentModal";
 import MultiSelectInput from "./MultiSelectInput"; // Adjust the import path accordingly
+import { Link } from "react-router-dom";
 
 // Utility function to format phone numbers
 const formatPhoneNumber = (phoneNumberString) => {
@@ -316,8 +317,13 @@ function DocAppointmentOverview() {
                       Visit Type: {appointment.visitType || "N/A"}
                     </p>
                     <p className="text-gray-600">
-                      Patient: {appointment.patientFirstName}{" "}
-                      {appointment.patientLastName}
+                      Patient: 
+                    <Link
+                        to={`/doctor/patient/${appointment.patientID}`}
+                        className="text-pink-500 hover:underline"
+                      >
+                        {` ${appointment.patientFirstName} ${appointment.patientLastName}`}
+                    </Link>
                     </p>
                     <p className="text-gray-600">
                       Patient's Email: {appointment.patientEmail || "N/A"}
