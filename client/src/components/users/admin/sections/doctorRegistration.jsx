@@ -11,7 +11,7 @@ const RegisterDoctor = () => {
     lastName: "",
     dateOfBirth: "",
     gender: "",
-    specialty: "",
+    specialtyID: "",
     workPhoneNumber: "",
     workEmail: "",
     password: "",
@@ -25,8 +25,28 @@ const RegisterDoctor = () => {
     officeID: "",
   });
 
+  const [specialties, setSpecialties] = useState([]);
   const [offices, setOffices] = useState([]);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchSpecialties = async () => {
+      try {
+        const response = await axios.get(`${envConfig.apiUrl}/auth/admin/specialSpecialties`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log('Specialties API response:', response.data);
+        setSpecialties(response.data);
+      } catch (error) {
+        console.error('Error fetching specialties:', error);
+        setError('Failed to load specialties');
+      }
+    };
+    fetchSpecialties();
+  }, []);
 
   useEffect(() => {
     const fetchOffices = async () => {
@@ -56,6 +76,7 @@ const RegisterDoctor = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
@@ -76,7 +97,27 @@ const RegisterDoctor = () => {
 
       if (response.status === 200 && response.data) {
         console.log("Doctor Registration Successful!");
-        navigate("/admin/dashboard");
+        setSuccessMessage("Doctor registered successfully!");
+
+      // Clear form data
+        setFormData({
+          firstName: "",
+          lastName: "",
+          dateOfBirth: "",
+          gender: "",
+          specialtyID: "",
+          workPhoneNumber: "",
+          workEmail: "",
+          password: "",
+          confirmPassword: "",
+          personalPhoneNumber: "",
+          personalEmail: "",
+          addrStreet: "",
+          addrZip: "",
+          addrCity: "",
+          addrState: "",
+          officeID: "",
+        });
       } else {
         setError("Registration failed. Please try again.");
       }
@@ -108,6 +149,7 @@ const RegisterDoctor = () => {
           </div>
 
           {error && <p className="text-red-500 text-center">{error}</p>}
+          {successMessage && <p className="text-green-500 text-center">{successMessage}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -189,21 +231,26 @@ const RegisterDoctor = () => {
               </div>
               <div>
                 <label
-                  htmlFor="specialty"
+                  htmlFor="specialtyID"
                   className="block text-sm font-medium text-gray-700"
                 >
                   Specialty
                 </label>
-                <input
-                  type="text"
-                  id="specialty"
-                  name="specialty"
-                  value={formData.specialty}
+                <select
+                  id="specialtyID"
+                  name="specialtyID"
+                  value={formData.specialtyID}
                   onChange={handleChange}
                   required
-                  maxLength="50"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
-                />
+                >
+                  <option value="">Select Specialty</option>
+                  {specialties.map((specialty) => (
+                    <option key={specialty.specialtyID} value={specialty.specialtyID}>
+                      {specialty.specialtyName}
+                    </option>
+                  ))}
+                </select>
               </div>
               {/* Contact Information */}
               <div>
