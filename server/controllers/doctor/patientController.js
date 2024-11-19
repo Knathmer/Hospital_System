@@ -104,9 +104,10 @@ export async function getPatientInfo(req, res) {
 
     // Fetch primary physician
     const [primaryPhysician] = await query(
-      `SELECT d.firstName, d.lastName, d.specialty, d.workPhoneNumber, d.workEmail
+      `SELECT d.firstName, d.lastName, s.specialtyName AS specialty, d.workPhoneNumber, d.workEmail
        FROM patient_doctor pd
        JOIN doctor d ON pd.doctorID = d.doctorID
+       LEFT JOIN specialty s ON d.specialtyID = s.specialtyID
        WHERE pd.patientID = ? AND pd.isPrimary = TRUE`,
       [patientID]
     );
