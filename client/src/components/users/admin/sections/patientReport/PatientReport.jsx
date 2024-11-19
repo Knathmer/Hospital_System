@@ -20,9 +20,22 @@ export default function PatientReports() {
     surgery: "",
     medicine: "",
     insurance: "",
+    appointmentCreationMethod: "", // New filter for creation method
   });
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  // Create a mapping for better display labels
+  const filterLabels = {
+    patientName: "Patient Name",
+    doctor: "Doctor",
+    allergy: "Allergy",
+    disability: "Disability",
+    surgery: "Surgery",
+    medicine: "Medicine",
+    insurance: "Insurance",
+    appointmentCreationMethod: "Appointment Creation Method",
+  };
 
   useEffect(() => {
     const fetchPatientServices = async () => {
@@ -80,6 +93,9 @@ export default function PatientReports() {
           case "doctor":
             targetValue = `${service.doctorFirstName} ${service.doctorLastName}`;
             break;
+          case "appointmentCreationMethod":
+            targetValue = service.appointmentCreationMethod ?? "";
+            break;
           default:
             targetValue = service[key];
         }
@@ -132,6 +148,9 @@ export default function PatientReports() {
         case "doctor":
           field = `${service.doctorFirstName} ${service.doctorLastName}`;
           break;
+        case "appointmentCreationMethod":
+          field = service.appointmentCreationMethod ?? "";
+          break;
         default:
           field = service[key];
       }
@@ -147,12 +166,12 @@ export default function PatientReports() {
         {Object.keys(filters).map((key) => (
           <div key={key}>
             <Label htmlFor={`${key}-filter`} className="text-pink-600 capitalize">
-              {key}
+              {filterLabels[key]}
             </Label>
             <SelectComplete
               id={`${key}-filter`}
               options={generateOptions(key)}
-              placeholder={`Filter by ${key}`}
+              placeholder={`Filter by ${filterLabels[key]}`}
               value={filters[key] ? { label: filters[key], value: filters[key] } : null}
               onChange={handleFilterChange(key)}
               isSearchable
@@ -219,6 +238,7 @@ export default function PatientReports() {
                   <TableHead className="text-pink-700">Surgery</TableHead>
                   <TableHead className="text-pink-700">Medicine</TableHead>
                   <TableHead className="text-pink-700">Insurance</TableHead>
+                  <TableHead className="text-pink-700">Appointment Creation Method</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -239,6 +259,7 @@ export default function PatientReports() {
                         : "N/A"}
                     </TableCell>
                     <TableCell>{service.insurance?.providerName ?? "N/A"}</TableCell>
+                    <TableCell>{service.appointmentCreationMethod ?? "N/A"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

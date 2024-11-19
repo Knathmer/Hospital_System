@@ -130,7 +130,8 @@ SELECT
     s.surgeryDateTime AS surgeryDateTime,
     pr.medicationName AS medicineName,
     pr.dateIssued AS prescriptionDateIssued,
-    i.providerName AS insuranceProvider
+    i.providerName AS insuranceProvider,
+    a.creationMethod AS appointmentCreationMethod
 FROM 
     patient AS p
 LEFT JOIN 
@@ -149,8 +150,8 @@ LEFT JOIN
     insurance AS i ON p.patientID = i.patientID
 ORDER BY 
     p.patientID;
-
 `;
+
 
 
 export const SELECT_DOCTORS_WITH_SPECIALTY = `
