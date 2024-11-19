@@ -16,7 +16,7 @@ const formatPhoneNumber = (phoneNumberString) => {
 
 // Utility function to sort appointments in descending order
 const sortAppointmentsDescending = (appointmentsList) => {
-  return [...appointmentsList].sort((a, b) => new Date(b.appointmentDateTime) - new Date(a.appointmentDateTime));
+  return [...appointmentsList].sort((a, b) => new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime));
 };
 
 function AppointmentOverview() {
