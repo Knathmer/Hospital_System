@@ -1,3 +1,5 @@
+// File: server/controllers/appointmentController.js
+
 import { query } from "../database.js"; // Import query function
 import pool from "../database.js"; // Import pool for transactions
 
@@ -67,7 +69,7 @@ export async function getOffices(req, res) {
   }
 }
 
-
+// Function to get patient appointments
 export async function getPatientAppointments(req, res) {
   const patientID = req.user.patientID; // Get patientID from the verified JWT
 
@@ -86,8 +88,8 @@ export async function getPatientAppointments(req, res) {
           s.serviceName AS service,
           d.firstName AS doctorFirstName, 
           d.lastName AS doctorLastName,
-          d.workEmail AS doctorEmail,       -- Updated
-          d.workPhoneNumber AS doctorPhone, -- Updated
+          d.workEmail AS doctorEmail,
+          d.workPhoneNumber AS doctorPhone,
           o.officeName AS officeName,
           CONCAT(addr.addrStreet, ', ', addr.addrcity, ', ', addr.addrstate, ' ', addr.addrzip) AS officeAddress
         FROM appointment a
@@ -146,7 +148,7 @@ export async function getPatientAppointments(req, res) {
 // Function to get specialties
 export async function getSpecialties(req, res) {
   try {
-    // Query the database to get unique specialties from the doctor table
+    // Query the database to get unique specialties from the specialty table
     const specialties = await query("SELECT * FROM specialty;");
 
     res.json(specialties);
@@ -156,6 +158,7 @@ export async function getSpecialties(req, res) {
   }
 }
 
+// Function to get services
 export const getServices = async (req, res) => {
   try {
     const { specialtyID } = req.query;
@@ -165,16 +168,16 @@ export const getServices = async (req, res) => {
       // Fetch services for the specified specialty
       services = await query(
         `SELECT service.serviceID, service.serviceName, service.price
-           FROM service
-           JOIN specialty_service ss ON service.serviceID = ss.serviceID
-           WHERE ss.specialtyID = ?`,
+         FROM service
+         JOIN specialty_service ss ON service.serviceID = ss.serviceID
+         WHERE ss.specialtyID = ?`,
         [specialtyID]
       );
     } else {
       // Fetch all services
       services = await query(
         `SELECT service.serviceID, service.serviceName, service.price
-           FROM service`
+         FROM service`
       );
     }
 
@@ -185,30 +188,30 @@ export const getServices = async (req, res) => {
   }
 };
 
+// Function to get doctors by specialty and filters
 export async function getDoctorsBySpecialty(req, res) {
   const { specialtyID, gender, state, city, officeID, serviceID } = req.query;
 
   try {
-    let queryStr = `
-      SELECT DISTINCT
-        doctor.doctorID,
-        doctor.firstName,
-        doctor.lastName,
-        doctor.gender,
-        doctor.workPhoneNumber,
-        doctor.workEmail,
-        s.specialtyName,
-        doctor.officeID,
-        office.officeName AS officeLocation,
-        CONCAT(a.addrStreet, ', ', a.addrcity, ', ', a.addrstate, ' ', a.addrzip) AS officeAddress
-      FROM doctor
-      LEFT JOIN office ON doctor.officeID = office.officeID
-      INNER JOIN specialty s ON doctor.specialtyID = s.specialtyID
-      JOIN address a ON office.addressID = a.addressID
-      LEFT JOIN specialty_service ss ON s.specialtyID = ss.specialtyID
-      LEFT JOIN service ON ss.serviceID = service.serviceID
-      WHERE 1=1 AND doctor.inactive = 0
-    `;
+    let queryStr = 
+      `SELECT DISTINCT
+          doctor.doctorID,
+          doctor.firstName,
+          doctor.lastName,
+          doctor.gender,
+          doctor.workPhoneNumber,
+          doctor.workEmail,
+          s.specialtyName,
+          doctor.officeID,
+          office.officeName AS officeLocation,
+          CONCAT(a.addrStreet, ', ', a.addrcity, ', ', a.addrstate, ' ', a.addrzip) AS officeAddress
+        FROM doctor
+        LEFT JOIN office ON doctor.officeID = office.officeID
+        INNER JOIN specialty s ON doctor.specialtyID = s.specialtyID
+        JOIN address a ON office.addressID = a.addressID
+        LEFT JOIN specialty_service ss ON s.specialtyID = ss.specialtyID
+        LEFT JOIN service ON ss.serviceID = service.serviceID
+        WHERE 1=1 AND doctor.inactive = 0`;
     const params = [];
 
     if (specialtyID) {
@@ -258,16 +261,19 @@ export async function bookAppointment(req, res) {
 
   // Validation Checks
   if (!patientID) {
+    console.warn("Booking attempt without patientID.");
     return res
       .status(401)
       .json({ message: "Patient must be logged in to book an appointment" });
   }
 
   if (!serviceID) {
+    console.warn("Booking attempt without serviceID.");
     return res.status(400).json({ message: "Service ID is required" });
   }
 
   if (!visitType) {
+    console.warn("Booking attempt without visitType.");
     return res.status(400).json({ message: "Visit Type is required" });
   }
 
@@ -280,8 +286,26 @@ export async function bookAppointment(req, res) {
   ];
 
   if (!allowedVisitTypes.includes(visitType)) {
+    console.warn(`Invalid visitType: ${visitType}`);
     return res.status(400).json({ message: "Invalid Visit Type selected" });
   }
+
+  // Validate appointmentDateTime is a valid ISO string
+  const appointmentDate = new Date(appointmentDateTime);
+  if (isNaN(appointmentDate.getTime())) {
+    console.warn(`Invalid appointmentDateTime format: ${appointmentDateTime}`);
+    return res.status(400).json({ message: "Invalid appointmentDateTime format" });
+  }
+
+  // Ensure appointmentDateTime is in the future
+  const now = new Date();
+  if (appointmentDate < now) {
+    console.warn(`Attempt to book appointment in the past: ${appointmentDateTime}`);
+    return res.status(400).json({ message: "Cannot book an appointment in the past" });
+  }
+
+  // Format appointmentDateTime to 'YYYY-MM-DD HH:MM:SS' for MySQL DATETIME
+  const formattedDateTime = appointmentDate.toISOString().slice(0, 19).replace('T', ' ');
 
   let connection;
   try {
@@ -290,11 +314,15 @@ export async function bookAppointment(req, res) {
 
     // Check if the appointment time is already booked for the same doctor
     const [existingAppointments] = await connection.query(
-      "SELECT * FROM appointment WHERE doctorID = ? AND appointmentDateTime = ? AND status IN ('Requested', 'Scheduled', 'Completed')",
-      [doctorID, appointmentDateTime]
+      `SELECT * FROM appointment 
+       WHERE doctorID = ? 
+         AND appointmentDateTime = ? 
+         AND status IN ('Requested', 'Scheduled', 'Completed')`,
+      [doctorID, formattedDateTime]
     );
 
     if (existingAppointments.length > 0) {
+      console.warn(`Time slot already booked: DoctorID ${doctorID}, Time ${formattedDateTime}`);
       await connection.rollback();
       return res.status(400).json({ message: "Time slot is already booked" });
     }
@@ -306,6 +334,7 @@ export async function bookAppointment(req, res) {
     );
 
     if (doctorRows.length === 0) {
+      console.warn(`Doctor not found: DoctorID ${doctorID}`);
       await connection.rollback();
       return res.status(404).json({ message: "Doctor not found" });
     }
@@ -314,6 +343,7 @@ export async function bookAppointment(req, res) {
 
     // Ensure the doctor has an associated office
     if (!officeID) {
+      console.warn(`Doctor does not have an associated office: DoctorID ${doctorID}`);
       await connection.rollback();
       return res.status(400).json({ message: "Doctor does not have an associated office" });
     }
@@ -322,11 +352,12 @@ export async function bookAppointment(req, res) {
     await connection.query(
       `INSERT INTO appointment 
           (appointmentDateTime, reason, status, patientID, doctorID, officeID, serviceID, visitType)
-          VALUES (?, ?, 'Requested', ?, ?, ?, ?, ?)`,
-      [appointmentDateTime, reason, patientID, doctorID, officeID, serviceID, visitType]
+       VALUES (?, ?, 'Requested', ?, ?, ?, ?, ?)`,
+      [formattedDateTime, reason, patientID, doctorID, officeID, serviceID, visitType]
     );
 
     await connection.commit();
+    console.log(`Appointment booked successfully: PatientID ${patientID}, DoctorID ${doctorID}, Time ${formattedDateTime}`);
     return res.status(200).json({ message: "Appointment booked successfully" });
   } catch (error) {
     if (connection) {
@@ -341,8 +372,7 @@ export async function bookAppointment(req, res) {
   }
 }
 
-
-// Function to get appointments for a doctor on a specific date
+// Function to get appointments by doctor and date
 export async function getAppointmentsByDoctorAndDate(req, res) {
   const { doctorID, date } = req.query;
 
@@ -351,29 +381,30 @@ export async function getAppointmentsByDoctorAndDate(req, res) {
   }
 
   try {
-    // Assuming appointmentDateTime is stored in ISO format
-    const startOfDay = `${date}T00:00:00`;
-    const endOfDay = `${date}T23:59:59`;
+    // Parse the date string as a date in the user's local time
+    const localDate = new Date(date);
+
+    if (isNaN(localDate.getTime())) {
+      return res.status(400).json({ error: "Invalid date format" });
+    }
+
+    // Calculate the start and end of the day in UTC
+    const startOfDayUTC = new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 0, 0, 0));
+    const endOfDayUTC = new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 23, 59, 59));
+
+    // Convert to ISO strings without milliseconds
+    const startOfDayISO = startOfDayUTC.toISOString().slice(0, 19).replace('T', ' ');
+    const endOfDayISO = endOfDayUTC.toISOString().slice(0, 19).replace('T', ' ');
 
     const appointments = await query(
       `SELECT appointmentDateTime FROM appointment 
-             WHERE doctorID = ? 
-             AND appointmentDateTime BETWEEN ? AND ? 
-             AND status IN ('Requested', 'Scheduled')`, // Include 'Requested' status
-      [doctorID, startOfDay, endOfDay]
+       WHERE doctorID = ? 
+         AND appointmentDateTime BETWEEN ? AND ? 
+         AND status IN ('Requested', 'Scheduled')`,
+      [doctorID, startOfDayISO, endOfDayISO]
     );
 
-    // Extract times in consistent format
-    const bookedTimes = appointments.map((app) => {
-      const dateObj = new Date(app.appointmentDateTime);
-      return dateObj.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      });
-    });
-
-    res.json({ bookedTimes });
+    res.json({ appointments });
   } catch (error) {
     console.error("Error fetching appointments:", error);
     res.status(500).json({ error: "Error fetching appointments" });
@@ -390,18 +421,19 @@ export async function getDoctorAppointments(req, res) {
 
   try {
     const appointments = await query(
-      `SELECT appointment.*, 
-        patient.firstName as patientFirstName, 
-        patient.lastName as patientLastName,
-        patient.dateOfBirth as patientDOB,
-        patient.gender as patientGender,
-        patient.phoneNumber as patientPhoneNumber,
-        patient.email as patientEmail,
-        service.serviceName
-      FROM appointment
-      JOIN patient ON appointment.patientID = patient.patientID
-      LEFT JOIN service ON appointment.serviceID = service.serviceID
-      WHERE appointment.doctorID = ?`,
+      `SELECT 
+          appointment.*, 
+          patient.firstName AS patientFirstName, 
+          patient.lastName AS patientLastName,
+          patient.dateOfBirth AS patientDOB,
+          patient.gender AS patientGender,
+          patient.phoneNumber AS patientPhoneNumber,
+          patient.email AS patientEmail,
+          service.serviceName
+       FROM appointment
+       JOIN patient ON appointment.patientID = patient.patientID
+       LEFT JOIN service ON appointment.serviceID = service.serviceID
+       WHERE appointment.doctorID = ?`,
       [doctorID]
     );
 
@@ -421,6 +453,12 @@ export async function updateAppointment(req, res) {
 
   const { appointmentID, status } = req.body;
 
+  // Validate status
+  const allowedStatuses = ['Requested', 'Scheduled', 'Completed', 'Missed', 'Cancelled', 'Request Denied'];
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: "Invalid status value" });
+  }
+
   try {
     const result = await query(
       `UPDATE appointment SET status = ? WHERE appointmentID = ? AND doctorID = ?`,
@@ -428,8 +466,10 @@ export async function updateAppointment(req, res) {
     );
 
     if (result.affectedRows > 0) {
+      console.log(`Appointment updated successfully: AppointmentID ${appointmentID}, Status ${status}`);
       res.json({ message: "Appointment updated successfully" });
     } else {
+      console.warn(`Appointment not found or not authorized: AppointmentID ${appointmentID}, DoctorID ${doctorID}`);
       res
         .status(404)
         .json({ error: "Appointment not found or not authorized" });
@@ -443,11 +483,11 @@ export async function updateAppointment(req, res) {
 // Function to get unique office locations
 export async function getLocations(req, res) {
   try {
-    const locations = await query(`
-            SELECT officeID, officeName, CONCAT(addrStreet, ', ', addrcity, ', ', addrstate, ' ', addrzip) AS address
-            FROM office
-            JOIN address ON office.addressID = address.addressID
-        `);
+    const locations = await query(
+      `SELECT officeID, officeName, CONCAT(addrStreet, ', ', addrcity, ', ', addrstate, ' ', addrzip) AS address
+       FROM office
+       JOIN address ON office.addressID = address.addressID`
+    );
     res.json(locations);
   } catch (error) {
     console.error("Error retrieving locations:", error);
