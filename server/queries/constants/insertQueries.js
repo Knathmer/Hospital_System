@@ -31,10 +31,11 @@ export const INSERT_EMERGENCY_CONTACT_QUERY = `
 
 export const INSERT_DOCTOR_QUERY = `
   INSERT INTO doctor 
-  (firstName, lastName, dateOfBirth, gender, specialty, workPhoneNumber, 
+  (firstName, lastName, gender, dateOfBirth, workPhoneNumber, 
   workEmail, password, lastLogin, personalPhoneNumber, personalEmail, 
-  createdBy, createdAt, updatedBy, updatedAt, officeID, addressID)
+  createdBy, createdAt, updatedBy, updatedAt, officeID, addressID, specialtyID)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 `;
+
 
 export const INSERT_NEW_PHARMACY_QUERY = `INSERT INTO pharmacy (pharmacyName, address, city, state, zipCode, phoneNumber) VALUES (?, ?, ?, ?, ?, ?)`;

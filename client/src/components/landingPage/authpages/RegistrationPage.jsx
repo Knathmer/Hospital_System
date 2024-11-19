@@ -27,29 +27,99 @@ const RegistrationPage = () => {
   });
 
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  const validStates = [
+    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+
+    // Automatically format phone numbers as (123) 456-7890
+    if (name === "phoneNumber" || name === "emergencyPhoneNumber") {
+      const cleaned = value.replace(/\D/g, "");
+      let formatted = value;
+
+      if (cleaned.length <= 10) {
+        if (cleaned.length >= 1) {
+          formatted = `(${cleaned.substring(0, 3)}`;
+        }
+        if (cleaned.length >= 4) {
+          formatted += `) ${cleaned.substring(3, 6)}`;
+        }
+        if (cleaned.length >= 7) {
+          formatted += `-${cleaned.substring(6, 10)}`;
+        }
+      }
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: formatted,
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
+    let valid = true;
+    let errors = {};
+
+    if (!phoneRegex.test(formData.phoneNumber)) {
+      valid = false;
+      errors.phoneNumber = "Phone number must be in the format (123) 456-7890";
+    }
+
+    if (!phoneRegex.test(formData.emergencyPhoneNumber)) {
+      valid = false;
+      errors.emergencyPhoneNumber =
+        "Emergency phone number must be in the format (123) 456-7890";
+    }
+
+    if (!validStates.includes(formData.addrState.toUpperCase())) {
+      valid = false;
+      errors.addrState = "State must be a valid two-letter abbreviation";
+    }
+
+    return { valid, errors };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setErrors({});
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
+    const { valid, errors } = validateForm();
+
+    if (!valid) {
+      setErrors(errors);
+      return;
+    }
+
+    const dataToSend = {
+      ...formData,
+      phoneNumber: formData.phoneNumber.replace(/\D/g, ""), // Remove formatting
+      emergencyPhoneNumber: formData.emergencyPhoneNumber.replace(/\D/g, ""), // Remove formatting
+    };
+
     try {
       const response = await axios.post(
         `${envConfig.apiUrl}/auth/register`,
-        formData
+        dataToSend
       );
 
       if (response.status === 200 && response.data) {
@@ -186,9 +256,17 @@ const RegistrationPage = () => {
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   required
-                  maxLength="15"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                  maxLength="14"
+                  placeholder="(123) 456-7890"
+                  className={`mt-1 block w-full px-3 py-2 border ${
+                    errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500`}
                 />
+                {errors.phoneNumber && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.phoneNumber}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -317,9 +395,19 @@ const RegistrationPage = () => {
                   value={formData.emergencyPhoneNumber}
                   onChange={handleChange}
                   required
-                  maxLength="15"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                  maxLength="14"
+                  placeholder="(123) 456-7890"
+                  className={`mt-1 block w-full px-3 py-2 border ${
+                    errors.emergencyPhoneNumber
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500`}
                 />
+                {errors.emergencyPhoneNumber && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.emergencyPhoneNumber}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -400,24 +488,32 @@ const RegistrationPage = () => {
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="addrState"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    State
-                  </label>
-                  <input
-                    type="text"
-                    id="addrState"
-                    name="addrState"
-                    value={formData.addrState}
-                    onChange={handleChange}
-                    required
-                    maxLength="2"
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
-                  />
-                </div>
+                <label
+                  htmlFor="addrState"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  State
+                </label>
+                <input
+                  type="text"
+                  id="addrState"
+                  name="addrState"
+                  value={formData.addrState}
+                  onChange={handleChange}
+                  required
+                  maxLength="2"
+                  placeholder="e.g., CA"
+                  className={`mt-1 block w-full px-3 py-2 border ${
+                    errors.addrState ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500`}
+                />
+                {errors.addrState && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.addrState}
+                  </p>
+                )}
               </div>
+            </div>
             </div>
             <div>
               <button

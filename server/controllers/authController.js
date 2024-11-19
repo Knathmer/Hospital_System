@@ -188,6 +188,27 @@ export async function register(req, res) {
   }
 }
 
+async function getSpecialtyID(connection, specialtyName) {
+  try {
+    const [specialties] = await connection.query(
+      'SELECT specialtyID FROM specialty WHERE specialtyName = ?',
+      [specialtyName]
+    );
+    if (specialties.length > 0) {
+      return specialties[0].specialtyID;
+    } else {
+      const [insertResult] = await connection.query(
+        'INSERT INTO specialty (specialtyName) VALUES (?)',
+        [specialtyName]
+      );
+      return insertResult.insertId;
+    }
+  } catch (error) {
+    console.error("Error checking or inserting specialty:", error);
+    throw new Error("Database error");
+  }
+}
+
 export async function registerDoctor(req, res) {
   const {confirmPassword, ...userData } = req.body;
   let connection;
@@ -215,24 +236,26 @@ export async function registerDoctor(req, res) {
       userData.addrState
     );
 
+    const specialtyID = userData.specialtyID;
+
     const [insertResult] = await connection.query(INSERT_DOCTOR_QUERY, [
-      userData.firstName,              // 1
-      userData.lastName,               // 2
-      userData.dateOfBirth,            // 3
-      userData.gender,                 // 4
-      userData.specialty,              // 5
-      userData.workPhoneNumber,        // 6
-      userData.workEmail,              // 7
-      userData.password,               // 8
-      new Date(),                      // 9 - lastLogin
-      userData.personalPhoneNumber,    // 10
-      userData.personalEmail,          // 11
-      "user",                          // 12 - createdBy
-      new Date(),                      // 13 - createdAt
-      "user",                          // 14 - updatedBy
-      new Date(),                      // 15 - updatedAt
-      userData.officeID,               // (This is officeID) Need to an additional form submission object that is for submitting the office code.
-      addressID,                       // 17
+      userData.firstName,            // 1
+      userData.lastName,             // 2
+      userData.gender,               // 3
+      userData.dateOfBirth,          // 4
+      userData.workPhoneNumber,      // 5
+      userData.workEmail,            // 6
+      userData.password,             // 7
+      new Date(),                    // 8 - lastLogin
+      userData.personalPhoneNumber,  // 9
+      userData.personalEmail,        // 10
+      "user",                        // 11 - createdBy
+      new Date(),                    // 12 - createdAt
+      "user",                        // 13 - updatedBy
+      new Date(),                    // 14 - updatedAt
+      userData.officeID,             // 15
+      addressID,                     // 16
+      userData.specialtyID           // 17
     ]);
 
     await connection.commit(); // Commit transaction
@@ -252,6 +275,16 @@ export async function registerDoctor(req, res) {
     if (connection) {
       connection.release(); // Release the connection back to the pool if it was successfully acquired
     }
+  }
+}
+
+export async function getspecialSpecialties(req, res) {
+  try {
+    const specialties = await query('SELECT specialtyID, specialtyName FROM specialty');
+    res.status(200).json(specialties);
+  } catch (error) {
+    console.error('Error fetching specialties:', error);
+    res.status(500).json({ message: 'Failed to fetch specialties' });
   }
 }
 

@@ -1,5 +1,5 @@
 import express from "express";
-import { registerDoctor } from "../../controllers/authController.js";
+import { registerDoctor, getspecialSpecialties} from "../../controllers/authController.js";
 import { getPrescriptionReport } from "../../controllers/admin/adminPrescriptionReport.js";
 import {
   getAppointmentAnalytics,
@@ -27,6 +27,7 @@ import {
 
 const router = express.Router();
 
+router.get("/specialSpecialties", getspecialSpecialties);
 router.post("/register", registerDoctor);
 router.get("/get-prescription-report", getPrescriptionReport);
 router.get("/appointmentAnalytics", getAppointmentAnalytics);
