@@ -207,7 +207,7 @@ export async function getDoctorsBySpecialty(req, res) {
       JOIN address a ON office.addressID = a.addressID
       LEFT JOIN specialty_service ss ON s.specialtyID = ss.specialtyID
       LEFT JOIN service ON ss.serviceID = service.serviceID
-      WHERE 1=1
+      WHERE 1=1 AND doctor.inactive = 0
     `;
     const params = [];
 
@@ -290,7 +290,7 @@ export async function bookAppointment(req, res) {
 
     // Check if the appointment time is already booked for the same doctor
     const [existingAppointments] = await connection.query(
-      "SELECT * FROM appointment WHERE doctorID = ? AND appointmentDateTime = ?",
+      "SELECT * FROM appointment WHERE doctorID = ? AND appointmentDateTime = ? AND status IN ('Requested', 'Scheduled', 'Completed')",
       [doctorID, appointmentDateTime]
     );
 
@@ -391,15 +391,17 @@ export async function getDoctorAppointments(req, res) {
   try {
     const appointments = await query(
       `SELECT appointment.*, 
-                    patient.firstName as patientFirstName, 
-                    patient.lastName as patientLastName,
-                    patient.dateOfBirth as patientDOB,
-                    patient.gender as patientGender,
-                    patient.phoneNumber as patientPhoneNumber,
-                    patient.email as patientEmail
-             FROM appointment
-             JOIN patient ON appointment.patientID = patient.patientID
-             WHERE appointment.doctorID = ?`,
+        patient.firstName as patientFirstName, 
+        patient.lastName as patientLastName,
+        patient.dateOfBirth as patientDOB,
+        patient.gender as patientGender,
+        patient.phoneNumber as patientPhoneNumber,
+        patient.email as patientEmail,
+        service.serviceName
+      FROM appointment
+      JOIN patient ON appointment.patientID = patient.patientID
+      LEFT JOIN service ON appointment.serviceID = service.serviceID
+      WHERE appointment.doctorID = ?`,
       [doctorID]
     );
 

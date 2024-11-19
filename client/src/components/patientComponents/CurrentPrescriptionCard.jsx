@@ -45,7 +45,7 @@ export default function CurrentPrescriptionCard({
         <div className="flex flex-col items-end">
           <p className="text-sm text-red-600 mb-2">No refills remaining.</p>
           <Link
-            to="/book"
+            to="/patient/dashboard?tab=appointments"
             className="bg-pink-600 text-white py-2 px-4 rounded-lg hover:bg-pink-700 transition-colors text-sm"
           >
             Schedule Appointment

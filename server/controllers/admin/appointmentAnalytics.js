@@ -11,6 +11,8 @@ export async function getAppointmentAnalytics(req, res) {
     const {
       startDate,
       endDate,
+      includeInactiveDoctors = 'false',
+      includeInactivePatients = 'false',
     } = req.query;
 
     const states = parseArray(req.query.states);
@@ -22,6 +24,9 @@ export async function getAppointmentAnalytics(req, res) {
     const visitTypes = parseArray(req.query.visitTypes);
     const specialtyIDs = parseArray(req.query.specialtyIDs);
     const serviceIDs = parseArray(req.query.serviceIDs);
+
+    const includeDoctorsInactive = includeInactiveDoctors === 'true';
+    const includePatientsInactive = includeInactivePatients === 'true';
 
     // Build the SQL query dynamically based on provided filters
     let sql = `
@@ -116,6 +121,16 @@ export async function getAppointmentAnalytics(req, res) {
       params.push(...serviceIDs);
     }
 
+    // Filter out inactive doctors if not included
+    if (!includeDoctorsInactive) {
+      sql += ' AND (d.Inactive = 0 OR d.Inactive IS NULL)';
+    }
+
+    // Filter out inactive patients if not included
+    if (!includePatientsInactive) {
+      sql += ' AND (p.Inactive = 0 OR p.Inactive IS NULL)';
+    }
+
     // Execute the query to get appointments
     const appointments = await query(sql, params);
 
@@ -132,7 +147,7 @@ export async function getAppointmentAnalytics(req, res) {
     const doctorCounts = {};
     const patientCounts = {};
 
-    appointments.forEach(appointment => {
+    appointments.forEach((appointment) => {
       // Count by status
       const status = appointment.status || 'Unknown';
       statusCounts[status] = (statusCounts[status] || 0) + 1;
@@ -166,11 +181,15 @@ export async function getAppointmentAnalytics(req, res) {
       officeCounts[office] = (officeCounts[office] || 0) + 1;
 
       // Count by doctor
-      const doctorName = `${appointment.doctorFirstName} ${appointment.doctorLastName}` || 'Unknown Doctor';
+      const doctorName =
+        `${appointment.doctorFirstName} ${appointment.doctorLastName}` ||
+        'Unknown Doctor';
       doctorCounts[doctorName] = (doctorCounts[doctorName] || 0) + 1;
 
       // Count by patient
-      const patientName = `${appointment.patientFirstName} ${appointment.patientLastName}` || 'Unknown Patient';
+      const patientName =
+        `${appointment.patientFirstName} ${appointment.patientLastName}` ||
+        'Unknown Patient';
       patientCounts[patientName] = (patientCounts[patientName] || 0) + 1;
     });
 
@@ -265,23 +284,34 @@ export async function getAppointmentAnalytics(req, res) {
   
   export async function getDoctors(req, res) {
     try {
-      const doctors = await query('SELECT doctorID, firstName, lastName FROM doctor');
+      const includeInactive = req.query.includeInactive === 'true';
+      let sql = 'SELECT doctorID, firstName, lastName FROM doctor';
+      if (!includeInactive) {
+        sql += ' WHERE Inactive = 0';
+      }
+      const doctors = await query(sql);
       res.status(200).json({ doctors });
     } catch (error) {
       console.error('Error fetching doctors:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-  
+
   export async function getPatients(req, res) {
     try {
-      const patients = await query('SELECT patientID, firstName, lastName FROM patient');
+      const includeInactive = req.query.includeInactive === 'true';
+      let sql = 'SELECT patientID, firstName, lastName FROM patient';
+      if (!includeInactive) {
+        sql += ' WHERE Inactive = 0';
+      }
+      const patients = await query(sql);
       res.status(200).json({ patients });
     } catch (error) {
       console.error('Error fetching patients:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
-  }
+}
+  
 
   // Function to get appointment statuses
 export async function getAppointmentStatuses(req, res) {

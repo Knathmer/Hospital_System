@@ -24,7 +24,9 @@ const QuickActionsDoctor = () => {
         >
           Patient List
         </NavButton>
-        <NavButton variant="outline">Manage Appointments</NavButton>
+        <NavButton to="/doctor/dashboard?tab=appointments" variant="outline">
+          Manage Appointments
+        </NavButton>
       </div>
     </section>
   );

@@ -4,7 +4,7 @@ import MedicationCard from "../../components/patientComponents/MedicationCard.js
 import NoMedicationFound from "../../components/patientComponents/NoMedicationFound.jsx";
 import NavbarPatient from "../../components/users/patient/sections/header/NavbarPatient.jsx";
 import Footer from "../../components/ui/Footer.jsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import envConfig from "../../envConfig.js";
 
@@ -18,11 +18,12 @@ export default function PrescriptionPage() {
   const [selectedPharmacyID, setSelectedPharmacyID] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const navigate = useNavigate();
+
   const fetchMedications = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      // If no token is found, it means that the user is not authenticated.
       if (!token) {
         setError("User is not authenticated");
         setLoading(false);
@@ -107,15 +108,39 @@ export default function PrescriptionPage() {
     );
   }
 
+  const activeMedications = medications.filter((med) => med.active === 1);
+
   return (
     <div className="flex flex-col min-h-screen bg-pink-50">
-      <NavbarPatient linkTo={"/patient/dashboard?tab=dashboard"} />
+      <NavbarPatient />
       <main className="flex-1 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-black">
               Medications
             </h1>
+          </div>
+          <div className="flex justify-between items-center mb-6">
+            <button
+              onClick={() => navigate("/patient/dashboard/")}
+              className="text-pink-600 hover:text-pink-700 focus:outline-none flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-6 h-6 mr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back to Patient Dashboard
+            </button>
           </div>
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-xl font-bold tracking-tighter sm:text-2xl md:text-3xl mb-4 text-black">
@@ -150,30 +175,24 @@ export default function PrescriptionPage() {
                 {errorMessage}
               </div>
             )}
-            {medications && medications.length > 0 && (
+            {activeMedications.length > 0 && (
               <Link
                 to="refill-medications"
-                className="inline-flex h-9 items-center justify-center rounded-md bg-pink-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-pink-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-700 disabled:pointer-events-none disabled:opacity-50"
+                className="inline-flex h-9 items-center justify-center rounded-md bg-pink-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-pink-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-700 disabled:pointer-events-none disabled:opacity-50 mb-4"
               >
-                Request refills
+                Request Refills
               </Link>
             )}
-            {medications && medications.length > 0 ? (
-              medications.map((med, index) => (
+            {activeMedications.length > 0 ? (
+              activeMedications.map((med, index) => (
                 <div key={index}>
                   <MedicationCard
                     key={index}
-                    refillCard={false}
                     name={med.medicationName}
                     instructions={med.instruction}
                     prescriptionDetails={{
                       prescribed: new Date(med.start).toLocaleDateString(
-                        "en-US",
-                        {
-                          month: "2-digit",
-                          day: "2-digit",
-                          year: "numeric",
-                        }
+                        "en-US"
                       ),
                       approvedBy: `${med.firstName} ${med.lastName}`,
                     }}
@@ -188,22 +207,20 @@ export default function PrescriptionPage() {
                       pharmacyState: med.state || "",
                       pharmacyZip: med.zipCode || "",
                       pharmacyPhoneNum: med.phoneNumber
-                        ? med.phoneNumber.slice(0, 3) +
-                          "-" +
-                          med.phoneNumber.slice(3, 6) +
-                          "-" +
-                          med.phoneNumber.slice(6)
+                        ? `${med.phoneNumber.slice(
+                            0,
+                            3
+                          )}-${med.phoneNumber.slice(
+                            3,
+                            6
+                          )}-${med.phoneNumber.slice(6)}`
                         : "",
                     }}
                     onAssignPharmacy={() =>
                       handlePharmacyClick(med.prescriptionID)
                     }
-                    onChangePharmacy={() =>
-                      handlePharmacyClick(med.prescriptionID)
-                    }
                   />
 
-                  {/* Conditionally render pharmacy assignment form */}
                   {assigningPharmacyPrescriptionID === med.prescriptionID && (
                     <div className="bg-gray-100 p-4 rounded-md mt-2">
                       <h3 className="text-lg font-semibold mb-2">

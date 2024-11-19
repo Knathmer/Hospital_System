@@ -20,7 +20,7 @@ const QuickActions = () => {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <NavButton
           className="bg-pink-500 text-white hover:bg-pink-600"
-          to="/patient/dashboard?tab=medications"
+          to="/patient/medications/"
         >
           Medications
         </NavButton>
@@ -31,7 +31,7 @@ const QuickActions = () => {
         <DefaultButton variant="outline" onClick={handleMedHistoryClick}>
           Update Medical History
         </DefaultButton>
-        <NavButton variant="outline" to="/patient/billing">
+        <NavButton variant="outline" to="/patient/dashboard?tab=billing">
           View Billing Statements
         </NavButton>
       </div>

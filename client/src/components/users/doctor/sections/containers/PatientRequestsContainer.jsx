@@ -26,7 +26,7 @@ const PatientRequestsContainer = () => {
           </span>
         </li>
       </ul>
-      <NavButton to="/doctor/patient-requests" className="mt-4 bg-blue-500 text-white hover:bg-blue-600">
+      <NavButton to="/doctor/dashboard?tab=appointments" className="mt-4 bg-blue-500 text-white hover:bg-blue-600">
         View All Requests
       </NavButton>
     </GenericContainer>
