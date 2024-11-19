@@ -104,7 +104,6 @@ function BookPage() {
       state: selectedState,
       city: selectedCity,
       officeID: selectedOffice,
-      // Removed visitTypeID to prevent filtering doctors based on Visit-Type
     };
     if (specialty) {
       params.specialtyID = specialty;
@@ -170,7 +169,18 @@ function BookPage() {
           params: { doctorID: selectedDoctor.doctorID, date },
         })
         .then((response) => {
-          setBookedTimes(response.data.bookedTimes); // Simplified mapping
+          const appointments = response.data.appointments;
+          const bookedTimes = appointments.map((app) => {
+            // Parse the UTC datetime string to a Date object
+            const dateObj = new Date(app.appointmentDateTime);
+            // Convert the Date object to a localized time string
+            return dateObj.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            });
+          });
+          setBookedTimes(bookedTimes);
         })
         .catch((error) => {
           console.error("Error fetching booked times:", error);
@@ -196,9 +206,10 @@ function BookPage() {
   };
 
   const isWeekend = (dateString) => {
+    if (!dateString) return false;
     const date = new Date(dateString);
     const day = date.getDay();
-    return day === 5 || day === 6; // Sunday (5) and Saturday (6)
+    return day === 0 || day === 6; // Sunday (0) and Saturday (6)
   };
 
   const convertTo24HourFormat = (timeStr) => {
@@ -241,13 +252,29 @@ function BookPage() {
       return;
     }
 
+    if (!time) {
+      setMessage("Please select a time.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const formattedTime = convertTo24HourFormat(time); // Convert to 24-hour format
 
+      // Extract year, month, day from the date input
+      const [year, month, day] = date.split("-").map(Number);
+      // Extract hours and minutes from the formattedTime
+      const [hours, minutes] = formattedTime.split(":").map(Number);
+
+      // Create a Date object in the user's local time zone
+      const localDateTime = new Date(year, month - 1, day, hours, minutes);
+
+      // Convert the local Date object to a UTC ISO string
+      const appointmentDateTime = localDateTime.toISOString();
+
       // Debugging: Log the data being sent
       console.log({
-        appointmentDateTime: `${date}T${formattedTime}:00`,
+        appointmentDateTime: appointmentDateTime,
         reason,
         doctorID: selectedDoctor.doctorID,
         serviceID: selectedService,
@@ -257,11 +284,11 @@ function BookPage() {
       await axios.post(
         `${envConfig.apiUrl}/appointment/book`,
         {
-          appointmentDateTime: `${date}T${formattedTime}:00`,
+          appointmentDateTime: appointmentDateTime,
           reason,
           doctorID: selectedDoctor.doctorID,
-          serviceID: selectedService, // Include the selected service ID
-          visitType: selectedVisitType, // Include the selected visit type as a string
+          serviceID: selectedService,
+          visitType: selectedVisitType,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -284,7 +311,11 @@ function BookPage() {
       setBookedTimes([]);
       setAvailableTimes([]);
     } catch (error) {
-      setMessage("Error booking appointment.");
+      if (error.response && error.response.data && error.response.data.message) {
+        setMessage(`Error: ${error.response.data.message}`);
+      } else {
+        setMessage("Error booking appointment.");
+      }
       console.error("Error booking appointment:", error);
     }
   };
@@ -497,6 +528,7 @@ function BookPage() {
                       onChange={(e) => setDate(e.target.value)}
                       min={new Date().toISOString().split("T")[0]}
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                      required
                     />
                     {isWeekend(date) && (
                       <p className="text-pink-500 text-sm mt-1">
@@ -517,6 +549,7 @@ function BookPage() {
                       value={time}
                       onChange={(e) => setTime(e.target.value)}
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                      required
                     >
                       <option value="">Select a time</option>
                       {availableTimes.map((t) => (
@@ -550,6 +583,7 @@ function BookPage() {
                       value={selectedVisitType}
                       onChange={(e) => setSelectedVisitType(e.target.value)}
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                      required
                     >
                       <option value="">Select a visit type</option>
                       {visitTypeOptions.map((visit, index) => (
@@ -574,6 +608,7 @@ function BookPage() {
                       value={selectedService}
                       onChange={(e) => setSelectedService(e.target.value)}
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                      required
                     >
                       <option value="">Select a service</option>
                       {services.map((service) => (
