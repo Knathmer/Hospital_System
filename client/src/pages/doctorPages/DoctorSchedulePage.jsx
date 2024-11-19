@@ -43,29 +43,6 @@ export default function DoctorSchedulePage() {
 
   return (
     <div className="container mx-auto p-4">
-      {/* Back Arrow */}
-      <div>
-        <button
-          onClick={() => navigate("/doctor/dashboard")}
-          className="text-pink-600 hover:text-pink-700 flex items-center mb-4"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="w-6 h-6 mr-2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back to Dashboard
-        </button>
-      </div>
       <h1 className="text-2xl font-bold mb-4">Today's Schedule</h1>
       <Table>
         <TableHeader>
