@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 // Utility function to format phone numbers
 const formatPhoneNumber = (phoneNumberString) => {
@@ -53,8 +54,13 @@ function AppointmentModal({ appointment, onClose, onUpdateStatus }) {
           {new Date(appointment.appointmentDateTime).toLocaleString()}
         </p>
         <p>
-          <strong>Patient:</strong> {appointment.patientFirstName}{" "}
-          {appointment.patientLastName}
+          <strong>Patient:</strong>
+          <Link
+                        to={`/doctor/patient/${appointment.patientID}`}
+                        className="text-pink-500 hover:underline"
+                      >
+                        {` ${appointment.patientFirstName} ${appointment.patientLastName}`}
+          </Link>
         </p>
         <p>
           <strong>Patient's Email:</strong> {appointment.patientEmail || "N/A"}
