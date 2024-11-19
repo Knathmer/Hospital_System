@@ -14,14 +14,28 @@ export default function PatientReports() {
   const [filteredServices, setFilteredServices] = useState([]);
   const [filters, setFilters] = useState({
     patientName: "",
-    appointments: "",
-    medicalRecords: "",
+    doctor: "",
+    allergy: "",
+    disability: "",
+    surgery: "",
     medicine: "",
-    billing: "",
     insurance: "",
+    appointmentCreationMethod: "", // New filter for creation method
   });
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  // Create a mapping for better display labels
+  const filterLabels = {
+    patientName: "Patient Name",
+    doctor: "Doctor",
+    allergy: "Allergy",
+    disability: "Disability",
+    surgery: "Surgery",
+    medicine: "Medicine",
+    insurance: "Insurance",
+    appointmentCreationMethod: "Appointment Creation Method",
+  };
 
   useEffect(() => {
     const fetchPatientServices = async () => {
@@ -42,11 +56,15 @@ export default function PatientReports() {
 
   useEffect(() => {
     const filtered = patientServices.filter((service) => {
-      const appointmentDate = new Date(service.appointments?.createdAt);
+      const surgeryDate = new Date(service.medicalRecords?.surgeryDateTime);
+      const prescriptionDate = new Date(service.medicine?.dateIssued);
 
       // Filter by date range if both startDate and endDate are selected
       if (startDate && endDate) {
-        if (appointmentDate < startDate || appointmentDate > endDate) {
+        if (
+          (surgeryDate && (surgeryDate < startDate || surgeryDate > endDate)) &&
+          (prescriptionDate && (prescriptionDate < startDate || prescriptionDate > endDate))
+        ) {
           return false;
         }
       }
@@ -57,20 +75,26 @@ export default function PatientReports() {
         let targetValue;
 
         switch (key) {
-          case "appointments":
-            targetValue = `${service.appointments?.id ?? ""} ${service.appointments?.createdAt ?? ""} ${service.appointments?.updatedAt ?? ""}`;
+          case "allergy":
+            targetValue = service.medicalRecords?.allergy ?? "";
             break;
-          case "medicalRecords":
-            targetValue = `${service.medicalRecords?.allergen ?? ""} ${service.medicalRecords?.disability ?? ""} ${service.medicalRecords?.surgery ?? ""}`;
+          case "disability":
+            targetValue = service.medicalRecords?.disability ?? "";
+            break;
+          case "surgery":
+            targetValue = service.medicalRecords?.surgery ?? "";
             break;
           case "medicine":
-            targetValue = `${service.medicine?.name ?? ""} ${service.medicine?.dateIssued ?? ""} ${service.medicine?.start ?? ""} ${service.medicine?.end ?? ""}`;
-            break;
-          case "billing":
-            targetValue = `${service.billing?.id ?? ""} ${service.billing?.dateIssued ?? ""} ${service.billing?.dueDate ?? ""}`;
+            targetValue = service.medicine?.name ?? "";
             break;
           case "insurance":
-            targetValue = `${service.insurance?.providerName ?? ""} ${service.insurance?.expirationDate ?? ""}`;
+            targetValue = service.insurance?.providerName ?? "";
+            break;
+          case "doctor":
+            targetValue = `${service.doctorFirstName} ${service.doctorLastName}`;
+            break;
+          case "appointmentCreationMethod":
+            targetValue = service.appointmentCreationMethod ?? "";
             break;
           default:
             targetValue = service[key];
@@ -106,42 +130,26 @@ export default function PatientReports() {
     patientServices.forEach((service) => {
       let field;
       switch (key) {
-        case "appointments":
-          if (service.appointments) {
-            const id = service.appointments.id;
-            const createdAt = formatDate(service.appointments.createdAt);
-            const updatedAt = formatDate(service.appointments.updatedAt);
-            field = `ID: ${id}, Created At: ${createdAt}, Updated At: ${updatedAt}`;
-          }
+        case "allergy":
+          field = service.medicalRecords?.allergy ?? "";
           break;
-        case "medicalRecords":
-          if (service.medicalRecords) {
-            field = `Allergen: ${service.medicalRecords.allergen ?? "N/A"}, Disability: ${service.medicalRecords.disability ?? "N/A"}, Surgery: ${service.medicalRecords.surgery ?? "N/A"}`;
-          }
+        case "disability":
+          field = service.medicalRecords?.disability ?? "";
+          break;
+        case "surgery":
+          field = service.medicalRecords?.surgery ?? "";
           break;
         case "medicine":
-          if (service.medicine) {
-            const name = service.medicine.name;
-            const dateIssued = formatDate(service.medicine.dateIssued);
-            const start = formatDate(service.medicine.start);
-            const end = formatDate(service.medicine.end);
-            field = `Name: ${name}, Issued: ${dateIssued}, Start: ${start}, End: ${end}`;
-          }
-          break;
-        case "billing":
-          if (service.billing) {
-            const id = service.billing.id;
-            const dateIssued = formatDate(service.billing.dateIssued);
-            const dueDate = formatDate(service.billing.dueDate);
-            field = `ID: ${id}, Issued: ${dateIssued}, Due: ${dueDate}`;
-          }
+          field = service.medicine?.name ?? "";
           break;
         case "insurance":
-          if (service.insurance) {
-            const providerName = service.insurance.providerName;
-            const expirationDate = formatDate(service.insurance.expirationDate);
-            field = `Provider: ${providerName}, Expiration: ${expirationDate}`;
-          }
+          field = service.insurance?.providerName ?? "";
+          break;
+        case "doctor":
+          field = `${service.doctorFirstName} ${service.doctorLastName}`;
+          break;
+        case "appointmentCreationMethod":
+          field = service.appointmentCreationMethod ?? "";
           break;
         default:
           field = service[key];
@@ -158,12 +166,12 @@ export default function PatientReports() {
         {Object.keys(filters).map((key) => (
           <div key={key}>
             <Label htmlFor={`${key}-filter`} className="text-pink-600 capitalize">
-              {key}
+              {filterLabels[key]}
             </Label>
             <SelectComplete
               id={`${key}-filter`}
               options={generateOptions(key)}
-              placeholder={`Filter by ${key}`}
+              placeholder={`Filter by ${filterLabels[key]}`}
               value={filters[key] ? { label: filters[key], value: filters[key] } : null}
               onChange={handleFilterChange(key)}
               isSearchable
@@ -224,76 +232,34 @@ export default function PatientReports() {
               <TableHeader>
                 <TableRow className="bg-pink-50">
                   <TableHead className="text-pink-700">Patient Name</TableHead>
-                  <TableHead className="text-pink-700">Appointments</TableHead>
-                  <TableHead className="text-pink-700">Medical Records</TableHead>
+                  <TableHead className="text-pink-700">Doctor</TableHead>
+                  <TableHead className="text-pink-700">Allergy</TableHead>
+                  <TableHead className="text-pink-700">Disability</TableHead>
+                  <TableHead className="text-pink-700">Surgery</TableHead>
                   <TableHead className="text-pink-700">Medicine</TableHead>
-                  <TableHead className="text-pink-700">Billing</TableHead>
                   <TableHead className="text-pink-700">Insurance</TableHead>
+                  <TableHead className="text-pink-700">Appointment Creation Method</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredServices.map((service, index) => (
                   <TableRow key={index}>
                     <TableCell>{service.patientName}</TableCell>
+                    <TableCell>{`${service.doctorFirstName} ${service.doctorLastName}`}</TableCell>
+                    <TableCell>{service.medicalRecords?.allergy ?? "N/A"}</TableCell>
+                    <TableCell>{service.medicalRecords?.disability ?? "N/A"}</TableCell>
                     <TableCell>
-                      {service.appointments.length > 0 ? (
-                        <ul className="list-disc list-inside max-h-32 overflow-y-auto">
-                          {service.appointments.map((appointment, idx) => (
-                            <li key={idx}>
-                              ID: {appointment.id}, Created At: {formatDate(appointment.createdAt)}, Updated At: {formatDate(appointment.updatedAt)}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        "N/A"
-                      )}
+                      {service.medicalRecords?.surgery
+                        ? `${service.medicalRecords.surgery} at ${formatDate(service.medicalRecords.surgeryDateTime)}`
+                        : "N/A"}
                     </TableCell>
                     <TableCell>
-                      <ul className="list-disc list-inside max-h-32 overflow-y-auto">
-                        <li>Allergies: {service.medicalRecords.allergies.join(", ") || "N/A"}</li>
-                        <li>Disabilities: {service.medicalRecords.disabilities.join(", ") || "N/A"}</li>
-                        <li>Surgeries: {service.medicalRecords.surgeries.join(", ") || "N/A"}</li>
-                      </ul>
+                      {service.medicine?.name
+                        ? `${service.medicine.name} (Issued: ${formatDate(service.medicine.dateIssued)})`
+                        : "N/A"}
                     </TableCell>
-                    <TableCell>
-                      {service.medicine.length > 0 ? (
-                        <ul className="list-disc list-inside max-h-32 overflow-y-auto">
-                          {service.medicine.map((med, idx) => (
-                            <li key={idx}>
-                              Name: {med.name}, Issued: {formatDate(med.dateIssued)}, Start: {formatDate(med.start)}, End: {formatDate(med.end)}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        "N/A"
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {service.billing.length > 0 ? (
-                        <ul className="list-disc list-inside max-h-32 overflow-y-auto">
-                          {service.billing.map((bill, idx) => (
-                            <li key={idx}>
-                              ID: {bill.id}, Issued: {formatDate(bill.dateIssued)}, Due: {formatDate(bill.dueDate)}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        "N/A"
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {service.insurance.length > 0 ? (
-                        <ul className="list-disc list-inside max-h-32 overflow-y-auto">
-                          {service.insurance.map((insurance, idx) => (
-                            <li key={idx}>
-                              Provider: {insurance.providerName}, Expiration: {formatDate(insurance.expirationDate)}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        "N/A"
-                      )}
-                    </TableCell>
+                    <TableCell>{service.insurance?.providerName ?? "N/A"}</TableCell>
+                    <TableCell>{service.appointmentCreationMethod ?? "N/A"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

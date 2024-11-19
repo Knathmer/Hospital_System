@@ -14,6 +14,7 @@ import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
 import DoctorDashboard from '../users/doctor/DoctorDashboard';
 import DocAppointmentsPage from '../users/doctor/sidebar/upcomingAppointments/DocAppointmentsPage.jsx';
 import DoctorBookingPage from '../users/doctor/DoctorBookingPage.jsx';
+import PatientReports from '../users/admin/sections/patientReport/PatientReport.jsx';
 import DoctorSchedulePage from "../../pages/doctorPages/DoctorSchedulePage.jsx";
 
 export default function DoctorSidebar() {
@@ -111,7 +112,7 @@ export default function DoctorSidebar() {
         {activeTab === 'schedule' && <DoctorSchedulePage />}
         {activeTab === 'patients-list' && (
           <div>
-            <p className="text-gray-700">Place patients list file here</p>
+            <p className="text-gray-700"><PatientReports /></p>
           </div>
         )}
       </main>
