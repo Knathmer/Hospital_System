@@ -32,7 +32,7 @@ const PatientContainer = () => {
     <GenericContainer>
       <h2 className="text-xl font-semibold mb-4 flex items-center">
         <UserPlus className="h-5 w-5 text-blue-500 mr-2" />
-        Patient Requests
+        Patients
       </h2>
       {/* Scrollable list */}
       <ul className="space-y-2 max-h-[200px] overflow-y-auto">
