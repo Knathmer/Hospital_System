@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import GenericContainer from "./GenericContainer.jsx";
 import { UserPlus } from "lucide-react";
-import NavButton from "../../../../ui/buttons/NavButton.jsx";
 import axios from "axios";
-import envConfig from "../../../../../envConfig.js"
+import envConfig from "../../../../../envConfig.js";
 
 const PatientContainer = () => {
   const [patients, setPatients] = useState([]);
@@ -35,23 +34,17 @@ const PatientContainer = () => {
         <UserPlus className="h-5 w-5 text-blue-500 mr-2" />
         Patient Requests
       </h2>
+      {/* Scrollable list */}
       <ul className="space-y-2 max-h-[200px] overflow-y-auto">
         {patients.map((patient, index) => (
-          <li key={index}>
-            <span className="font-medium text-sm text-gray-700">{patient.patientName}</span>
-            <br />
-            <span className="text-sm text-gray-500">
+          <li key={index} className="border-b pb-2">
+            <p className="font-medium text-sm text-gray-700">{patient.patientName}</p>
+            <p className="text-sm text-gray-500">
               {patient.isPrimary} Patient
-            </span>
+            </p>
           </li>
         ))}
       </ul>
-      {/* <NavButton
-        to="/doctor/dashboard?tab=appointments"
-        className="mt-4 bg-blue-500 text-white hover:bg-blue-600"
-      >
-        View All Requests
-      </NavButton> */}
     </GenericContainer>
   );
 };

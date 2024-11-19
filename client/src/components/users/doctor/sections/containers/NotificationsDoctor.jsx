@@ -32,24 +32,26 @@ const OfficeDoc = () => {
         <Hospital className="h-5 w-5 text-blue-500 mr-2" />
         Office Information
       </h2>
-      {office ? (
-        <ul className="space-y-2">
-          <li className="text-sm">
-            <strong>Office Name:</strong> {office.officeName}
-          </li>
-          <li className="text-sm">
-            <strong>Address:</strong> {office.address}
-          </li>
-          <li className="text-sm">
-            <strong>Phone:</strong> {office.phone}
-          </li>
-          <li className="text-sm">
-            <strong>Email:</strong> {office.email}
-          </li>
-        </ul>
-      ) : (
-        <p className="text-sm text-gray-500">Loading office information...</p>
-      )}
+      <div className="max-h-[200px] overflow-y-auto">
+        {office ? (
+          <ul className="space-y-2">
+            <li className="text-sm">
+              <strong>Office Name:</strong> {office.officeName}
+            </li>
+            <li className="text-sm">
+              <strong>Address:</strong> {office.address}
+            </li>
+            <li className="text-sm">
+              <strong>Phone:</strong> {office.phone}
+            </li>
+            <li className="text-sm">
+              <strong>Email:</strong> {office.email}
+            </li>
+          </ul>
+        ) : (
+          <p className="text-sm text-gray-500">Loading office information...</p>
+        )}
+      </div>
       {/* <NavButton variant="outline" className="mt-4">
         View More Details
       </NavButton> */}
