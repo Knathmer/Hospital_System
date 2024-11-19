@@ -42,7 +42,7 @@ export default function DoctorNameDisplay() {
       <div>
         <h2 className="text-lg font-bold text-pink-600">Welcome</h2>
         <p className="text-sm text-gray-700">
-          {name.firstName} {name.lastName}
+          Dr. {name.lastName}
         </p>
       </div>
     </div>

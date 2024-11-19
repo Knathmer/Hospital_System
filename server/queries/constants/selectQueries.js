@@ -91,6 +91,37 @@ export const SELECT_RECENT_MED_REQ_DB = `SELECT status, requestDate FROM refill 
 
 export const SELECT_BILLING_DB = `SELECT dueDate, paidStatus FROM bill WHERE patientID = ?`;
 
+// doctor dashboard 
+export const SELECT_DOCTOR_APPOINTMENTS = `
+  SELECT 
+    a.status AS appointmentStatus,
+    p.firstName AS patientFirstName,
+    p.lastName AS patientLastName,
+    a.appointmentDateTime AS appointmentDateTime
+  FROM 
+    appointment AS a
+  JOIN 
+    patient AS p ON a.patientID = p.patientID
+  WHERE 
+    a.doctorID = ?
+  ORDER BY 
+    a.appointmentDateTime ASC;
+`;
+
+// export const SELECT_PATIENT_DOC = `
+// SELECT 
+//     pd.patientID, 
+//     p.firstName AS patientFirstName, 
+//     p.lastName AS patientLastName, 
+//     pd.isPrimary
+// FROM 
+//     patient_doctor AS pd
+// JOIN 
+//     patient AS p ON pd.patientID = p.patientID
+// WHERE 
+//     pd.doctorID = ?;
+
+// `
 // Admin Dashboard DB Queries
 export const SELECT_TOTAL_DOC = "SELECT COUNT(*) AS totalDoctors FROM doctor";
 export const SELECT_TOTAL_PATIENT =
