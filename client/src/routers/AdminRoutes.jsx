@@ -7,6 +7,7 @@ import ManagePatients from "../components/users/admin/sections/managePatients";
 import Settings from "../components/users/admin/sections/settings";
 import AppointmentAnalytics from "../components/users/admin/sections/appointmentReport/appointmentAnalytics";
 import AdminSidebar from "../components/userLoginRoot/AdminSidebar";
+import FinancialOverviewPage from "../pages/adminPages/FinancialReport";
 
 import PrescriptionSummaryReport from "../components/users/admin/reports/PrescriptionSummaryReport";
 
@@ -17,6 +18,8 @@ const AdminRoutes = () => {
       <Route path="manage-patients" element={<ManagePatients />} />
       <Route path="manage-doctors" element={<DoctorManagement />} />
       <Route path="appointmentAnalytics" element={<AppointmentAnalytics />} />
+      <Route path="financial-report" element={<FinancialOverviewPage />} />
+
       <Route path="settings" element={<Settings />} />
       {/* Add other admin routes here */}
       <Route

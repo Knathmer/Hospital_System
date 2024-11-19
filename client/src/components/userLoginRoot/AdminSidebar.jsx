@@ -23,6 +23,7 @@ import AdminNameDisplay from "./sidebarItems/WelcomeAdminName";
 import AdminDashboard from "../users/admin/adminDashboard/AdminDashboard";
 import PrescriptionSummaryReport from "../users/admin/reports/PrescriptionSummaryReport";
 import AppointmentAnalytics from "../users/admin/sections/appointmentReport/appointmentAnalytics";
+import FinancialOverviewPage from "../../pages/adminPages/FinancialReport";
 import DoctorReports from "../users/admin/reports/adminDoctorReport";
 import DoctorManagement from "../users/admin/sections/doctorManagement/doctorManagement";
 import PatientManagement from "../users/admin/sections/patientManagement/patientManagement";
@@ -135,7 +136,6 @@ export default function AdminSidebar() {
         {activeTab === "manage-patients" && <PatientManagement />}
         {activeTab === "manage-doctors" && <DoctorManagement />}
         {activeTab === "register-doctor" && <RegisterDoctor />}
-        {activeTab === "billing-data" && <div>bill stuff</div>}
         {activeTab === "prescription-analysis" && (
           <div>
             <PrescriptionSummaryReport />
@@ -143,6 +143,7 @@ export default function AdminSidebar() {
         )}
 
         {activeTab === "appointment-data" && <AppointmentAnalytics />}
+        {activeTab === "billing-data" && <FinancialOverviewPage />}
         
         {activeTab === "doctor-data" && <DoctorReports />}
         {activeTab === "patient-data" && <PatientReports />}
