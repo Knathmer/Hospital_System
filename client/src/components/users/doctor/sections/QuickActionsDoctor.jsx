@@ -8,7 +8,7 @@ const QuickActionsDoctor = () => {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <NavButton
           className="bg-blue-500 text-white hover:bg-blue-600"
-          to="/doctor/schedule"
+          to="/doctor/dashboard?tab=schedule"
         >
           View Schedule
         </NavButton>
@@ -20,7 +20,7 @@ const QuickActionsDoctor = () => {
         </NavButton>
         <NavButton
           className="bg-blue-500 text-white hover:bg-blue-600"
-          to="/doctor/patient-list"
+          to="/doctor/dashboard?tab=patient-list"
         >
           Patient List
         </NavButton>

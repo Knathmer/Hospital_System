@@ -8,6 +8,17 @@ export async function getPatientServices(req, res) {
         patientName: `${row.patientFirstName} ${row.patientLastName}`,
         doctorFirstName: row.doctorFirstName,
         doctorLastName: row.doctorLastName,
+        appointments: row.appointmentIDs
+          ? row.appointmentIDs.split(",").map((id, index) => ({
+              id,
+              createdAt: row.appointmentCreatedAts
+                ? row.appointmentCreatedAts.split(",")[index] || null
+                : null,
+              updatedAt: row.appointmentUpdatedAts
+                ? row.appointmentUpdatedAts.split(",")[index] || null
+                : null,
+            }))
+          : [],
         medicalRecords: {
           allergy: row.allergy,
           disability: row.disability,

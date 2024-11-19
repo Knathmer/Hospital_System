@@ -196,7 +196,7 @@ export default function AppointmentPage() {
   }, []);
 
   const handleBackClick = () => {
-    navigate("/doctor/schedule");
+    navigate("/doctor/dashboard?tab=schedule");
   };
 
   const fetchAllPharmacies = async () => {
@@ -439,7 +439,7 @@ export default function AppointmentPage() {
       );
 
       alert("Appointment marked as complete.");
-      navigate("/doctor/schedule");
+      navigate("/doctor/dashboard?tab=schedule");
     } catch (error) {
       console.error("Error completing appointment:", error);
       alert(

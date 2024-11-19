@@ -119,6 +119,8 @@ const DoctorBookingPage = () => {
                   <option value="Scheduled">Scheduled</option>
                   <option value="Completed">Completed</option>
                   <option value="Cancelled">Cancelled</option>
+                  <option value="Missed">Cancelled</option>
+                  <option value="Request Denied">Cancelled</option>
                 </select>
                 <input
                   type="text"
@@ -211,6 +213,9 @@ const DoctorBookingPage = () => {
                           <option value="Scheduled">Scheduled</option>
                           <option value="Completed">Completed</option>
                           <option value="Cancelled">Cancelled</option>
+                          <option value="Missed">Cancelled</option>
+                          <option value="Request Denied">Cancelled</option>
+
                         </select>
                       ) : (
                         <span
