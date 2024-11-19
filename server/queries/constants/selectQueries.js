@@ -118,86 +118,40 @@ export const SELECT_UPCOMING_APPOINTMENTS_ADMIN = `
 `;
 
 // admin-patient-report
-// export const SELECT_PATIENT_SERVICES = `
-// SELECT
-//     p.firstName AS patientFirstName,
-//     p.lastName AS patientLastName,
-//     a.appointmentID AS appointmentID,
-//     a.createdAt AS appointmentCreatedAt,
-//     a.updatedAt AS appointmentUpdatedAt,
-//     al.allergen AS medicalAllergy,
-//     d.disabilityType AS medicalDisability,
-//     s.surgeryType AS medicalSurgery,
-//     pr.medicationName AS prescriptionMedicationName,
-//     pr.dateIssued AS prescriptionDateIssued,
-//     pr.start AS prescriptionStartDate,
-//     pr.end AS prescriptionEndDate,
-//     b.billID AS billingID,
-//     b.dateIssued AS billingDateIssued,
-//     b.dueDate AS billingDueDate,
-//     i.providerName AS insuranceProvider,
-//     i.coverage_expiration_date AS insuranceExpirationDate
-// FROM
-//     patient AS p
-// LEFT JOIN
-//     appointment AS a ON p.patientID = a.patientID
-// LEFT JOIN
-//     allergy AS al ON p.patientID = al.patientID
-// LEFT JOIN
-//     disability AS d ON p.patientID = d.patientID
-// LEFT JOIN
-//     surgery AS s ON p.patientID = s.patientID
-// LEFT JOIN
-//     prescription AS pr ON p.patientID = pr.patientID
-// LEFT JOIN
-//     bill AS b ON p.patientID = b.patientID
-// LEFT JOIN
-//     insurance AS i ON p.patientID = i.patientID
-// ORDER BY
-//     p.patientID, a.createdAt;
-
-// `;
 export const SELECT_PATIENT_SERVICES = `
 SELECT 
     p.firstName AS patientFirstName,
     p.lastName AS patientLastName,
-    GROUP_CONCAT(DISTINCT a.appointmentID) AS appointmentIDs,
-    GROUP_CONCAT(DISTINCT a.createdAt) AS appointmentCreatedAts,
-    GROUP_CONCAT(DISTINCT a.updatedAt) AS appointmentUpdatedAts,
-    GROUP_CONCAT(DISTINCT al.allergen) AS medicalAllergies,
-    GROUP_CONCAT(DISTINCT d.disabilityType) AS medicalDisabilities,
-    GROUP_CONCAT(DISTINCT s.surgeryType) AS medicalSurgeries,
-    GROUP_CONCAT(DISTINCT pr.medicationName) AS prescriptionMedicationNames,
-    GROUP_CONCAT(DISTINCT pr.dateIssued) AS prescriptionDatesIssued,
-    GROUP_CONCAT(DISTINCT pr.start) AS prescriptionStartDates,
-    GROUP_CONCAT(DISTINCT pr.end) AS prescriptionEndDates,
-    GROUP_CONCAT(DISTINCT b.billID) AS billingIDs,
-    GROUP_CONCAT(DISTINCT b.dateIssued) AS billingDatesIssued,
-    GROUP_CONCAT(DISTINCT b.dueDate) AS billingDueDates,
-    GROUP_CONCAT(DISTINCT i.providerName) AS insuranceProviders,
-    GROUP_CONCAT(DISTINCT i.coverage_expiration_date) AS insuranceExpirationDates
+    d.firstName AS doctorFirstName,
+    d.lastName AS doctorLastName,
+    al.allergen AS allergy,
+    dis.disabilityType AS disability,
+    s.surgeryType AS surgery,
+    s.surgeryDateTime AS surgeryDateTime,
+    pr.medicationName AS medicineName,
+    pr.dateIssued AS prescriptionDateIssued,
+    i.providerName AS insuranceProvider
 FROM 
     patient AS p
 LEFT JOIN 
     appointment AS a ON p.patientID = a.patientID
 LEFT JOIN 
+    doctor AS d ON a.doctorID = d.doctorID
+LEFT JOIN 
     allergy AS al ON p.patientID = al.patientID
 LEFT JOIN 
-    disability AS d ON p.patientID = d.patientID
+    disability AS dis ON p.patientID = dis.patientID
 LEFT JOIN 
     surgery AS s ON p.patientID = s.patientID
 LEFT JOIN 
     prescription AS pr ON p.patientID = pr.patientID
 LEFT JOIN 
-    bill AS b ON p.patientID = b.patientID
-LEFT JOIN 
     insurance AS i ON p.patientID = i.patientID
-GROUP BY 
-    p.patientID
 ORDER BY 
     p.patientID;
 
 `;
+
 
 export const SELECT_DOCTORS_WITH_SPECIALTY = `
   SELECT 
