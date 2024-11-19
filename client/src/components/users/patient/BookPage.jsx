@@ -243,7 +243,7 @@ function BookPage() {
 
     try {
       const token = localStorage.getItem("token");
-      const formattedTime = convertTo24HourFormat(time); // Convert to 24-hour format
+      const formattedTime = new Date(convertTo24HourFormat(time)).toLocaleString(); // Convert to 24-hour format
 
       // Debugging: Log the data being sent
       console.log({
