@@ -14,11 +14,8 @@ import SidebarToggleButton from '../ui/buttons/SidebarToggleButton';
 import DoctorDashboard from '../users/doctor/DoctorDashboard';
 import DocAppointmentsPage from '../users/doctor/sidebar/upcomingAppointments/DocAppointmentsPage.jsx';
 import DoctorBookingPage from '../users/doctor/DoctorBookingPage.jsx';
-<<<<<<< HEAD
 import PatientReports from '../users/admin/sections/patientReport/PatientReport.jsx';
-=======
 import DoctorSchedulePage from "../../pages/doctorPages/DoctorSchedulePage.jsx";
->>>>>>> main
 
 export default function DoctorSidebar() {
   const [activeTab, setActiveTab] = useState('dashboard');
