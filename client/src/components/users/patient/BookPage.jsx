@@ -259,7 +259,7 @@ function BookPage() {
 
     try {
       const token = localStorage.getItem("token");
-      const formattedTime = convertTo24HourFormat(time); // Convert to 24-hour format
+      const formattedTime = convertTo24HourFormat(time) // Convert to 24-hour format
 
       // Extract year, month, day from the date input
       const [year, month, day] = date.split("-").map(Number);
